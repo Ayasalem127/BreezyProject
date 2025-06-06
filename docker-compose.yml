@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "4000:4000"
+    env_file:
+      - ./auth-service/.env
+    depends_on:
+      - mongo_auth
+
+  user-service:
+    build: ./user-service
+    ports:
+      - "4001:4001"
+    env_file:
+      - ./user-service/.env
+    depends_on:
+      - mongo_user
+
+  gateway:
+    build: ./gateway
+    ports:
+      - "3001:3001"
+    depends_on:
+      - auth-service
+      - user-service
+
+  # MongoDB pour auth-service
+  mongo_auth:
+    image: mongo
+    container_name: breezy-mongo-auth
+    ports:
+      - "27017:27017"
+    volumes:
+      - auth_data:/data/db
+
+  # MongoDB pour user-service
+  mongo_user:
+    image: mongo
+    container_name: breezy-mongo-user
+    ports:
+      - "27018:27017"
+    volumes:
+      - user_data:/data/db
+
+volumes:
+  auth_data:
+  user_data:

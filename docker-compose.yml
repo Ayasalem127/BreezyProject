@@ -1,14 +1,32 @@
 version: "3.8"
 
 services:
+  comment-service:
+    build: ./comment-service
+    ports:
+      - "4004:4004"
+    env_file:
+      - ./comment-service/.env
+    depends_on:
+      - mongo_comment
+
   auth-service:
     build: ./auth-service
     ports:
       - "4000:4000"
-    env_file:
-      - ./auth-service/.env
+    # env_file:
+    #   - ./auth-service/.env
     depends_on:
       - mongo_auth
+
+  post-service:
+    build: ./post-service
+    ports:
+      - "4002:4002"
+    env_file:
+      - ./post-service/.env
+    depends_on:
+      - mongo_post
 
   user-service:
     build: ./user-service
@@ -26,6 +44,9 @@ services:
     depends_on:
       - auth-service
       - user-service
+      - post-service
+      - comment-service
+      
 
   # MongoDB pour auth-service
   mongo_auth:
@@ -45,6 +66,26 @@ services:
     volumes:
       - user_data:/data/db
 
+  # MongoDB pour post-service
+  mongo_post:
+    image: mongo
+    container_name: breezy-mongo-post
+    ports:
+      - "27019:27017"
+    volumes:
+      - post_data:/data/db
+
+#  MongoDB pour comment-service
+  mongo_comment:
+    image: mongo
+    container_name: breezy-mongo-comment
+    ports:
+      - "27020:27017"
+    volumes:
+      - comment_data:/data/db
+
 volumes:
   auth_data:
   user_data:
+  post_data:
+  comment_data:

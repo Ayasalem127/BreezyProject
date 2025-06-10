@@ -5,8 +5,8 @@ const userProfileSchema = new mongoose.Schema({
   displayName: { type: String },
   bio: { type: String },
   avatarUrl: { type: String },
-  followers: [{ type: ObjectId, ref: 'UserProfile' }],
-  following: [{ type: ObjectId, ref: 'UserProfile' }]
+  followers: [{ type: String, ref: 'UserProfile' }],
+  following: [{ type: String, ref: 'UserProfile' }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('UserProfile', userProfileSchema);

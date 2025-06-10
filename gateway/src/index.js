@@ -13,6 +13,17 @@ app.use('/user', createProxyMiddleware({
   changeOrigin: true
 }));
 
+app.use('/posts', createProxyMiddleware({
+  target: 'http://localhost:4002/posts',
+  changeOrigin: true
+}));
+
+app.use('/comments', createProxyMiddleware({
+  target: 'http://localhost:4003/comments',
+  changeOrigin: true
+}));
+
+
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`🚀 API Gateway listening on port ${PORT}`);

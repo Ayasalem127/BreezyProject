@@ -8,4 +8,6 @@ router.put('/:userId', controller.updateProfile);
 router.post('/:userId/follow', controller.followUser);
 router.post('/:userId/unfollow', controller.unfollowUser);
 
+router.get("/:userId/following", controller.getFollowing);
+
 module.exports = router;

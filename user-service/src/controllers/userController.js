@@ -52,8 +52,8 @@ exports.followUser = async (req, res) => {
 
     if (!user || !follower) return res.status(404).json({ message: "Utilisateurs non trouvés" });
 
-    if (!user.followers.includes(follower._id)) user.followers.push(follower._id);
-    if (!follower.following.includes(user._id)) follower.following.push(user._id);
+    if (!user.followers.includes(follower.userId)) user.followers.push(follower.userId);
+    if (!follower.following.includes(user.userId)) follower.following.push(user.userId);
 
     await user.save();
     await follower.save();
@@ -74,8 +74,8 @@ exports.unfollowUser = async (req, res) => {
 
     if (!user || !follower) return res.status(404).json({ message: "Utilisateurs non trouvés" });
 
-    user.followers = user.followers.filter(id => id !== followerId);
-    follower.following = follower.following.filter(id => id !== userId);
+    user.followers = user.followers.filter(id => id !== follower.userId);
+    follower.following = follower.following.filter(id => id !== user.userId);
 
     await user.save();
     await follower.save();
@@ -83,5 +83,22 @@ exports.unfollowUser = async (req, res) => {
     res.json({ message: "Unfollow réussi" });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+
+exports.getFollowing = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await UserProfile.findOne({ userId });
+
+    if (!user) return res.status(404).json({ message: "Utilisateur non trouvé." });
+
+    // On renvoie la liste des _id MongoDB des utilisateurs suivis
+    res.json({ following: user.following });
+  } catch (err) {
+    console.error("Erreur getFollowing :", err.message);
+    res.status(500).json({ message: "Erreur serveur." });
   }
 };

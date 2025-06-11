@@ -2,12 +2,79 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Debug Auth Service (Docker)",
+      "type": "node",
+      "request": "attach",
+      "port": 9230,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/auth-service",
+      "remoteRoot": "/app",
+      "restart": true,
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Debug Auth Service (Local)",
       "type": "node",
       "request": "launch",
-      "name": "Debug Auth Service",
       "program": "${workspaceFolder}/auth-service/src/index.js",
       "envFile": "${workspaceFolder}/auth-service/.env",
       "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Debug User Service",
+      "type": "node",
+      "request": "attach",
+      "port": 9232,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/user-service",
+      "remoteRoot": "/app",
+      "restart": true,
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Debug Post Service",
+      "type": "node",
+      "request": "attach",
+      "port": 9231,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/post-service",
+      "remoteRoot": "/app",
+      "restart": true,
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Debug Comment Service",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/comment-service",
+      "remoteRoot": "/app",
+      "restart": true,
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Debug Gateway",
+      "type": "node",
+      "request": "attach",
+      "port": 9233,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/gateway",
+      "remoteRoot": "/app",
+      "restart": true,
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug All Services",
+      "configurations": [
+        "Debug Auth Service",
+        "Debug User Service", 
+        "Debug Post Service",
+        "Debug Comment Service",
+        "Debug Gateway"
+      ]
     }
   ]
 }

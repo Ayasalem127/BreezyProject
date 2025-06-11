@@ -9,15 +9,8 @@ const JWT_SECRET = process.env.JWT_SECRET;
 router.post('/register',authController.register);
 
 router.post('/login',authController.login );
+router.get('/authenticate',authController.authenticate );
 
-router.post('/verify-token', (req, res) => {
-  const { token } = req.body;
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    res.json({ valid: true, decoded });
-  } catch {
-    res.status(401).json({ valid: false });
-  }
-});
+
 
 module.exports = router;

@@ -4,8 +4,7 @@ const axios = require("axios");
 exports.createPost = async (req, res) => {
   try {
     const { content } = req.body;
-    //const idUser=req.headers['user-id']
-    const idUser=12345;
+    const idUser=req.headers['x-user-id']
     if (!content || content.length > 280) {
       return res.status(400).json({ message: "Le contenu est requis (max 280 caractères)." });
     }
@@ -34,9 +33,10 @@ exports.updatePost = async (req, res) => {
 
     const post = await Post.findById(postId);
     if (!post) return res.status(404).json({ message: "Post non trouvé." });
-
+     const idUser=req.headers['x-user-id']
+        const roleUser=req.headers['x-user-role']
     // Vérifie si l'utilisateur est l'auteur ou un admin
-    if (post.author !== req.user.id && req.user.role !== "admin" && req.user.role !== "moderator") {
+    if (post.author !== idUser && roleUser !== "admin" && roleUser !== "moderator") {
       return res.status(403).json({ message: "Non autorisé à modifier ce post." });
     }
 
@@ -56,8 +56,10 @@ exports.deletePost = async (req, res) => {
     const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).json({ message: "Post non trouvé." });
 
+        const idUser=req.headers['x-user-id']
+        const roleUser=req.headers['x-user-role']
     // Vérifie autorisation
-    if (post.author !== req.user.id && req.user.role !== "admin" && req.user.role !== "moderator") {
+    if (post.author !== idUser && roleUser!== "admin" && roleUser !== "moderator") {
       return res.status(403).json({ message: "Non autorisé à supprimer ce post." });
     }
 
@@ -71,9 +73,9 @@ exports.deletePost = async (req, res) => {
 //voir les posts d'un utilisateur
 exports.getPostsByUser = async (req, res) => {
   try {
-    const { userId } = req.params;
+          const idUser=req.headers['x-user-id']
 
-    const posts = await Post.find({ author: userId })
+    const posts = await Post.find({ author: idUser })
       .sort({ createdAt: -1 }); // Tri du plus récent au plus ancien
 
     //nmbre de likes du post
@@ -91,7 +93,8 @@ exports.getPostsByUser = async (req, res) => {
 //voir mes posts
 exports.getMyPosts = async (req, res) => {
   try {
-    const posts = await Post.find({ author: req.user.id })
+          const idUser=req.headers['x-user-id']
+    const posts = await Post.find({ author: idUser })
       .sort({ createdAt: -1 });
 
     posts.forEach(post => {
@@ -108,10 +111,9 @@ exports.getMyPosts = async (req, res) => {
 //voir mon feed avec les utilisateurs suivis
 exports.getFeed = async (req, res) => {
   try {
-    const userId = req.user.id;
-
+         const idUser=req.headers['x-user-id']
     //  Appel REST vers le user-service pour récupérer la liste des followings
-    const response = await axios.get(`http://localhost:3001/user/api/users/${userId}/following`, {
+    const response = await axios.get(`http://localhost:3001/user/api/users/${idUser}/following`, {
   headers: {
     Authorization: req.headers.authorization
   }
@@ -143,8 +145,8 @@ exports.getFeed = async (req, res) => {
 exports.toggleLikePost = async (req, res) => {
   try {
     const postId = req.params.id;
-    const userId = req.user.id;
 
+    const idUser=req.headers['x-user-id']
     const post = await Post.findById(postId);
     if (!post) return res.status(404).json({ message: "Post non trouvé." });
 
@@ -152,10 +154,10 @@ exports.toggleLikePost = async (req, res) => {
 
     if (hasLiked) {
       // Dislike → on enlève l'ID
-      post.likes = post.likes.filter(id => id !== userId);
+      post.likes = post.likes.filter(id => id !== idUser);
     } else {
       // Like → on ajoute l'ID
-      post.likes.push(userId);
+      post.likes.push(idUser);
     }
 
     await post.save();

@@ -1,25 +1,35 @@
 const express = require('express');
+const {validateJWT}=require("./middleware/jwt")
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
 
+// Routes publiques (sans JWT)
 app.use('/auth', createProxyMiddleware({
-  target: 'http://localhost:4000/auth', // ou 'http://auth-service:4000' en Docker
+  target: 'http://localhost:4000', // ou 'http://auth-service:4000' en Docker
   changeOrigin: true
 }));
 
-app.use('/user', createProxyMiddleware({
-  target: 'http://localhost:4001/user',
+// Routes protégées (avec JWT)
+app.use('/user',createProxyMiddleware({
+  target: 'http://localhost:4001',
+   changeOrigin: true
+// ,
+//   onProxyReq: (proxyReq, req, res) => {
+// // Transmettre les headers enrichis
+// proxyReq.setHeader('X-User-ID', req.headers['x-user-id']);
+// proxyReq.setHeader('X-User-Email', req.headers['x-user-email']);
+// proxyReq.setHeader('X-User-Role', req.headers['x-user-role']);
+// }
+}));
+
+app.use('/posts',validateJWT, createProxyMiddleware({
+  target: 'http://localhost:4002',
   changeOrigin: true
 }));
 
-app.use('/posts', createProxyMiddleware({
-  target: 'http://localhost:4002/posts',
-  changeOrigin: true
-}));
-
-app.use('/comments', createProxyMiddleware({
-  target: 'http://localhost:4003/comments',
+app.use('/comments',validateJWT, createProxyMiddleware({
+  target: 'http://localhost:4003',
   changeOrigin: true
 }));
 

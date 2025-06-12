@@ -1,7 +1,34 @@
 'use client';
 
+import { useState, useRef } from 'react';
+
 export default function ProfilModification() {
     const infos = ["username", "/logo.webp", "Description"];
+    const [image, setImage] = useState(infos[1]);
+    const fileInputRef = useRef(null);
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith("image/")) {
+          const reader = new FileReader();
+          reader.onload = () => setImage(reader.result);
+          reader.readAsDataURL(file);
+        }
+      };
+    
+      const handleDragOver = (e) => e.preventDefault();
+    
+      const handleClick = () => fileInputRef.current.click();
+    
+      const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith("image/")) {
+          const reader = new FileReader();
+          reader.onload = () => setImage(reader.result);
+          reader.readAsDataURL(file);
+        }
+      };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -23,7 +50,21 @@ export default function ProfilModification() {
     return (
         <div className="flex items-center justify-center">
             <form onSubmit={handleSubmit} className="p-4 rounded-lg w-full max-w-sm space-y-6">
-                <img src={infos[1]} alt="logo" className="w-50 h-50 object-contain mb-2 rounded-full mx-auto"/>
+                <div
+                onClick={handleClick}
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                className="w-32 h-32 mx-auto rounded-full overflow-hidden border-2 border-gray-300 cursor-pointer flex items-center justify-center bg-gray-100"
+                >
+                <img src={image} alt="Profil" className="object-cover w-full h-full" />
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    ref={fileInputRef}
+                    className="hidden"
+                />
+                </div>
 
                 <div>
                 <label htmlFor="username" className="block text-sm font-medium text-gray-700">Nom d'utilisateur</label>

@@ -3,9 +3,17 @@ const axios = require("axios");
 
 exports.createPost = async (req, res) => {
   try {
+      const userId = req.headers['x-user-id'];
+  const username = req.headers['x-user-username'];
+  const role = req.headers['x-user-role'];
+
+  console.log("USER ID:", userId);         // Doit afficher 684983...
+  console.log("USERNAME:", username);      // Doit afficher le username
+  console.log("ROLE:", role);              // Doit afficher "user"
     const { content } = req.body;
     const idUser=req.headers['x-user-id']
-    console.log("iduserrrrrrrrrr",req)
+    console.log("headersss",req.headers)
+     console.log("iduserrrrrrrrrr",req.headers['x-user-id'])
       if (!idUser) {
       return res.status(400).json({ message: 'Identifiant utilisateur (author) manquant dans les headers.' });
     }

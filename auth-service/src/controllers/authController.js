@@ -40,7 +40,7 @@ exports.register = async (req, res, next) => {
     // const code = Math.floor(100000 + Math.random() * 900000).toString();
     // await sendVerificationEmail(email, code);
 
-    const token = generateToken({ id: user._id, username: user.displayName , role:"user"  });
+    const token = generateToken({ id: user._id, username: username , role:"user"  });
     res.status(201).json({ message: "Compte créé. Un code vous a été envoyé par email.", token });
 
   } catch (err) {
@@ -54,7 +54,7 @@ exports.login =async (req, res) => {
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    const token = jwt.sign({ id: user._id, username: user.displayName,role:"user" }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user._id, username: username,role:"user" }, JWT_SECRET, { expiresIn: '1h' });
     res.json({ token });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -73,14 +73,13 @@ exports.authenticate = async (req, res) => {
 
       if (err || !user) return res.sendStatus(403);
 
-    // Enrichir les headers pour Nginx
-res.set('x-user-id', user.id);
-res.set('x-user-username', user.username);
-res.set('x-user-role', user.role);
+      res.set('X-User-Id', user.id);
+      res.set('X-User-Username', user.username || '');
+      res.set('X-User-Role', user.role || 'user');
 
-    console.log("RES:", res.headers);
-    return res.sendStatus(200);
+      return res.sendStatus(200); // 🔁 pas de JSON ici
     });
+
   } catch (error) {
     console.error("Erreur auth:", error);
     return res.sendStatus(500);

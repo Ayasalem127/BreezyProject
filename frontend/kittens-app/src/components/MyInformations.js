@@ -20,7 +20,7 @@ export default function MyInformations() {
                 <img src={infos[1]} alt="logo" className="w-50 h-50 object-contain mb-2 rounded-full mx-auto"/>
                 <span className="font-semibold">{infos[0]}</span>
                 <textarea readOnly type="text" id="description" value={infos[2]} className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"/>
-                <button style={{ backgroundColor: 'var(--buttons)' }} className="w-50 p-2 shadow-md rounded-md cursor-pointer transition">Modifier mon profil</button>
+                <button style={{ backgroundColor: 'var(--buttons)' }} className="w-50 p-2 shadow-md rounded-md cursor-pointer transition" onClick={handleModification}>Modifier mon profil</button>
             </div>
         </div>
     );

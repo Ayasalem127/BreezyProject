@@ -6,8 +6,14 @@ export default function Navbar() {
       style={{ backgroundColor: "var(--buttons)" }}
       className="fixed top-0 left-0 w-full h-16 flex items-center justify-between px-6 shadow-md z-50"
     >
-      {/* Zone gauche : Accueil, Abonnements, Messages */}
+      {/* Zone gauche : Logo + Accueil, Abonnements, Messages */}
       <div className="flex items-center space-x-6">
+        {/* 👉 Ton image logo à gauche */}
+        <img
+          src="/logo.webp" // remplace par l’image que tu veux
+          alt="Logo"
+          className="w-10 h-10 object-contain"
+        />
 
         <Link href="/home">
           <img

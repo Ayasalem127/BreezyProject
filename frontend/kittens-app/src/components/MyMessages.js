@@ -41,7 +41,7 @@ export default function MyMessages() {
         <div>
             <h2 className="text-2xl font-bold text-gray-800 p-5">Mes messages</h2>
         
-            <div className="flex flex-wrap w-full gap-4">
+            <div className="flex flex-col items-center w-full px-4">
                 {messages.map((message, index) => (
                 <div key={index} className="w-full sm:w-[calc(50%-0.5rem)] p-2 mt-4 box-border flex flex-col justify-between border rounded-lg">
                     <form onSubmit={(e) => handleModification(e, index)} className="rounded-lg w-full space-y-2">
@@ -78,7 +78,9 @@ export default function MyMessages() {
                         </div>
 
                         <div className="flex justify-end">
-                        <button type="submit">Publier</button>
+                        <div className="w-30">
+                            <button type="submit">Publier</button>
+                        </div>
                         </div>
                     </form>
                 </div>

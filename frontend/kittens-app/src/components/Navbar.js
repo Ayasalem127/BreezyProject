@@ -1,29 +1,57 @@
 import Link from "next/link";
 
 export default function Navbar() {
-    return (
-        <nav style={{ backgroundColor: 'var(--buttons)' }} className=" fixed bottom-0 left-0 w-full p-4 items-center">
-            <div className="container mx-auto flex justify-between items-center">
-                <Link href="/home">
-                    <img src="/home.png" alt="Home" className="w-10 h-10 object-contain" />
-                </Link>
+  return (
+    <nav
+      style={{ backgroundColor: "var(--buttons)" }}
+      className="fixed top-0 left-0 w-full h-16 flex items-center justify-between px-6 shadow-md z-50"
+    >
+      {/* Zone gauche : Accueil, Abonnements, Messages */}
+      <div className="flex items-center space-x-6">
 
-                <Link href="/">
-                    <img src="/messaging.png" alt="Messaging system" className="w-10 h-10 object-contain" />
-                </Link>
+        <Link href="/home">
+          <img
+            src="/home.png"
+            alt="Accueil"
+            className="w-8 h-8 hover:scale-110 transition-transform"
+          />
+        </Link>
 
-                <Link href="/notifications">
-                    <img src="/notification.png" alt="Notifications" className="w-10 h-10 object-contain" />
-                </Link>
+        <Link href="/subscriptions">
+          <img
+            src="/follow.png"
+            alt="Abonnements"
+            className="w-8 h-8 hover:scale-110 transition-transform"
+          />
+        </Link>
 
-                <Link href="/myProfile">
-                    <img src="/user.png" alt="User's profile" className="w-10 h-10 object-contain" />
-                </Link>
+        <Link href="/">
+          <img
+            src="/messaging.png"
+            alt="Messages"
+            className="w-8 h-8 hover:scale-110 transition-transform"
+          />
+        </Link>
+      </div>
 
-                <Link href="/subscriptions">
-                    <img src="/follow.png" alt="Subscribing" className="w-10 h-10 object-contain" />
-                </Link>
-            </div>
-        </nav>
-    );
+      {/* Zone droite : Notifications, Profil */}
+      <div className="flex items-center space-x-6">
+        <Link href="/notifications">
+          <img
+            src="/notification.png"
+            alt="Notifications"
+            className="w-8 h-8 hover:scale-110 transition-transform"
+          />
+        </Link>
+
+        <Link href="/myProfile">
+          <img
+            src="/logo.webp"
+            alt="Profil"
+            className="w-8 h-8 hover:scale-110 transition-transform"
+          />
+        </Link>
+      </div>
+    </nav>
+  );
 }

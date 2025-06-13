@@ -65,7 +65,9 @@ export default function MyMessages() {
                         </div>
 
                         <div className="flex justify-end">
-                            <button type="submit">Modifier</button>
+                            <div className="w-30">
+                                <button type="submit">Modifier</button>
+                            </div>
                         </div>
                     </form>
 

@@ -1,18 +1,32 @@
 'use client';
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function ConnectionForm() {
     const router = useRouter();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [passwordError, setPasswordError] = useState(true); // par défaut true
+
+    // Détection en temps réel du champ vide
+    useEffect(() => {
+        if (password.trim() === "") {
+            setPasswordError(true);
+        } else {
+            setPasswordError(false);
+        }
+    }, [password]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        //Affichage temporaire
+        if (password.trim() === "") {
+            setPasswordError(true);
+            return;
+        }
+
         console.log(`Email : ${email}`);
         console.log(`Mot de passe : ${password}`);
 
@@ -21,22 +35,46 @@ export default function ConnectionForm() {
         } catch (error) {
             console.error("Erreur : ", error);
         }
+    };
 
-    }
     return (
         <div className="flex items-center justify-center p-4">
             <form onSubmit={handleSubmit} className="p-4 rounded-lg w-full max-w-sm space-y-6">
                 <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Adresse e-mail</label>
-                <input type="email" id="email" className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" placeholder="exemple@domaine.com"/>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">Adresse e-mail</label>
+                    <input
+                        type="email"
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
+                        placeholder="exemple@domaine.com"
+                    />
                 </div>
 
                 <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">Mot de passe</label>
-                <input type="password" id="password" className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"/>
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-700">Mot de passe</label>
+                    <input
+                        type="password"
+                        id="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className={`bg-white mt-1 block w-full rounded-md p-2 border ${
+                            passwordError ? 'border-red-500' : 'border-gray-300'
+                        } focus:border-blue-500 focus:outline-none`}
+                    />
+                    {passwordError && (
+                        <p className="text-red-500 text-sm mt-1">Le mot de passe est requis.</p>
+                    )}
                 </div>
 
-                <button type="submit" style={{ backgroundColor: 'var(--buttons)' }} className="w-full p-2 shadow-md rounded-md cursor-pointer transition">Se connecter</button>
+                <button
+                    type="submit"
+                    style={{ backgroundColor: 'var(--buttons)' }}
+                    className="w-full p-2 shadow-md rounded-md cursor-pointer transition"
+                >
+                    Se connecter
+                </button>
             </form>
         </div>
     );

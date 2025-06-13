@@ -70,8 +70,6 @@ export default function ConnectionForm() {
 
                 <button
                     type="submit"
-                    style={{ backgroundColor: 'var(--buttons)' }}
-                    className="w-full p-2 shadow-md rounded-md cursor-pointer transition"
                 >
                     Se connecter
                 </button>

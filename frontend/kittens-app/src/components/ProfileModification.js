@@ -91,7 +91,7 @@ export default function ProfilModification() {
                 <input type="password" id="confirm_password" className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"/>
                 </div>
 
-                <button type="submit" style={{ backgroundColor: 'var(--buttons)' }} className="w-full p-2 shadow-md rounded-md cursor-pointer transition">Modifier</button>
+                <button type="submit">Modifier</button>
             </form>
         </div>
     );

@@ -21,7 +21,9 @@ export default function Publish() {
                 </div>
 
                 <div className="flex justify-end">
-                <button type="submit" style={{ backgroundColor: 'var(--buttons)' }} className="w-30 p-2 shadow-md rounded-md cursor-pointer transition">Publier</button>
+                <div className="w-30">
+                <button type="submit">Publier</button>
+                </div>
                 </div>
             </form>
         </div>

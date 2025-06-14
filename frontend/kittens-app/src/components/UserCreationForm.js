@@ -1,5 +1,8 @@
 'use client';
 
+import PopupEmptyFields from "./PopupEmptyFields";
+import PopupDifferentPasswords from "./PopupDifferentPasswords";
+
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
@@ -7,12 +10,32 @@ import { AiOutlineInfoCircle } from "react-icons/ai";
 export default function UserCreationForm() {
   const router = useRouter();
 
-  const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [confirmError, setConfirmError] = useState('');
+  const [showPopupEmpty, setShowPopupEmpty] = useState(false);
+  const [showPopupDifferent, setShowPopupDifferent] = useState(false);
+
+  useEffect(() => {
+      if (username.trim() === "") {
+          setUsernameError(true);
+      } else {
+          setUsernameError(false);
+      }
+  }, [username]);
+  
+  useEffect(() => {
+      if (email.trim() === "") {
+          setEmailError(true);
+      } else {
+          setEmailError(false);
+      }
+  }, [email]);
 
   const isValidPassword = (pwd) => {
     if (!pwd) return "Mot de passe requis.";
@@ -38,19 +61,32 @@ export default function UserCreationForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const usernameEmpty = username.trim() === '';
+    const emailEmpty = email.trim() === '';
+    const passwordEmpty = password.trim() === '';
+    const confirmPasswordEmpty = confirmPassword.trim() === '';
+
+    setEmailError(emailEmpty);
+    setUsernameError(usernameEmpty);
+    setPasswordError(passwordEmpty ? "Mot de passe requis." : "");
+    setConfirmError(confirmPasswordEmpty ? "Confirmation requise." : confirmPassword !== password ? "Le mot de passe ne correspond pas." : "");
+
+    if (usernameEmpty || emailEmpty || passwordEmpty || confirmPasswordEmpty) {
+      setShowPopupEmpty(true);
+      return;
+    }
+
     const pwdError = isValidPassword(password);
     if (pwdError) {
       setPasswordError(pwdError);
       return;
     }
 
-    if (!confirmPassword || confirmPassword !== password) {
+    if (confirmPassword !== password) {
+      setShowPopupDifferent(true);
       setConfirmError("Le mot de passe ne correspond pas.");
       return;
     }
-
-    setPasswordError("");
-    setConfirmError("");
 
     console.log("Email:", email);
     console.log("Username:", username);
@@ -64,20 +100,15 @@ export default function UserCreationForm() {
 
   return (
     <div className="flex items-center justify-center p-4">
-      <form onSubmit={handleSubmit} className="p-4 rounded-lg w-full max-w-sm space-y-6">
+      {showPopupEmpty && (
+      <PopupEmptyFields onClose={() => setShowPopupEmpty(false)} />
+      )}
 
-        {/* Email */}
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Adresse e-mail</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className={`${inputBase} border border-black`}
-            placeholder="exemple@domaine.com"
-          />
-        </div>
+      {showPopupDifferent && (
+      <PopupDifferentPasswords onClose={() => setShowPopupDifferent(false)} />
+      )}
+
+      <form onSubmit={handleSubmit} className="p-4 rounded-lg w-full max-w-sm space-y-6">
 
         {/* Nom d'utilisateur */}
         <div>
@@ -87,8 +118,31 @@ export default function UserCreationForm() {
             id="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className={`${inputBase} border border-black`}
+            className={`bg-white mt-1 block w-full rounded-md p-2 border ${
+                usernameError ? 'border-red-500' : 'border-gray-300'
+            } focus:border-blue-500 focus:outline-none`}
           />
+          {usernameError && (
+              <p className="text-red-500 text-sm mt-1">Un nom d'utilisateur est requis.</p>
+          )}
+        </div>
+
+        {/* Email */}
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Adresse e-mail</label>
+          <input
+            type="email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={`bg-white mt-1 block w-full rounded-md p-2 border ${
+                emailError ? 'border-red-500' : 'border-gray-300'
+            } focus:border-blue-500 focus:outline-none`}
+            placeholder="exemple@domaine.com"
+          />
+          {emailError && (
+              <p className="text-red-500 text-sm mt-1">Une adresse email est requise.</p>
+          )}
         </div>
 
         {/* Mot de passe + icône info */}

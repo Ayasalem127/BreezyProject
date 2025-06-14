@@ -9,7 +9,7 @@ export default function Home() {
       </div>
       <div className="flex flex-col items-center justify-center text-center space-y-4">
         <div className="flex flex-col items-center justify-center rounded-2xl shadow-2xl border border-gray-500 w-2/3 h-9/10">
-          <h1 className="text-4xl font-bold text-gray-800">Création de compte</h1>
+          <h1 className="text-4xl font-bold text-gray-800 mt-10">Création de compte</h1>
           <main>
             <UserCreationForm />
           </main>

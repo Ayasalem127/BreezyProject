@@ -93,7 +93,7 @@ export default function UserCreationForm() {
     console.log("Mot de passe:", password);
     console.log("Confirmation:", confirmPassword);
 
-    router.push("/");
+    router.push("/profileModification");
   };
 
   const inputBase = "bg-white mt-1 block w-full rounded-md p-2 focus:outline-none focus:border-blue-500";

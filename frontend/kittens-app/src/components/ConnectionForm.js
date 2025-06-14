@@ -1,5 +1,8 @@
 'use client';
 
+import PopupEmptyFields from "./PopupEmptyFields";
+import PopupWrongCredentials from "./PopupWrongCredentials";
+
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -7,8 +10,11 @@ export default function ConnectionForm() {
     const router = useRouter();
 
     const [email, setEmail] = useState('');
+    const [emailError, setEmailError] = useState(true);
     const [password, setPassword] = useState('');
-    const [passwordError, setPasswordError] = useState(true); // par défaut true
+    const [passwordError, setPasswordError] = useState(true);
+    const [showPopupEmpty, setShowPopupEmpty] = useState(false);
+    const [showPopupWrong, setShowPopupWrong] = useState(false);
 
     // Détection en temps réel du champ vide
     useEffect(() => {
@@ -19,11 +25,28 @@ export default function ConnectionForm() {
         }
     }, [password]);
 
+    useEffect(() => {
+        if (email.trim() === "") {
+            setEmailError(true);
+        } else {
+            setEmailError(false);
+        }
+    }, [email]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (password.trim() === "") {
-            setPasswordError(true);
+        const emailEmpty = email.trim() === '';
+        const passwordEmpty = password.trim() === '';
+
+        setEmailError(emailEmpty);
+        setPasswordError(passwordEmpty);
+
+        if (emailEmpty || passwordEmpty) {
+            setShowPopupEmpty(true);
+            return;
+        } else if (password.trim() === "a") {
+            setShowPopupWrong(true);
             return;
         }
 
@@ -39,6 +62,14 @@ export default function ConnectionForm() {
 
     return (
         <div className="flex items-center justify-center p-4">
+            {showPopupEmpty && (
+            <PopupEmptyFields onClose={() => setShowPopupEmpty(false)} />
+            )}
+
+            {showPopupWrong && (
+            <PopupWrongCredentials onClose={() => setShowPopupWrong(false)} />
+            )}
+
             <form onSubmit={handleSubmit} className="p-4 rounded-lg w-full max-w-sm space-y-6">
                 <div>
                     <label htmlFor="email" className="block text-sm font-medium text-gray-700">Adresse e-mail</label>
@@ -47,9 +78,14 @@ export default function ConnectionForm() {
                         id="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
+                        className={`bg-white mt-1 block w-full rounded-md p-2 border ${
+                            emailError ? 'border-red-500' : 'border-gray-300'
+                        } focus:border-blue-500 focus:outline-none`}
                         placeholder="exemple@domaine.com"
                     />
+                    {emailError && (
+                        <p className="text-red-500 text-sm mt-1">L'adresse email est requise.</p>
+                    )}
                 </div>
 
                 <div>

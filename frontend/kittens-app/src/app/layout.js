@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+import { ToggleProvider } from "@/context/ToggleTargetComponentContext";
 import NavbarClient from "@/components/NavbarClient";
 import { use } from "react";
 
@@ -24,11 +25,11 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-        <NavbarClient hideNavbar={hideNavbar} />
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <ToggleProvider>
+          {children}
+          <NavbarClient hideNavbar={hideNavbar} />
+        </ToggleProvider>
       </body>
     </html>
   );

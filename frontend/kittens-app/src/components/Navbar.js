@@ -1,6 +1,9 @@
 import Link from "next/link";
+import { useToggleTargetComponent } from "@/context/ToggleTargetComponentContext";
 
 export default function Navbar() {
+  const { setVisible } = useToggleTargetComponent();
+  
   return (
     <nav
       style={{ backgroundColor: "var(--buttons)" }}
@@ -41,7 +44,15 @@ export default function Navbar() {
 
       {/* Zone droite : Notifications, Profil */}
       <div className="flex items-center space-x-6">
-        <Link href="/notifications">
+        <div role="button" className="hidden sm:block" onClick={() => setVisible(v => !v)}>
+          <img
+            src="/notification.png"
+            alt="Notifications"
+            className="w-5 h-5 hover:scale-110 transition-transform"
+          />
+        </div>
+
+        <Link className="block sm:hidden" href="/notifications">
           <img
             src="/notification.png"
             alt="Notifications"

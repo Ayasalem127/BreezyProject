@@ -1,6 +1,6 @@
 'use client';
 
-export default function Notifications() {
+export default function NotificationsMobile() {
     const notifications = ["Description", "Description", "Description", "Description", "Description", "Description", "Description", "Description", "Description", "Description"];
 
     function remove(index) {

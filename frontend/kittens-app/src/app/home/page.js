@@ -2,6 +2,7 @@
 
 import Publish from "@/components/Publish";
 import Messages from "@/components/Messages";
+import UsersSuggestionPC from "@/components/UsersSuggestionPC";
 import NotificationsPC from "@/components/NotificationsPC";
 import { useToggleTargetComponent } from "@/context/ToggleTargetComponentContext";
 
@@ -19,6 +20,11 @@ export default function Home() {
         )}
 
         <Publish />
+
+        <div className="hidden sm:block w-full h-full z-10 flex items-center justify-center">
+          <UsersSuggestionPC />
+        </div>
+
         <Messages />
     </div>
   );

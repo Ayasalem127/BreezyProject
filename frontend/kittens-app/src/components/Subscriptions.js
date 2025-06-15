@@ -12,7 +12,7 @@ export default function Subscriptions() {
                     <div key={index} className="w-full sm:w-[calc(50%-0.5rem)] p-2 m-4 box-border flex flex-col justify-between border border-gray-500 rounded-2xl shadow-2xl">
                         <Link href={"/otherProfile"}>
                             <div className="p-2 box-border flex flex-row items-center justify-center rounded-lg gap-4">
-                                <img src={subscription[1]} alt="photo de profil" className="w-15 h-15 object-contain rounded-full"/>
+                                <img src={subscription[1]} alt="photo de profil" className="w-10 h-10 object-contain rounded-full"/>
                                 <span className="font-semibold">{subscription[0]}</span>
                             </div>
                         </Link>

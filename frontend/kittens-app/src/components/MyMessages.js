@@ -43,7 +43,7 @@ export default function MyMessages() {
         
             <div className="flex flex-col items-center w-full px-4">
                 {messages.map((message, index) => (
-                <div key={index} className="w-full sm:w-[calc(50%-0.5rem)] p-2 mt-4 box-border flex flex-col justify-between border rounded-lg">
+                <div key={index} className="w-full sm:w-[calc(50%-0.5rem)] p-2 m-4 box-border flex flex-col justify-between border border-gray-500 rounded-2xl shadow-2xl">
                     <form onSubmit={(e) => handleModification(e, index)} className="rounded-lg w-full space-y-2">
                         <div className="flex items-center gap-3 w-full">
                             <img src={message[1]} alt="logo" className="w-10 h-10 object-contain mb-2 rounded-full"/>

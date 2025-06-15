@@ -3,6 +3,8 @@ import { useToggleTargetComponent } from "@/context/ToggleTargetComponentContext
 
 export default function Navbar() {
   const { setVisible } = useToggleTargetComponent();
+
+  const photo = "/logo.webp";
   
   return (
     <nav
@@ -10,7 +12,7 @@ export default function Navbar() {
       className="fixed top-0 left-0 w-full h-12 flex items-center justify-between px-6 shadow-md z-50"
     >
       {/* Zone gauche : Logo + Accueil, Abonnements, Messages */}
-      <div className="flex items-center space-x-6">
+      <div className="flex items-center space-x-6 w-1/2">
         <img
           src="/kitties transparents.webp" // remplace par l’image que tu veux
           alt="Logo"
@@ -25,25 +27,29 @@ export default function Navbar() {
           />
         </Link>
 
-        <Link href="/subscriptions">
-          <img
-            src="/follow.png"
-            alt="Abonnements"
-            className="w-5 h-5 hover:scale-110 transition-transform"
-          />
-        </Link>
+        <div className="flex justify-center">
+          <Link href="/subscriptions">
+            <img
+              src="/follow.png"
+              alt="Abonnements"
+              className="w-5 h-5 hover:scale-110 transition-transform"
+            />
+          </Link>
+        </div>
 
-        <Link href="/">
-          <img
-            src="/messaging.png"
-            alt="Messages"
-            className="w-5 h-5 hover:scale-110 transition-transform"
-          />
-        </Link>
+        <div className="flex justify-end">
+          <Link href="/">
+            <img
+              src="/messaging.png"
+              alt="Messages"
+              className="w-5 h-5 hover:scale-110 transition-transform"
+            />
+          </Link>
+        </div>
       </div>
 
       {/* Zone droite : Notifications, Profil */}
-      <div className="flex items-center space-x-6">
+      <div className="flex items-center space-x-6 w-1/2 justify-end">
         <div role="button" className="hidden sm:block" onClick={() => setVisible(v => !v)}>
           <img
             src="/notification.png"
@@ -62,7 +68,7 @@ export default function Navbar() {
 
         <Link href="/myProfile">
           <img
-            src="/logo.webp"
+            src={photo}
             alt="Profil"
             className="w-5 h-5 hover:scale-110 transition-transform rounded-full"
           />

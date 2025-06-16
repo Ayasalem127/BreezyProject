@@ -1,6 +1,7 @@
 'use client';
 import { useState } from "react";
 import axios from "axios";
+import { useEffect } from "react";
 
 const messages = [["username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 3, [0, 1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]], ["username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 1, [3]]];
     const comments = [

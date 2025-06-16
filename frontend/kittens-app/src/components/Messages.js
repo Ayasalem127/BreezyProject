@@ -2,13 +2,7 @@
 import { useState } from "react";
 import axios from "axios";
 export default function Messages() {
-    const [posts, setPosts] = useState([]);
-    useEffect(() => {
-    axios.get('http://localhost:3001/post/api/posts/me')
-      .then(res => setPosts(res.data))
-      .catch(err => console.error(err));
-  }, []);
-  console.log(posts);
+
     const messages = [["username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 1], ["username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 1]];
 
     const [likes, setLikes] = useState(Array(messages.length).fill(false));

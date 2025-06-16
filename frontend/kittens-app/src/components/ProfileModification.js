@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useRef } from 'react';
-
+import { useContext } from "react";
+import { AuthContext } from "@/context/AuthContext";
 export default function ProfilModification() {
-    const infos = ["username", "/logo.webp", "Description"];
+   const infos = ["username", "/logo.webp", "Description"];
+      const { user } = useContext(AuthContext);
     const [image, setImage] = useState(infos[1]);
     const fileInputRef = useRef(null);
 
@@ -72,11 +74,11 @@ export default function ProfilModification() {
                 </div>
 
                 <div>
-                <label htmlFor="username" className="block text-sm font-medium text-gray-700">Nom d'utilisateur</label>
+                <label htmlFor="username" className="block text-sm font-medium text-gray-700">bio</label>
                 <textarea readOnly type="text" id="biography" className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"/>
                 </div>
 
-                <div>
+                {/* <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">Adresse e-mail</label>
                 <input type="email" id="email" className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" placeholder="exemple@domaine.com"/>
                 </div>
@@ -89,7 +91,7 @@ export default function ProfilModification() {
                 <div>
                 <label htmlFor="confirm_password" className="block text-sm font-medium text-gray-700">Confirmation du mot de passe</label>
                 <input type="password" id="confirm_password" className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"/>
-                </div>
+                </div> */}
 
                 <button type="submit" style={{ backgroundColor: 'var(--buttons)' }} className="w-full p-2 shadow-md rounded-md cursor-pointer transition">Modifier</button>
             </form>

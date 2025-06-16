@@ -112,6 +112,7 @@ useEffect(() => {
         <div>
           <label htmlFor="biography" className="block text-sm font-medium text-gray-700">Biographie</label>
           <textarea id="biography" className={`${inputBase} border border-black`} />
+
         </div>
 
         <div>

@@ -68,7 +68,7 @@ export default function UserCreationForm() {
     }
   }, [password, confirmPassword]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 

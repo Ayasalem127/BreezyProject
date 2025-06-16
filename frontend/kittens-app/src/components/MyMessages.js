@@ -53,7 +53,19 @@ export default function MyMessages() {
 
     return (
         <div>
-            <h2 className="text-2xl font-bold text-gray-800 p-5">Mes posts</h2>
+
+            <h2 className="text-2xl font-bold text-gray-800 p-5">Mes messages</h2>
+        
+            <div className="flex flex-col items-center w-full px-4">
+                {messages.map((message, index) => (
+                <div key={index} className="w-full sm:w-[calc(50%-0.5rem)] p-2 m-4 box-border flex flex-col justify-between border border-gray-500 rounded-2xl shadow-2xl">
+                    <form onSubmit={(e) => handleModification(e, index)} className="rounded-lg w-full space-y-2">
+                        <div className="flex items-center gap-3 w-full">
+                            <img src={message[1]} alt="logo" className="w-10 h-10 object-contain mb-2 rounded-full"/>
+                            <span className="font-semibold">{message[0]}</span>
+                            <span className="flex ml-auto text-sm text-gray-500">{message[2]}</span>
+                        </div>
+
 
             <div className="flex flex-wrap w-full gap-4">
                 {posts.map((post, index) => (
@@ -65,16 +77,14 @@ export default function MyMessages() {
                                 <span className="ml-auto text-sm text-gray-500">{new Date(post.createdAt).toLocaleDateString()}</span>
                             </div>
 
-                            <textarea
-                                value={messageTexts[index]}
-                                onChange={(e) => {
-                                    const updatedTexts = [...messageTexts];
-                                    updatedTexts[index] = e.target.value;
-                                    setMessageTexts(updatedTexts);
-                                }}
-                                rows={3}
-                                className="w-full border rounded-md p-2 focus:outline-none"
-                            />
+
+                        <div className="flex justify-end">
+                            <div className="w-30">
+                                <button type="submit">Modifier</button>
+                            </div>
+                        </div>
+                    </form>
+
 
                             <div className="flex gap-4">
                                 <div className="flex flex-col items-center">
@@ -92,21 +102,15 @@ export default function MyMessages() {
                             </div>
                         </form>
 
-                        {/* Formulaire de réponse */}
-                        {isVisible[index] && (
-                            <form onSubmit={(e) => handleResponse(e, index)} className="mt-2 space-y-2">
-                                <textarea
-                                    id={`response-${index}`}
-                                    className="w-full border rounded-md p-2 focus:outline-none"
-                                    rows={3}
-                                    placeholder="Écrire une réponse..."
-                                />
-                                <div className="flex justify-end">
-                                    <button type="submit" className="p-2 rounded-md bg-green-500 text-white">Publier</button>
-                                </div>
-                            </form>
-                        )}
-                    </div>
+
+                        <div className="flex justify-end">
+                        <div className="w-30">
+                            <button type="submit">Publier</button>
+                        </div>
+                        </div>
+                    </form>
+                </div>
+
                 ))}
             </div>
         </div>

@@ -10,7 +10,7 @@ const postRoutes = require("./routes/post.routes");
 const app = express();
 
 
-app.use(cors());        // Middleware
+
 app.use(express.json()); // pour parser le JSON
 
 

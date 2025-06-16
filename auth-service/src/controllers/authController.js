@@ -61,7 +61,7 @@ exports.login =async (req, res) => {
     if (!user || !(await user.comparePassword(password)) ) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    const token = jwt.sign({ id: user._id, username: username,role:"user" }, JWT_SECRET, { expiresIn: '1h' });
+     const token = jwt.sign({ id: user._id, username: user.username,role:user.role}, JWT_SECRET, { expiresIn: '1h' });
     
     res.cookie('token', token, {
   httpOnly: true,          //  pas accessible en JS

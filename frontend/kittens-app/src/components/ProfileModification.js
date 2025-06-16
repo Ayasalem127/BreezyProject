@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
-
+import { useContext } from "react";
+import { AuthContext } from "@/context/AuthContext";
 export default function ProfilModification() {
   const infos = ["username", "/logo.webp", "Description"];
   const [image, setImage] = useState(infos[1]);
@@ -12,7 +13,7 @@ export default function ProfilModification() {
   const [passwordError, setPasswordError] = useState('');
   const [confirmError, setConfirmError] = useState('');
   const [formSubmitted, setFormSubmitted] = useState(false);
-
+ const { user } = useContext(AuthContext);
   const isValidPassword = (pwd) => {
     if (!pwd) return "Mot de passe requis.";
     if (pwd.length < 6 || !/\d/.test(pwd)) {

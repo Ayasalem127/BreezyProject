@@ -17,6 +17,6 @@ mongoose.connect(MONGO_URI)
 app.use('/api/users', require('./routes/userRoutes'));
 
 app.listen(PORT, () => {
-  console.log(`🚀 User service listening on port ${PORT}`);
+  console.log(` User service listening on port ${PORT}`);
 });
 

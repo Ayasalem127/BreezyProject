@@ -5,6 +5,11 @@ exports.createPost = async (req, res) => {
   try {
     const { content } = req.body;
     const idUser=req.headers['x-user-id']
+    console.log("iduserrrrrrrrrr",req)
+      if (!idUser) {
+      return res.status(400).json({ message: 'Identifiant utilisateur (author) manquant dans les headers.' });
+    }
+    console.log(req.headers);
     if (!content || content.length > 280) {
       return res.status(400).json({ message: "Le contenu est requis (max 280 caractères)." });
     }

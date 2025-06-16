@@ -17,6 +17,9 @@ export default function ConnectionForm() {
         console.log(`Mot de passe : ${password}`);
 
         try {
+            const res = await axios.post('http://localhost:3001/auth/auth/login', { email, password }, { withCredentials: true } //  pour envoyer/recevoir le cookie
+                )
+              console.log(`TOKEN : ${res.data.token}`);
             router.push("/home");
         } catch (error) {
             console.error("Erreur : ", error);
@@ -28,12 +31,16 @@ export default function ConnectionForm() {
             <form onSubmit={handleSubmit} className="p-4 rounded-lg w-full max-w-sm space-y-6">
                 <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">Adresse e-mail</label>
-                <input type="email" id="email" className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" placeholder="exemple@domaine.com"/>
+                <input type="email" id="email" className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" placeholder="exemple@domaine.com" value={email}
+          onChange={e => setEmail(e.target.value)}
+          required/>
                 </div>
 
                 <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">Mot de passe</label>
-                <input type="password" id="password" className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"/>
+                <input type="password" id="password" className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" value={password}
+          onChange={e => setPassword(e.target.value)}
+          required/>
                 </div>
 
                 <button type="submit" style={{ backgroundColor: 'var(--buttons)' }} className="w-full p-2 shadow-md rounded-md cursor-pointer transition">Se connecter</button>

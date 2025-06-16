@@ -1,10 +1,13 @@
 'use client';
 
 import { useRouter } from "next/navigation";
-
+import { useContext } from "react";
+import { AuthContext } from "@/context/AuthContext";
 export default function MyInformations() {
     const router = useRouter();
-    const infos = ["username", "/logo.webp", "Description"];
+    const { user } = useContext(AuthContext);
+    console.log(user)
+    const infos = [user.displayName, "/logo.webp", user.bio||"Description"];
 
     function handleModification() {
         try {

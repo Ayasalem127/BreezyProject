@@ -1,6 +1,6 @@
 import Image from "next/image";
 import WelcomeButtons from "@/components/WelcomeButtons";
-
+import {AuthProvider} from "../context/AuthContext"
 export default function Home() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 w-full h-screen-minus-navbar">
@@ -16,5 +16,6 @@ export default function Home() {
         </div>
       </div>
     </div>
+  
   );
 }

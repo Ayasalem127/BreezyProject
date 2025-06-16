@@ -54,6 +54,9 @@ export default function ConnectionForm() {
         console.log(`Mot de passe : ${password}`);
 
         try {
+            const res = await axios.post('http://localhost:3001/auth/auth/login', { email, password }, { withCredentials: true } //  pour envoyer/recevoir le cookie
+                )
+              console.log(`TOKEN : ${res.data.token}`);
             router.push("/home");
         } catch (error) {
             console.error("Erreur : ", error);

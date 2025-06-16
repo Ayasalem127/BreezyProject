@@ -1,5 +1,7 @@
 'use client';
 
+import axios from "axios";
+
 import PopupEmptyFields from "./PopupEmptyFields";
 import PopupDifferentPasswords from "./PopupDifferentPasswords";
 
@@ -18,6 +20,7 @@ export default function UserCreationForm() {
   const [passwordError, setPasswordError] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [confirmError, setConfirmError] = useState('');
+  const [error, setError] = useState('');
   const [showPopupEmpty, setShowPopupEmpty] = useState(false);
   const [showPopupDifferent, setShowPopupDifferent] = useState(false);
 
@@ -39,10 +42,17 @@ export default function UserCreationForm() {
 
   const isValidPassword = (pwd) => {
     if (!pwd) return "Mot de passe requis.";
-    if (pwd.length < 6 || !/\d/.test(pwd)) {
+    if (pwd.length < 8 || !/\d/.test(pwd)) {
       return "Mot de passe invalide.";
     }
     return "";
+  };
+
+  const validatePassword = (pwd) => {
+      const hasMinLength = pwd.length >= 8;
+      const hasNumber = /\d/.test(pwd);
+      const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
+      return hasMinLength && hasNumber && hasSpecialChar;
   };
 
   useEffect(() => {
@@ -60,6 +70,7 @@ export default function UserCreationForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setError('');
 
     const usernameEmpty = username.trim() === '';
     const emailEmpty = email.trim() === '';
@@ -70,6 +81,11 @@ export default function UserCreationForm() {
     setUsernameError(usernameEmpty);
     setPasswordError(passwordEmpty ? "Mot de passe requis." : "");
     setConfirmError(confirmPasswordEmpty ? "Confirmation requise." : confirmPassword !== password ? "Le mot de passe ne correspond pas." : "");
+
+    if (!validatePassword(password)) {
+        setError(" Le mot de passe doit contenir au moins 8 caractères, un chiffre et un caractère spécial.");
+        return;
+    }
 
     if (usernameEmpty || emailEmpty || passwordEmpty || confirmPasswordEmpty) {
       setShowPopupEmpty(true);
@@ -93,7 +109,15 @@ export default function UserCreationForm() {
     console.log("Mot de passe:", password);
     console.log("Confirmation:", confirmPassword);
 
-    router.push("/profileModification");
+    try {
+      const res = await axios.post('http://localhost:3001/auth/auth/register', { username,email, password }, { withCredentials: true } //  pour envoyer/recevoir le cookie
+        )
+      console.log(`TOKEN : ${res.data.token}`);
+      // localStorage.setItem('token', res.data.token)
+      router.push("/myProfile");
+    } catch (err) {
+      setError(err.response?.data?.error || "Erreur lors de l'inscription.");
+    }
   };
 
   const inputBase = "bg-white mt-1 block w-full rounded-md p-2 focus:outline-none focus:border-blue-500";
@@ -109,6 +133,7 @@ export default function UserCreationForm() {
       )}
 
       <form onSubmit={handleSubmit} className="p-4 rounded-lg w-full max-w-sm space-y-6">
+        {error && <p className="text-red-500">{error}</p>}
 
         {/* Nom d'utilisateur */}
         <div>

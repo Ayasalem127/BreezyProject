@@ -40,8 +40,15 @@ exports.register = async (req, res, next) => {
     // const code = Math.floor(100000 + Math.random() * 900000).toString();
     // await sendVerificationEmail(email, code);
 
-    const token = generateToken({ id: user._id, username: user.displayName , role:"user"  });
-    res.status(201).json({ message: "Compte créé. Un code vous a été envoyé par email.", token });
+    const token = generateToken({ id: user._id, username: username , role:"user"  });
+
+    res.cookie('token', token, {
+  httpOnly: true,          //  pas accessible en JS
+  secure: true,            //  seulement en HTTPS
+  sameSite: 'lax',         // ou 'strict' ou 'none' selon ton besoin
+  maxAge: 3600000          // 1h en ms
+});
+  res.status(201).json({ message: "création du compte réussie" });
 
   } catch (err) {
     next(err);
@@ -51,11 +58,18 @@ exports.login =async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
-    if (!user || !(await user.comparePassword(password))) {
+    if (!user || !(await user.comparePassword(password)) ) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    const token = jwt.sign({ id: user._id, username: user.displayName,role:"user" }, JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token });
+    const token = jwt.sign({ id: user._id, username: username,role:"user" }, JWT_SECRET, { expiresIn: '1h' });
+    
+    res.cookie('token', token, {
+  httpOnly: true,          //  pas accessible en JS
+  secure: true,            //  seulement en HTTPS
+  sameSite: 'lax',         // ou 'strict' ou 'none' selon ton besoin
+  maxAge: 3600000          // 1h en ms
+});
+res.status(200).json({ message: "Connexion réussie" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -63,24 +77,22 @@ exports.login =async (req, res) => {
 
 exports.authenticate = async (req, res) => {
   try {
-    const authHeader = req.headers.authorization;
-    console.log("TOKEN:", authHeader);
-    if (!authHeader) return res.sendStatus(401);
+    const token = req.cookies?.token;
+     console.log("token:", token);
+if (!token) return res.status(401).end();
 
-    const token = authHeader.split(' ')[1];
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
       console.log("DECODED USER:", user);
 
       if (err || !user) return res.sendStatus(403);
+      console.log("UserId", user.id);
+      res.set('X-User-Id', user.id);
+      res.set('X-User-Username', user.username || '');
+      res.set('X-User-Role', user.role || 'user');
 
-    // Enrichir les headers pour Nginx
-res.set('x-user-id', user.id);
-res.set('x-user-username', user.username);
-res.set('x-user-role', user.role);
-
-    console.log("RES:", res.headers);
-    return res.sendStatus(200);
+      return res.sendStatus(200); 
     });
+
   } catch (error) {
     console.error("Erreur auth:", error);
     return res.sendStatus(500);

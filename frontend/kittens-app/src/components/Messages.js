@@ -1,5 +1,6 @@
 'use client';
 import { useState } from "react";
+import axios from "axios";
 
 const messages = [["username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 3, [0, 1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]], ["username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 1, [3]]];
     const comments = [
@@ -86,6 +87,14 @@ export default function Messages() {
     const [visibleCommentsCount, setVisibleCommentsCount] = useState(
         messages.map(() => 10)
     );
+
+    const [posts, setPosts] = useState([]);
+    useEffect(() => {
+        axios.get('http://localhost:3001/post/api/posts/me')
+        .then(res => setPosts(res.data))
+        .catch(err => console.error(err));
+    }, []);
+    console.log(posts);
 
     function toggleLike(index) {
         const newLikes = [...likes];

@@ -14,7 +14,20 @@ exports.createProfile = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
+exports.getMyProfile = async (req, res) => {
+  try {
+         const userId = req.headers['x-user-id'];
+         console.log("idduserprofile",userId);
+    const profile = await UserProfile
+    .findOne({ userId: userId })
+    .populate('followers', 'userId displayName avatarUrl') // on récupère les infos utiles seulement
+    .populate('following', 'userId displayName avatarUrl');
+    if (!profile) return res.status(404).json({ message: "Profil non trouvé" });
+    res.json(profile);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 exports.getProfile = async (req, res) => {
   try {
     const profile = await UserProfile

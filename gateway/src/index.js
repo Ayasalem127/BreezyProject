@@ -1,5 +1,5 @@
 const express = require('express');
-const {validateJWT}=require("./middleware/jwt")
+const validateJWT = require("./middleware/jwt")
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
@@ -11,7 +11,7 @@ app.use('/auth', createProxyMiddleware({
 }));
 
 // Routes protégées (avec JWT)
-app.use('/user',createProxyMiddleware({
+app.use('/user', createProxyMiddleware({
   target: 'http://localhost:4001',
    changeOrigin: true
 // ,
@@ -23,12 +23,15 @@ app.use('/user',createProxyMiddleware({
 // }
 }));
 
-app.use('/posts',validateJWT, createProxyMiddleware({
+app.use('/posts', validateJWT, createProxyMiddleware({
   target: 'http://localhost:4002',
-  changeOrigin: true
+  changeOrigin: true,
+  pathRewrite: {
+    '^/posts': '', // retire le préfixe /posts pour le service cible
+  },
 }));
 
-app.use('/comments',validateJWT, createProxyMiddleware({
+app.use('/comments', validateJWT, createProxyMiddleware({
   target: 'http://localhost:4003',
   changeOrigin: true
 }));

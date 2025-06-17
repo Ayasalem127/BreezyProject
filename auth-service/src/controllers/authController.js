@@ -25,7 +25,7 @@ exports.register = async (req, res, next) => {
 
     const user = new User({ username, email, password });
     await user.save();
-  const response = await axios.post(`http://user-service:4001/api/users`, {
+    const response = await axios.post(`http://user-service:4001/api/users`, {
     userId: user._id,
     displayName: username,
     bio: "",

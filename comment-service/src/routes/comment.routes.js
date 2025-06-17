@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const controller = require("../controllers/comment.controller");
 const auth = require("../middlewares/auth");
-const checkRole = require('./middlewares/checkRole');
+// const checkRole = require('./middlewares/checkRole');
 router.post("/:postId", auth, controller.createComment);
 router.post("/reply/:commentId", auth, controller.replyToComment);
 router.get("/:postId", controller.getCommentsByPost);

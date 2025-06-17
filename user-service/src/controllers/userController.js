@@ -115,3 +115,51 @@ exports.getFollowing = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur." });
   }
 };
+
+// BAN
+exports.banUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const updated = await UserProfile.findOneAndUpdate(
+      { userId },
+      { status: 'banned' },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ message: "Utilisateur non trouvé" });
+    res.json({ message: "Utilisateur banni", user: updated });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// SUSPEND
+exports.suspendUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const updated = await UserProfile.findOneAndUpdate(
+      { userId },
+      { status: 'suspended' },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ message: "Utilisateur non trouvé" });
+    res.json({ message: "Utilisateur suspendu", user: updated });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// REACTIVATE
+exports.reactivateUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const updated = await UserProfile.findOneAndUpdate(
+      { userId },
+      { status: 'active' },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ message: "Utilisateur non trouvé" });
+    res.json({ message: "Utilisateur réactivé", user: updated });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

@@ -26,7 +26,7 @@ exports.register = async (req, res, next) => {
 
     const user = new User({ username, email, password });
     await user.save();
-  const response = await axios.post(`http://user-service:4001/api/users`, {
+    const response = await axios.post(`http://user-service:4001/api/users`, {
     userId: user._id,
     displayName: username,
     bio: "",
@@ -66,6 +66,7 @@ exports.login = async (req, res) => {
       return res.status(401).json({ error: 'Identifiants invalides' });
     }
 
+
     // ✅ Toujours générer le token, même si suspendu/banni
     const accessToken = jwt.sign(
       {
@@ -96,6 +97,7 @@ exports.login = async (req, res) => {
     });
 
     res.status(200).json({ message: 'Connexion réussie', refreshToken });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

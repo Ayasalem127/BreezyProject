@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+import { ToggleProvider } from "@/context/ToggleTargetComponentContext";
 import NavbarClient from "@/components/NavbarClient";
 import { use } from "react";
 import {AuthProvider} from "../context/AuthContext"
@@ -27,10 +28,12 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>
-          {children}
-        </AuthProvider>
-        <NavbarClient hideNavbar={hideNavbar} />
+        <ToggleProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+          <NavbarClient hideNavbar={hideNavbar} />
+        </ToggleProvider>
       </body>
     </html>
   );

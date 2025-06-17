@@ -1,12 +1,30 @@
+'use client';
+
 import Publish from "@/components/Publish";
 import Messages from "@/components/Messages";
+import UsersSuggestionPC from "@/components/UsersSuggestionPC";
+import NotificationsPC from "@/components/NotificationsPC";
+import { useToggleTargetComponent } from "@/context/ToggleTargetComponentContext";
 
 export default function Home() {
+  const { visible } = useToggleTargetComponent();
+
   return (
     <div className="w-full px-2 text-center">
-        <img src="/logo.webp" alt="logo" className="fixed top-2 right-2 w-10 h-10 object-contain mb-2" />
         <h1 className="text-4xl font-bold text-gray-800 mb-4 p-10">Accueil</h1>
+
+        {visible && (
+          <div className="w-full h-full z-50 flex items-center justify-center">
+            <NotificationsPC />
+          </div>
+        )}
+
         <Publish />
+
+        <div className="hidden sm:block w-full h-full z-10 flex items-center justify-center">
+          <UsersSuggestionPC />
+        </div>
+
         <Messages />
     </div>
   );

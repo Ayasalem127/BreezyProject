@@ -29,9 +29,9 @@ export default function Messages() {
     }
 
     return (
-        <div className="flex flex-wrap w-full gap-4">
+        <div className="flex flex-col items-center w-full px-4">
             {messages.map((message, index) => (
-            <div key={index} className="w-full sm:w-[calc(50%-0.5rem)] p-2 mt-4 box-border flex flex-col justify-between border rounded-lg">
+            <div key={index} className="w-full sm:w-[calc(50%-0.5rem)] p-2 m-4 box-border flex flex-col justify-between border border-gray-500 rounded-2xl shadow-2xl">
                 <div className="flex items-center gap-3 w-full">
                     <img src={message[1]} alt="logo" className="w-10 h-10 object-contain mb-2 rounded-full"/>
                     <span className="font-semibold">{message[0]}</span>
@@ -58,7 +58,7 @@ export default function Messages() {
                     </div>
 
                     <div className="flex justify-end">
-                    <button type="submit" style={{ backgroundColor: 'var(--buttons)' }} className="w-30 p-2 shadow-md rounded-md cursor-pointer transition">Publier</button>
+                    <button type="submit">Publier</button>
                     </div>
                 </form>
             </div>

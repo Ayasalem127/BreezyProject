@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const upload = require('../middleware/upload');
 const controller = require('../controllers/userController');
+const checkRole = require('../middlewares/checkRole');
 
 
 router.post('/', controller.createProfile);
@@ -13,5 +14,9 @@ router.post('/:userId/follow', controller.followUser);
 router.post('/:userId/unfollow', controller.unfollowUser);
 router.post("/upload-avatar", upload.single("avatar"), controller.updateImage); 
 router.get("/:userId/following", controller.getFollowing);
+
+router.post('/:userId/ban', checkRole(['admin', 'moderator']), controller.banUser);
+router.post('/:userId/suspend', checkRole(['admin', 'moderator']), controller.suspendUser);
+router.post('/:userId/reactivate', checkRole(['admin', 'moderator']), controller.reactivateUser);
 
 module.exports = router;

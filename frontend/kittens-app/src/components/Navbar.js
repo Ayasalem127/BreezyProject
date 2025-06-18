@@ -36,6 +36,7 @@ export default function Navbar() {
             />
           </Link>
         </div>
+        
 
         <div className="flex justify-end">
           <Link href="/">
@@ -46,6 +47,17 @@ export default function Navbar() {
             />
           </Link>
         </div>
+          
+        <div className="flex justify-end">
+          <Link href="/connection">
+            <img
+              src="/logout.png"
+              alt="logout"
+              className="w-5 h-5 hover:scale-110 transition-transform"
+            />
+          </Link>
+        </div>
+    
       </div>
 
       {/* Zone droite : Notifications, Profil */}

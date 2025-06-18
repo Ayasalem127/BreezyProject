@@ -1,6 +1,5 @@
 const Post = require("../models/post.model");
 const axios = require("axios");
-
 exports.createPost = async (req, res) => {
   try {
       const userId = req.headers['x-user-id'];
@@ -33,6 +32,9 @@ exports.createPost = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur." });
   }
 };
+
+
+
 
 //modif possible d'un post seulement par son auteur ou un admin
 exports.updatePost = async (req, res) => {

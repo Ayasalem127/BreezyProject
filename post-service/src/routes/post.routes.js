@@ -6,6 +6,7 @@ const auth = require("../middlewares/auth");
 
 // router.post("/", auth, postController.createPost);
 router.post("/", postController.createPost); 
+
 router.put("/:id", postController.updatePost);     // Modifier un post
 router.delete("/:id", postController.deletePost);  // Supprimer un post
 router.get("/user/:userId", postController.getPostsByUser);   //récupérer les posts d'un utilisateur

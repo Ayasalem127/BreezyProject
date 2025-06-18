@@ -34,6 +34,8 @@ services:
       - ./user-service/.env
     depends_on:
       - mongo_user
+    volumes:
+      - ./uploads:/app/uploads
 
   gateway:
     build: ./gateway

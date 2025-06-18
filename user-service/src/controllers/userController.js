@@ -1,4 +1,5 @@
 const UserProfile = require('../models/UserProfile');
+const multer = require("multer")
 
 exports.createProfile = async (req, res) => {
   try {
@@ -38,6 +39,49 @@ exports.getProfile = async (req, res) => {
     res.json(profile);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+// Config multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // dossier où on stockes
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, Date.now() + ext); // nom unique
+  }
+});  
+const upload = multer({ storage });
+exports.updateImage =  async (req, res) => {
+  try {
+     if (!req.file) {
+      return res.status(400).json({ error: "Aucun fichier reçu" });
+    }
+console.log("req.file:", req.file);
+        const userId = req.headers['x-user-id'];
+    const imagePath = `/uploads/${req.file.filename}`;
+console.log("userid",userId);
+console.log("imagePath",imagePath);
+    // Mise à jour de l'utilisateur
+ console.log("✅ Fichier reçu :", req.file.path);
+console.log("✅ Chemin image enregistré :", `/uploads/${req.file.filename}`);
+console.log("✅ userId reçu :", req.headers['x-user-id']);
+
+
+    const user = await UserProfile.findOneAndUpdate(
+  { userId: userId },
+  { avatarUrl: imagePath },
+  { new: true }
+);
+
+if (!user) {
+  return res.status(404).json({ error: "Utilisateur non trouvé avec cet userId" });
+}
+
+res.json({ success: true, avatar: user.avatar });
+
+  } catch (err) {
+    res.status(500).json({ error: "Erreur upload avatar" });
   }
 };
 

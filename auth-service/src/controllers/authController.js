@@ -97,7 +97,7 @@ exports.login = async (req, res) => {
     // Envoie du token via cookie HttpOnly
     res.cookie('token', accessToken, {
       httpOnly: true,
-      secure: true,         // ⚠️ Met à false en local si pas HTTPS
+      secure: false,
       sameSite: 'lax',
       maxAge: 15 * 60 * 1000 // 15 minutes
     });
@@ -114,7 +114,9 @@ exports.login = async (req, res) => {
 
 exports.authenticate = async (req, res) => {
   try {
-    const token = req.cookies?.token;
+    const authHeader = req.headers['authorization'];
+    const token = authHeader?.split(' ')[1] || req.cookies?.token;
+
     if (!token) return res.status(401).end();
 
     jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
@@ -145,6 +147,7 @@ exports.authenticate = async (req, res) => {
     return res.sendStatus(500);
   }
 };
+
 
 
 exports.refreshToken = async (req, res) => {

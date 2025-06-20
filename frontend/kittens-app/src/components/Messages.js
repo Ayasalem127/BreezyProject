@@ -91,7 +91,9 @@ export default function Messages() {
 
     const [posts, setPosts] = useState([]);
     useEffect(() => {
-        axios.get('http://localhost:3001/post/api/posts/me')
+        axios.get('http://localhost:3001/post/api/posts/feed', {
+            withCredentials: true
+        })
         .then(res => setPosts(res.data))
         .catch(err => console.error(err));
     }, []);

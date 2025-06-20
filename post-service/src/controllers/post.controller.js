@@ -126,34 +126,41 @@ exports.getMyPosts = async (req, res) => {
 //voir mon feed avec les utilisateurs suivis
 exports.getFeed = async (req, res) => {
   try {
-         const idUser=req.headers['x-user-id']
-    //  Appel REST vers le user-service pour récupérer la liste des followings
-    const response = await axios.get(`http://localhost:3001/user/api/users/${idUser}/following`, {
-  headers: {
-    Authorization: req.headers.authorization
-  }
-});
+    const idUser = req.headers['x-user-id'];
+    console.log("idUser:", idUser);
+
+    const response = await axios.get(`http://gateway:3001/user/api/users/${idUser}/following`, {
+      headers: {
+  Authorization: req.headers.authorization ?? '',
+  'x-user-id': idUser // facultatif mais utile si tu le traites côté user-service
+}
+    });
 
     const following = response.data.following;
+    console.log("Following:", following);
 
     if (!following || following.length === 0) {
-      return res.json([]); // pas de feed si on suit personne
+      return res.json([]); // Aucun feed
     }
 
-    const posts = await Post.find({ author: { $in: following } })   //in : filtre les auteurs
+    const posts = await Post.find({ author: { $in: following } })
       .sort({ createdAt: -1 })
-      .lean();      //optimise la requête pour retourner obj + légers
+      .lean();
+
+    console.log("Posts:", posts);
 
     posts.forEach(post => {
-      post.likeCount = post.likes.length;
+      post.likeCount = post.likes.length ?? 0;
     });
 
     res.json(posts);
   } catch (err) {
     console.error("Erreur récupération feed :", err.message);
+    console.error(err); // ajoute ça pour voir la stack
     res.status(500).json({ message: "Erreur serveur." });
   }
 };
+
 
 
 // like/dislike post

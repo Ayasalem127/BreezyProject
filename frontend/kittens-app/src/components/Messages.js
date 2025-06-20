@@ -1,11 +1,10 @@
 'use client';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
+
 export default function Messages() {
 
-
-
-const messages = [["username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 3, [0, 1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]], ["username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 1, [3]]];
+    const messages = [["username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 3, [0, 1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]], ["username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 1, [3]]];
     const comments = [
         [0, "username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 0, []],
         [1, "username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 0, []],
@@ -25,79 +24,78 @@ const messages = [["username", "/logo.webp", "01/01/2001", "J'ai écris ce messa
         [15, "username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 0, []],
     ];
 
-function Comment({ commentId }) {
-    const commentsById = Object.fromEntries(comments.map(c => [c[0], c]));
-    const comment = commentsById[commentId];
-    const [liked, setLiked] = useState(false);
-    const [isVisible, setIsVisible] = useState(false);
+    function Comment({ commentId }) {
+        const commentsById = Object.fromEntries(comments.map(c => [c[0], c]));
+        const comment = commentsById[commentId];
+        const [liked, setLiked] = useState(false);
+        const [isVisible, setIsVisible] = useState(false);
 
-    if (!comment) return null;
+        if (!comment) return null;
 
-    const toggleLike = () => setLiked(prev => !prev);
-    const toggleResponse = () => setIsVisible(prev => !prev);
+        const toggleLike = () => setLiked(prev => !prev);
+        const toggleResponse = () => setIsVisible(prev => !prev);
 
-    const handleResponse = (e) => {
-        e.preventDefault();
-        const response = e.target.elements[`response-${commentId}`].value;
-        console.log(`Réponse au commentaire ${commentId} : ${response}`);
-    };
+        const handleResponse = (e) => {
+            e.preventDefault();
+            const response = e.target.elements[`response-${commentId}`].value;
+            console.log(`Réponse au commentaire ${commentId} : ${response}`);
+        };
 
-    return (
-        <div className="ml-6 mt-4 border-l-2 border-gray-300 pl-4">
-        <div className="flex items-center gap-3">
-            <img src={comment[2]} alt="avatar" className="w-8 h-8 rounded-full" />
-            <span className="font-semibold">{comment[1]}</span>
-            <span className="text-xs text-gray-500 ml-auto">{comment[3]}</span>
-        </div>
-
-        <textarea readOnly value={comment[4]} rows={2} className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2" />
-
-        <div className="flex gap-3 mt-2 text-xl">
-            <div className="flex flex-col items-center cursor-pointer" onClick={toggleLike}>
-            <span>{liked ? "❤️" : "🤍"}</span>
-            <span className="text-sm">{comment[5]}</span>
-            </div>
-            <div className="flex flex-col items-center cursor-pointer" onClick={toggleResponse}>
-            <span>💬</span>
-            <span className="text-sm">{comment[6]}</span>
-            </div>
-        </div>
-
-        {isVisible && (
-            <form onSubmit={handleResponse} className="mt-2 space-y-2">
-            <div className="flex items-center gap-2">
+        return (
+            <div className="ml-6 mt-4 border-l-2 border-gray-300 pl-4">
+            <div className="flex items-center gap-3">
                 <img src={comment[2]} alt="avatar" className="w-8 h-8 rounded-full" />
-                <textarea id={`response-${commentId}`} className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" rows={3} placeholder="Laisse parler ton coeur..."/>
+                <span className="font-semibold">{comment[1]}</span>
+                <span className="text-xs text-gray-500 ml-auto">{comment[3]}</span>
             </div>
-            <div className="flex justify-end">
-                <div className="w-30">
-                    <button type="submit">Publier</button>
+
+            <textarea readOnly value={comment[4]} rows={2} className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2" />
+
+            <div className="flex gap-3 mt-2 text-xl">
+                <div className="flex flex-col items-center cursor-pointer" onClick={toggleLike}>
+                <span>{liked ? "❤️" : "🤍"}</span>
+                <span className="text-sm">{comment[5]}</span>
+                </div>
+                <div className="flex flex-col items-center cursor-pointer" onClick={toggleResponse}>
+                <span>💬</span>
+                <span className="text-sm">{comment[6]}</span>
                 </div>
             </div>
-            </form>
-        )}
 
-        {comment[7].map(childId => (
-            <Comment key={childId} commentId={childId} />
-        ))}
-        </div>
-    );
-}
+            {isVisible && (
+                <form onSubmit={handleResponse} className="mt-2 space-y-2">
+                <div className="flex items-center gap-2">
+                    <img src={comment[2]} alt="avatar" className="w-8 h-8 rounded-full" />
+                    <textarea id={`response-${commentId}`} className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" rows={3} placeholder="Laisse parler ton coeur..."/>
+                </div>
+                <div className="flex justify-end">
+                    <div className="w-30">
+                        <button type="submit">Publier</button>
+                    </div>
+                </div>
+                </form>
+            )}
 
-export default function Messages() {
+            {comment[7].map(childId => (
+                <Comment key={childId} commentId={childId} />
+            ))}
+            </div>
+        );
+    }
+
     const [likes, setLikes] = useState(Array(messages.length).fill(false));
     const [isVisible, setIsVisible] = useState(Array(messages.length).fill(false));
     const [visibleCommentsCount, setVisibleCommentsCount] = useState(
         messages.map(() => 10)
     );
 
-    const [posts, setPosts] = useState([]);
+    /*const [posts, setPosts] = useState([]);
     useEffect(() => {
         axios.get('http://localhost:3001/post/api/posts/me')
         .then(res => setPosts(res.data))
         .catch(err => console.error(err));
     }, []);
-    console.log(posts);
+    console.log(posts);*/
 
     function toggleLike(index) {
         const newLikes = [...likes];

@@ -38,7 +38,7 @@ export default function Navbar() {
         </div>
 
         <div className="flex justify-end">
-          <Link href="/">
+          <Link href="/chatList">
             <img
               src="/messaging.png"
               alt="Messages"

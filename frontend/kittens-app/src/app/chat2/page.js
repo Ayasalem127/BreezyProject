@@ -1,4 +1,4 @@
-import InputBar from "@/components/ImputBar";
+import InputBar from "@/components/InputBar";
 import Chat from "@/components/Chat";
 
 export default function Home() {

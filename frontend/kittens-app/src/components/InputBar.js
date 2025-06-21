@@ -1,14 +1,17 @@
 'use client';
 
 import { useRef } from "react";
+import axios from "axios";
 
-export default function InputBar() {
+export default function InputBar({ userId }) {
     const textareaRef = useRef(null);
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        //e.preventDefault();
 
         const message = e.target.elements.message.value;
+        
+        const res = await axios.post('http://localhost:3001/messaging/messaging/send', { content: message, recipientId: userId }, { withCredentials: true });
 
         //Affichage temporaire
         console.log(`Message : ${message}`);

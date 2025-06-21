@@ -105,19 +105,42 @@ exports.getChats = async (req, res) => {
 
 exports.getMessages = async (req, res) => {
     try {
-        const authorId = req.headers['x-user-id'];
-        const recipientId = req.params.recipientId;
+        const me = req.headers['x-user-id'];
+        const other = req.params.otherId;
+
+        let meUserInfo = { displayName: null };
+        try {
+            const response = await axios.get(`http://user-service:4001/api/users/${me}`);
+            meUserInfo = response.data;
+        } catch (error) {
+            console.error(`Erreur lors de la récupération de l'utilisateur ${me} :`, error.message);
+        }
+
+        let otherUserInfo = { displayName: null };
+        try {
+            const response = await axios.get(`http://user-service:4001/api/users/${other}`);
+            otherUserInfo = response.data;
+        } catch (error) {
+            console.error(`Erreur lors de la récupération de l'utilisateur ${other} :`, error.message);
+        }
         
-        const messagesSend = await Messaging.find({ authorId: authorId, recipientId: recipientId})
+        const messagesSend = await Messaging.find({ authorId: me, recipientId: other})
         .sort({ createdAt: 1});
 
-        const messagesReceive = await Messaging.find({ authorId: recipientId, recipientId: authorId})
+        const messagesReceive = await Messaging.find({ authorId: other, recipientId: me})
         .sort({ createdAt: 1});
 
         const allMessages = [...messagesSend, ...messagesReceive];
         allMessages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
-        res.status(200).json(allMessages);
+        res.status(200).json({
+            meId: me,
+            meDisplayName: meUserInfo.displayName,
+            meAvatar: meUserInfo.avatarUrl,
+            otherDisplayName: otherUserInfo.displayName,
+            otherAvatar: otherUserInfo.avatarUrl,
+            messages: allMessages
+        });
 
     } catch (error) {
         console.error("Erreur lors de la récupération des messages : ", error);

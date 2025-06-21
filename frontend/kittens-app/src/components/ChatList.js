@@ -1,5 +1,6 @@
 'use client';
 import Link from "next/link";
+import axios from "axios";
 
 function truncate(text, maxLength) {
   return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;

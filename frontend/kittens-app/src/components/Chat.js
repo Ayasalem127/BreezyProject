@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export default function Chat() {
     const chats = [["username", "/logo.webp", "Moi", "J'ai envoyé ce message.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.", "01/01/2001"], ["username", "/logo.webp", "Username", "J'ai reçu ce message.", "01/01/2001"], ["username", "/logo.webp", "Moi", "J'ai envoyé ce message.", "01/01/2001"], ["username", "/logo.webp", "Username", "J'ai reçu ce message.", "01/01/2001"], ["username", "/logo.webp", "Moi", "J'ai envoyé ce message.", "01/01/2001"], ["username", "/logo.webp", "Username", "J'ai reçu ce message.", "01/01/2001"], ["username", "/logo.webp", "Moi", "J'ai envoyé ce message.", "01/01/2001"], ["username", "/logo.webp", "Username", "J'ai reçu ce message.", "01/01/2001"]];
 

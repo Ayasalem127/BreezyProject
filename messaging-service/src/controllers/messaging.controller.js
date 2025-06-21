@@ -36,6 +36,73 @@ exports.createMessage = async (req, res) => {
     }
 };
 
+exports.getChats = async (req, res) => {
+    try {
+        const userId = req.headers['x-user-id'];
+
+        // 1. Récupération des messages où l'utilisateur est soit auteur soit destinataire
+        const messages = await Messaging.aggregate([
+            {
+                $match: {
+                    $or: [
+                        { authorId: userId },
+                        { recipientId: userId }
+                    ]
+                }
+            },
+            {
+                $sort: { createdAt: -1 }
+            },
+            {
+                $group: {
+                    _id: {
+                        $cond: [
+                            { $eq: ["$authorId", userId] },
+                            "$recipientId",
+                            "$authorId"
+                        ]
+                    },
+                    lastMessage: { $first: "$$ROOT" }
+                }
+            }
+        ]);
+
+        // 2. Pour chaque interlocuteur, enrichir avec infos utilisateur
+        const enrichedMessages = await Promise.all(messages.map(async (msgGroup) => {
+            const otherUserId = msgGroup._id;
+
+            try {
+                const response = await axios.get(`http://user-service:4001/api/users/${otherUserId}`);
+                const { displayName, avatarUrl } = response.data;
+
+                return {
+                    ...msgGroup.lastMessage,
+                    otherUser: {
+                        userId: otherUserId,
+                        displayName,
+                        avatarUrl
+                    }
+                };
+            } catch (error) {
+                console.error(`Erreur lors de la récupération de l'utilisateur ${otherUserId} :`, error.message);
+                return {
+                    ...msgGroup.lastMessage,
+                    otherUser: {
+                        userId: otherUserId,
+                        displayName: null,
+                        avatarUrl: null
+                    }
+                };
+            }
+        }));
+
+        res.status(200).json(enrichedMessages);
+    } catch (error) {
+        console.error("Erreur lors de la récupération des conversations : ", error);
+        res.status(500).json({ message: "Erreur serveur récupération conversations." });
+    }
+};
+
 exports.getMessages = async (req, res) => {
     try {
         const authorId = req.headers['x-user-id'];

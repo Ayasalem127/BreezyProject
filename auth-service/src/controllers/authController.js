@@ -56,29 +56,23 @@ exports.register = async (req, res, next) => {
   }
 };
 
-
 exports.login = async (req, res) => {
   const { email, password } = req.body;
+  console.log("email reçu:", email);
 
   try {
+    // Vérification utilisateur
     const user = await User.findOne({ email });
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ error: 'Identifiants invalides' });
     }
-// <<<<<<< HEAD
-//      const token = jwt.sign({ id: user._id, username: user.username,role:user.role}, JWT_SECRET, { expiresIn: '1h' });
-    
-//     res.cookie('token', token, {
-//   httpOnly: true,          //  pas accessible en JS
-//   secure: true,            //  seulement en HTTPS
-//   sameSite: 'lax',         // ou 'strict' ou 'none' selon ton besoin
-//   maxAge: 3600000          // 1h en ms
-// });
-// res.status(200).json({ message: "Connexion réussie" });
-// =======
 
+    // Vérifie que les secrets JWT sont définis
+    if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
+      return res.status(500).json({ error: "Clés JWT manquantes dans .env" });
+    }
 
-    // ✅ Toujours générer le token, même si suspendu/banni
+    // Génération des tokens
     const accessToken = jwt.sign(
       {
         id: user._id,
@@ -96,20 +90,23 @@ exports.login = async (req, res) => {
       { expiresIn: '30d' }
     );
 
+    // Stockage du refreshToken en base
     user.refreshTokens.push(refreshToken);
     await user.save();
 
-    // ✅ Envoie l'accessToken côté cookie
+    // Envoie du token via cookie HttpOnly
     res.cookie('token', accessToken, {
       httpOnly: true,
       secure: false,
       sameSite: 'lax',
-      maxAge: 15 * 60 * 1000
+      maxAge: 15 * 60 * 1000 // 15 minutes
     });
 
+    // Réponse JSON (tu peux ne pas envoyer le refreshToken côté client si tu ne veux pas)
     res.status(200).json({ message: 'Connexion réussie', refreshToken });
 
   } catch (err) {
+    console.error("Erreur login:", err);
     res.status(500).json({ error: err.message });
   }
 };

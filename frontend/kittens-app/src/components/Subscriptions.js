@@ -1,8 +1,41 @@
 'use client';
 import Link from "next/link";
-
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../context/AuthContext"; 
+import axios from "axios";
 export default function Subscriptions() {
-    const subscriptions = [["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"]];
+   //const subscriptions = [["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"]];
+  const { user } = useContext(AuthContext);
+  const userId = user?._id;
+    const [subscriptions, setSubscriptions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    setLoading(true);
+    setError(null);
+
+    axios
+      .get(` http://localhost:3001/user/api/users/${userId}/following`, { withCredentials: true })
+      .then((res) => {
+        setSubscriptions(res.data.map((u) => [u.username, u.logo]));
+      })
+      .catch((err) => {
+        if (!axios.isCancel(err)) {
+          console.error(err);
+          setError(err.message || "Erreur inconnue");
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+
+    return () => {
+      source.cancel("Component unmounted");
+    };
+  }, [userId]);
 
     return (
         <div>

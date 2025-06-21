@@ -140,7 +140,7 @@ exports.getFollowing = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const user = await UserProfile.findOne({ userId });
+    const user = await UserProfile.findOne( { _id: userId });
 
     if (!user) return res.status(404).json({ message: "Utilisateur non trouvé." });
 

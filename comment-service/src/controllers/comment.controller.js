@@ -168,8 +168,15 @@ exports.getCommentLikes = async (req, res) => {
     const comment = await Comment.findById(id);
     if (!comment) return res.status(404).json({ message: "Commentaire introuvable" });
 
-    res.json({ likes: comment.likes.length });
+    const likesCount = comment.likes.length;
+
+    // 🔐 Récupère l'ID de l'utilisateur depuis les headers envoyés par le gateway (ou middleware)
+    const userId = req.headers['x-user-id'];
+    const liked = userId && comment.likes.includes(userId);
+
+    res.json({ likes: likesCount, liked }); // <-- retourne aussi le booléen liked
   } catch (err) {
+    console.error("Erreur getCommentLikes :", err);
     res.status(500).json({ message: "Erreur serveur" });
   }
 };

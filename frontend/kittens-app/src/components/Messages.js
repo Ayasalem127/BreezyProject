@@ -1,189 +1,181 @@
 'use client';
-import { useState } from "react";
-import axios from "axios";
-import { useEffect } from "react";
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const messages = [["username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 3, [0, 1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]], ["username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 1, [3]]];
-    const comments = [
-        [0, "username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 0, []],
-        [1, "username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 0, []],
-        [2, "username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 0, []],
-        [3, "username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 1, [4]],
-        [4, "username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 1, [5]],
-        [5, "username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 0, []],
-        [6, "username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 0, []],
-        [7, "username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 0, []],
-        [8, "username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 0, []],
-        [9, "username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 0, []],
-        [10, "username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 0, []],
-        [11, "username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 0, []],
-        [12, "username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 0, []],
-        [13, "username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 0, []],
-        [14, "username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 0, []],
-        [15, "username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 0, []],
-    ];
-
-function Comment({ commentId }) {
-    const commentsById = Object.fromEntries(comments.map(c => [c[0], c]));
-    const comment = commentsById[commentId];
-    const [liked, setLiked] = useState(false);
-    const [isVisible, setIsVisible] = useState(false);
-
-    if (!comment) return null;
-
-    const toggleLike = () => setLiked(prev => !prev);
-    const toggleResponse = () => setIsVisible(prev => !prev);
-
-    const handleResponse = (e) => {
-        e.preventDefault();
-        const response = e.target.elements[`response-${commentId}`].value;
-        console.log(`Réponse au commentaire ${commentId} : ${response}`);
-    };
-
-    return (
-        <div className="ml-6 mt-4 border-l-2 border-gray-300 pl-4">
-        <div className="flex items-center gap-3">
-            <img src={comment[2]} alt="avatar" className="w-8 h-8 rounded-full" />
-            <span className="font-semibold">{comment[1]}</span>
-            <span className="text-xs text-gray-500 ml-auto">{comment[3]}</span>
-        </div>
-
-        <textarea readOnly value={comment[4]} rows={2} className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2" />
-
-        <div className="flex gap-3 mt-2 text-xl">
-            <div className="flex flex-col items-center cursor-pointer" onClick={toggleLike}>
-            <span>{liked ? "❤️" : "🤍"}</span>
-            <span className="text-sm">{comment[5]}</span>
-            </div>
-            <div className="flex flex-col items-center cursor-pointer" onClick={toggleResponse}>
-            <span>💬</span>
-            <span className="text-sm">{comment[6]}</span>
-            </div>
-        </div>
-
-        {isVisible && (
-            <form onSubmit={handleResponse} className="mt-2 space-y-2">
-            <div className="flex items-center gap-2">
-                <img src={comment[2]} alt="avatar" className="w-8 h-8 rounded-full" />
-                <textarea id={`response-${commentId}`} className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" rows={3} placeholder="Laisse parler ton coeur..."/>
-            </div>
-            <div className="flex justify-end">
-                <div className="w-30">
-                    <button type="submit">Publier</button>
-                </div>
-            </div>
-            </form>
-        )}
-
-        {comment[7].map(childId => (
-            <Comment key={childId} commentId={childId} />
-        ))}
-        </div>
-    );
-}
+axios.defaults.withCredentials = true;
 
 export default function Messages() {
-    const [likes, setLikes] = useState(Array(messages.length).fill(false));
-    const [isVisible, setIsVisible] = useState(Array(messages.length).fill(false));
-    const [visibleCommentsCount, setVisibleCommentsCount] = useState(
-        messages.map(() => 10)
-    );
+  const [posts, setPosts] = useState([]);
+  const [commentsByPost, setCommentsByPost] = useState({});
+  const [likesByPost, setLikesByPost] = useState({});
+  const [likedPosts, setLikedPosts] = useState({});
+  const [isVisible, setIsVisible] = useState([]);
 
-    const [posts, setPosts] = useState([]);
-    useEffect(() => {
-        axios.get('http://localhost:3001/post/api/posts/feed', {
-            withCredentials: true
-        })
-        .then(res => setPosts(res.data))
-        .catch(err => console.error(err));
-    }, []);
-    console.log(posts);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const postRes = await axios.get('http://localhost:3001/post/api/posts/feed');
+        const postsData = postRes.data;
+        setPosts(postsData);
+        setIsVisible(postsData.map(() => false));
 
-    function toggleLike(index) {
-        const newLikes = [...likes];
-        newLikes[index] = !newLikes[index];
-        setLikes(newLikes);
+        const likeCounts = {};
+        const commentsMap = {};
+        const likedState = {};
+
+        for (const post of postsData) {
+          // Likes
+          try {
+            const likeRes = await axios.get(`http://localhost:3001/post/api/posts/${post._id}/likes`);
+            likeCounts[post._id] = likeRes.data.likes || 0;
+            likedState[post._id] = false;
+          } catch {
+            likeCounts[post._id] = 0;
+          }
+
+          // Comments
+          try {
+            const res = await axios.get(`http://localhost:3001/comment/api/comments/${post._id}`);
+            commentsMap[post._id] = res.data;
+          } catch {
+            commentsMap[post._id] = [];
+          }
+        }
+
+        setLikesByPost(likeCounts);
+        setCommentsByPost(commentsMap);
+        setLikedPosts(likedState);
+      } catch (err) {
+        console.error("Erreur récupération des posts :", err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handlePostLike = async (postId) => {
+    try {
+      const res = await axios.post(`http://localhost:3001/post/api/posts/${postId}/like`);
+      const { liked, totalLikes } = res.data;
+
+      setLikesByPost(prev => ({ ...prev, [postId]: totalLikes }));
+      setLikedPosts(prev => ({ ...prev, [postId]: liked }));
+    } catch (err) {
+      console.error("Erreur like post :", err);
     }
+  };
 
-    function toggleResponse(index) {
-        const newIsVisible = [...isVisible];
-        newIsVisible[index] = !newIsVisible[index];
-        setIsVisible(newIsVisible);
-    }
+  const toggleResponse = (index) => {
+    const updated = [...isVisible];
+    updated[index] = !updated[index];
+    setIsVisible(updated);
+  };
 
-    function showMoreComments(messageIndex) {
-        setVisibleCommentsCount(prev => {
-            const newCount = [...prev];
-            newCount[messageIndex] += 10;
-            return newCount;
-        });
-    }
+  return (
+    <div className="flex flex-col items-center w-full px-4">
+      {posts.map((post, index) => (
+        <div
+          key={post._id}
+          className="w-full sm:w-[calc(50%-0.5rem)] p-4 m-4 border border-gray-500 rounded-2xl shadow-2xl"
+        >
+          <div className="flex items-center justify-between">
+            <span className="font-semibold">Auteur : {post.author}</span>
+            <span className="text-sm text-gray-500">{new Date(post.createdAt).toLocaleString()}</span>
+          </div>
 
-    const handleResponse = async (e, index) => {
-        e.preventDefault();
+          <textarea
+            readOnly
+            value={post.content}
+            rows={3}
+            className="bg-white mt-2 block w-full rounded-md border border-gray-300 p-2"
+          />
 
-        const response = e.target.elements[`response-${index}`].value;
-
-        //Affichage temporaire
-        console.log(`Réponse : ${response}`);
-    }
-
-    return (
-        <div className="flex flex-col items-center w-full px-4">
-            {messages.map((message, index) => (
-            <div key={index} className="w-full sm:w-[calc(50%-0.5rem)] p-4 m-4 box-border flex flex-col justify-center border border-gray-500 rounded-2xl shadow-2xl">
-                <div className="flex items-center gap-3 w-full">
-                    <img src={message[1]} alt="logo" className="w-10 h-10 object-contain mb-2 rounded-full"/>
-                    <span className="font-semibold">{message[0]}</span>
-                    <span className="flex ml-auto text-sm text-gray-500">{message[2]}</span>
-                </div>
-
-                <textarea readOnly id="message" value={message[3]} rows={3} className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"/>
-                
-                <div className="flex justify-start gap-2 mt-3">
-                    <div className="flex flex-col items-center">
-                        <span id={`likeButton-${index}`} className="text-3xl cursor-pointer" onClick={() => toggleLike(index)} role="button" aria-label="like button">{likes[index] ? "❤️" : "🤍"}</span>
-                        <span id={`numberLikes-${index}`}>{message[4]}</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                        <span id={`responseButton-${index}`} className="text-3xl cursor-pointer" onClick={() => toggleResponse(index)} role="button" aria-label="response button">💬</span>
-                        <span id={`numberResponses-${index}`}>{message[5]}</span>
-                    </div>
-                </div>
-
-                <div className="mt-4">
-                    {message[6]
-                    .slice(0, visibleCommentsCount[index])
-                    .map((commentId) => (
-                        <Comment key={commentId} commentId={commentId} />
-                    ))}
-
-                    {visibleCommentsCount[index] < message[6].length && (
-                    <span
-                        role="button"
-                        onClick={() => showMoreComments(index)}
-                        className="mt-2 text-sm text-blue-600 cursor-pointer"
-                    >
-                        Afficher plus
-                    </span>
-                    )}
-                </div>
-
-                <form onSubmit={(e) => handleResponse(e, index)} style={{display: isVisible[index] ? 'block' : 'none'}} className="rounded-lg w-full space-y-2">
-                    <div className="flex items-center gap-2">
-                    <img src={message[1]} alt="logo" className="w-10 h-10 object-contain mb-2 rounded-full"/>
-                    <textarea type="text" id={`response-${index}`} className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" rows={3} placeholder="Laisse parler ton coeur..."/>
-                    </div>
-
-                    <div className="flex justify-end">
-                    <div className="w-30">
-                    <button type="submit">Publier</button>
-                    </div>
-                    </div>
-                </form>
+          <div className="flex gap-4 mt-3 text-xl">
+            <div className="flex flex-col items-center cursor-pointer" onClick={() => handlePostLike(post._id)}>
+              <span>{likedPosts[post._id] ? "❤️" : "🤍"}</span>
+              <span className="text-sm">{likesByPost[post._id] || 0}</span>
             </div>
-            ))}
-            
+            <div className="flex flex-col items-center cursor-pointer" onClick={() => toggleResponse(index)}>
+              <span>💬</span>
+              <span className="text-sm">{commentsByPost[post._id]?.length || 0}</span>
+            </div>
+          </div>
+
+          {isVisible[index] && (
+            <div className="mt-4 space-y-4">
+              {commentsByPost[post._id]?.map(comment => (
+                <CommentThread key={comment._id} comment={comment} />
+              ))}
+            </div>
+          )}
         </div>
-    );
+      ))}
+    </div>
+  );
+}
+
+function CommentThread({ comment }) {
+  const [likes, setLikes] = useState(0);
+  const [liked, setLiked] = useState(false);
+
+  useEffect(() => {
+    const fetchLikes = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:3001/comment/api/comments/${comment._id}/likes`,
+          { withCredentials: true }
+        );
+        setLikes(res.data.likes || 0);
+        setLiked(res.data.liked || false); // <-- récupère l'état liked du back
+      } catch (err) {
+        console.error("Erreur récupération des likes commentaire :", err);
+      }
+    };
+
+    fetchLikes();
+  }, [comment._id]);
+
+  const handleLikeComment = async () => {
+    try {
+      const res = await axios.post(
+        `http://localhost:3001/comment/api/comments/${comment._id}/like`,
+        {},
+        { withCredentials: true }
+      );
+      const { likes: newLikes, liked: hasLiked } = res.data;
+      setLikes(newLikes);
+      setLiked(hasLiked); // <-- met à jour l'état du like
+    } catch (err) {
+      console.error("Erreur like commentaire :", err);
+    }
+  };
+
+  return (
+    <div className="ml-4 border-l-2 border-gray-300 pl-4 mt-2">
+      <div className="flex justify-between text-sm text-gray-600">
+        <span>Auteur : {comment.author}</span>
+        <span>{new Date(comment.createdAt).toLocaleString()}</span>
+      </div>
+
+      <p className="mt-1">{comment.content}</p>
+
+      <div
+        className="mt-2 flex items-center gap-2 cursor-pointer text-sm"
+        onClick={handleLikeComment}
+      >
+        <span className={liked ? "text-red-500" : ""}>
+          {liked ? "❤️" : "🤍"}
+        </span>
+        <span>{likes}</span>
+      </div>
+
+      {comment.replies?.length > 0 && (
+        <div className="mt-2">
+          {comment.replies.map(reply => (
+            <CommentThread key={reply._id} comment={reply} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }

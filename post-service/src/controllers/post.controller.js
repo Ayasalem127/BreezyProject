@@ -129,11 +129,17 @@ exports.getFeed = async (req, res) => {
     const idUser = req.headers['x-user-id'];
     console.log("idUser:", idUser);
 
+    // 🔑 Récupération du token depuis le cookie
+    const token = req.cookies?.token;
+    const authHeader = token ? `Bearer ${token}` : undefined;
+
+    console.log("Authorization header:", authHeader); // Debug
+
     const response = await axios.get(`http://gateway:3001/user/api/users/${idUser}/following`, {
       headers: {
-  Authorization: req.headers.authorization ?? '',
-  'x-user-id': idUser // facultatif mais utile si tu le traites côté user-service
-}
+        Authorization: authHeader,
+        'x-user-id': idUser
+      }
     });
 
     const following = response.data.following;
@@ -147,19 +153,19 @@ exports.getFeed = async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
-    console.log("Posts:", posts);
-
     posts.forEach(post => {
-      post.likeCount = post.likes.length ?? 0;
+      post.likeCount = post.likes?.length ?? 0;
     });
 
     res.json(posts);
   } catch (err) {
     console.error("Erreur récupération feed :", err.message);
-    console.error(err); // ajoute ça pour voir la stack
+    console.error(err);
     res.status(500).json({ message: "Erreur serveur." });
   }
 };
+
+
 
 
 
@@ -167,8 +173,8 @@ exports.getFeed = async (req, res) => {
 exports.toggleLikePost = async (req, res) => {
   try {
     const postId = req.params.id;
+    const userId = req.headers['x-user-id']; // ✅ cohérent avec le nom utilisé ensuite
 
-    const idUser=req.headers['x-user-id']
     const post = await Post.findById(postId);
     if (!post) return res.status(404).json({ message: "Post non trouvé." });
 
@@ -176,10 +182,10 @@ exports.toggleLikePost = async (req, res) => {
 
     if (hasLiked) {
       // Dislike → on enlève l'ID
-      post.likes = post.likes.filter(id => id !== idUser);
+      post.likes = post.likes.filter(id => id !== userId);
     } else {
       // Like → on ajoute l'ID
-      post.likes.push(idUser);
+      post.likes.push(userId);
     }
 
     await post.save();
@@ -193,3 +199,4 @@ exports.toggleLikePost = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur." });
   }
 };
+

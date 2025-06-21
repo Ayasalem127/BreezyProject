@@ -9,7 +9,7 @@ const app = express();
 //   credentials: true
 // }));
 app.use(express.json());
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 console.log("__dirname backend = ", __dirname);
 

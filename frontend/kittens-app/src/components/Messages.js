@@ -49,7 +49,7 @@ export default function Messages() {
                 <span className="text-xs text-gray-500 ml-auto">{comment[3]}</span>
             </div>
 
-            <textarea readOnly value={comment[4]} rows={2} className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2" />
+            <textarea readOnly value={comment[4]} rows={2} />
 
             <div className="flex gap-3 mt-2 text-xl">
                 <div className="flex flex-col items-center cursor-pointer" onClick={toggleLike}>
@@ -66,7 +66,7 @@ export default function Messages() {
                 <form onSubmit={handleResponse} className="mt-2 space-y-2">
                 <div className="flex items-center gap-2">
                     <img src={comment[2]} alt="avatar" className="w-8 h-8 rounded-full" />
-                    <textarea id={`response-${commentId}`} className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" rows={3} placeholder="Laisse parler ton coeur..."/>
+                    <textarea id={`response-${commentId}`} className="focus:border-blue-500 focus:outline-none" rows={3} placeholder="Laisse parler ton coeur..."/>
                 </div>
                 <div className="flex justify-end">
                     <div className="w-30">
@@ -129,14 +129,14 @@ export default function Messages() {
     return (
         <div className="flex flex-col items-center w-full px-4">
             {messages.map((message, index) => (
-            <div key={index} className="w-full sm:w-[calc(50%-0.5rem)] p-4 m-4 box-border flex flex-col justify-center border border-gray-500 rounded-2xl shadow-2xl">
+            <div key={index} style={{ boxShadow: "0 12px 32px var(--shadow-color)", borderColor: 'var(--input-border)' }} className="w-full sm:w-[calc(50%-0.5rem)] p-4 m-4 box-border flex flex-col justify-center border rounded-2xl">
                 <div className="flex items-center gap-3 w-full">
                     <img src={message[1]} alt="logo" className="w-10 h-10 object-contain mb-2 rounded-full"/>
                     <span className="font-semibold">{message[0]}</span>
                     <span className="flex ml-auto text-sm text-gray-500">{message[2]}</span>
                 </div>
 
-                <textarea readOnly id="message" value={message[3]} rows={3} className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"/>
+                <textarea readOnly id="message" value={message[3]} rows={3} className="focus:border-blue-500 focus:outline-none"/>
                 
                 <div className="flex justify-start gap-2 mt-3">
                     <div className="flex flex-col items-center">
@@ -157,11 +157,7 @@ export default function Messages() {
                     ))}
 
                     {visibleCommentsCount[index] < message[6].length && (
-                    <span
-                        role="button"
-                        onClick={() => showMoreComments(index)}
-                        className="mt-2 text-sm text-blue-600 cursor-pointer"
-                    >
+                    <span role="button" onClick={() => showMoreComments(index)} className="mt-2 text-sm text-blue-600 cursor-pointer">
                         Afficher plus
                     </span>
                     )}
@@ -169,14 +165,14 @@ export default function Messages() {
 
                 <form onSubmit={(e) => handleResponse(e, index)} style={{display: isVisible[index] ? 'block' : 'none'}} className="rounded-lg w-full space-y-2">
                     <div className="flex items-center gap-2">
-                    <img src={message[1]} alt="logo" className="w-10 h-10 object-contain mb-2 rounded-full"/>
-                    <textarea type="text" id={`response-${index}`} className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" rows={3} placeholder="Laisse parler ton coeur..."/>
+                        <img src={message[1]} alt="logo" className="w-10 h-10 object-contain mb-2 rounded-full"/>
+                        <textarea type="text" id={`response-${index}`} className="focus:border-blue-500 focus:outline-none" rows={3} placeholder="Laisse parler ton coeur..."/>
                     </div>
 
                     <div className="flex justify-end">
-                    <div className="w-30">
-                    <button type="submit">Publier</button>
-                    </div>
+                        <div className="w-30">
+                            <button type="submit">Publier</button>
+                        </div>
                     </div>
                 </form>
             </div>

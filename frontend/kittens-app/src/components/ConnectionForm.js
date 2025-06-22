@@ -76,15 +76,13 @@ export default function ConnectionForm() {
 
             <form onSubmit={handleSubmit} className="p-4 rounded-lg w-full max-w-sm space-y-6">
                 <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">Adresse e-mail</label>
+                    <label htmlFor="email">Adresse e-mail</label>
                     <input
                         type="email"
                         id="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className={`bg-white mt-1 block w-full rounded-md p-2 border ${
-                            emailError ? 'border-red-500' : 'border-gray-300'
-                        } focus:border-blue-500 focus:outline-none`}
+                        className={`${ emailError ? 'border-red-500' : 'border-gray-300' } focus:border-blue-500 focus:outline-none`}
                         placeholder="exemple@domaine.com"
                     />
                     {emailError && (
@@ -93,24 +91,20 @@ export default function ConnectionForm() {
                 </div>
 
                 <div>
-                    <label htmlFor="password" className="block text-sm font-medium text-gray-700">Mot de passe</label>
+                    <label htmlFor="password">Mot de passe</label>
                     <input
                         type="password"
                         id="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className={`bg-white mt-1 block w-full rounded-md p-2 border ${
-                            passwordError ? 'border-red-500' : 'border-gray-300'
-                        } focus:border-blue-500 focus:outline-none`}
+                        className={`${ passwordError ? 'border-red-500' : 'border-gray-300' } focus:border-blue-500 focus:outline-none`}
                     />
                     {passwordError && (
                         <p className="text-red-500 text-sm mt-1">Le mot de passe est requis.</p>
                     )}
                 </div>
 
-                <button
-                    type="submit"
-                >
+                <button type="submit">
                     Se connecter
                 </button>
             </form>

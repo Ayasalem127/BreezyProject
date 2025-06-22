@@ -9,7 +9,7 @@ export default function NotificationsPC() {
 
     return (
         <div className="flex flex-col fixed top-12 left-0 items-end w-full overflow-y-auto" style={{ maxHeight: 'calc(100vh - var(--navbar-height))' }}>
-            <div className="bg-white w-1/4 p-2 rounded-xl">
+            <div style={{ backgroundColor: 'var(--input-background)'}} className="w-1/4 p-2 rounded-xl">
                 {notifications.map((notification, index) => (
                 <div key={index} className="w-full p-2 mt-4 box-border border rounded-lg relative">
                     <span id={`deleteButton-${index}`} className="absolute top-2 right-2 text-l cursor-pointer" onClick={() => remove(index)} role="button" aria-label="delete button">❌</span>

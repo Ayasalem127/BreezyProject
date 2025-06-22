@@ -5,7 +5,7 @@ import UsersSuggestionMobile from "@/components/UsersSuggestionMobile";
 export default function Home() {
   return (
     <div className="w-full px-2 text-center">
-        <h1 className="text-4xl font-bold text-gray-800 mb-4 p-10">Utilisateurs</h1>
+        <h1>Utilisateurs</h1>
         <Searchbar />
         <Subscriptions />
 

@@ -45,7 +45,7 @@ export default function Chat({userId}) {
                                 <p className="font-semibold">{displayName}</p>
                             </div>
                             <div>
-                                <p className="text-sm break-all whitespace-pre-wrap bg-white rounded-xl shadow-md p-3">{chat.content}</p>
+                                <p style={{ backgroundColor: 'var(--input-background)', boxShadow: "0 12px 32px var(--shadow-color)", borderColor: 'var(--input-border)' }} className="text-sm break-all whitespace-pre-wrap rounded-xl p-3">{chat.content}</p>
                                 <p className="text-right text-xs text-gray-400 mt-1">{chat.createdAt}</p>
                             </div>
                         </div>

@@ -1,15 +1,19 @@
 import Link from "next/link";
+import ThemeList from "./ThemeList";
 import { useToggleTargetComponent } from "@/context/ToggleTargetComponentContext";
+import { useState } from "react";
 
 export default function Navbar() {
   const { setVisible } = useToggleTargetComponent();
+
+  const [showThemeList, setShowThemeList] = useState(false);
 
   const photo = "/logo.webp";
   
   return (
     <nav
-      style={{ backgroundColor: "var(--buttons)" }}
-      className="fixed top-0 left-0 w-full h-12 flex items-center justify-between px-6 shadow-md z-50"
+      style={{ backgroundColor: "var(--buttons)", boxShadow: "0 12px 32px var(--shadow-color)" }}
+      className="fixed top-0 left-0 w-full h-12 flex items-center justify-between px-6 z-50"
     >
       {/* Zone gauche : Logo + Accueil, Abonnements, Messages */}
       <div className="flex items-center space-x-6 w-1/2">
@@ -48,14 +52,30 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Zone droite : Notifications, Profil */}
+      {/* Zone droite : Notifications, Theme, Profil */}
       <div className="flex items-center space-x-6 w-1/2 justify-end">
         <div role="button" className="hidden sm:block" onClick={() => setVisible(v => !v)}>
           <img
             src="/notification.png"
             alt="Notifications"
-            className="w-5 h-5 hover:scale-110 transition-transform"
+            className="w-5 h-5 hover:scale-110 transition-transform cursor-pointer"
           />
+        </div>
+
+        <div role="button">
+          <img
+            src="/theme.png"
+            alt="Theme"
+            className="w-5 h-5 hover:scale-110 transition-transform cursor-pointer"
+            onClick={() => setShowThemeList((v) => !v)}
+          />
+
+          {showThemeList && (
+            <ThemeList
+              onClose={() => setShowThemeList(false)}
+              onSelect={(theme) => console.log('Thème choisi :', theme)}
+            />
+          )}
         </div>
 
         <Link className="block sm:hidden" href="/notifications">

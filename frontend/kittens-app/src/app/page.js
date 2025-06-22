@@ -8,8 +8,8 @@ export default function Home() {
         <img src="/logo-removebg.png" alt="logo" className="w-full h-150 object-contain mb-2" />
       </div>
       <div className="flex flex-col items-center justify-center text-center space-y-4">
-        <div className="flex flex-col items-center justify-center rounded-2xl shadow-2xl border border-gray-500 w-2/3 h-9/10">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4 p-10">Bienvenue sur Kitties</h1>
+        <div style={{ boxShadow: "0 12px 32px var(--shadow-color)", borderColor: 'var(--input-border)' }} className="flex flex-col items-center justify-center rounded-2xl border w-2/3 h-9/10">
+          <h1>Bienvenue sur Kitties</h1>
           <main>
             <WelcomeButtons />
           </main>

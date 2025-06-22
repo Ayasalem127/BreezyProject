@@ -120,7 +120,7 @@ export default function UserCreationForm() {
     }
   };
 
-  const inputBase = "bg-white mt-1 block w-full rounded-md p-2 focus:outline-none focus:border-blue-500";
+  const inputBase = "focus:outline-none focus:border-blue-500";
 
   return (
     <div className="flex items-center justify-center p-4">
@@ -137,15 +137,13 @@ export default function UserCreationForm() {
 
         {/* Nom d'utilisateur */}
         <div>
-          <label htmlFor="username" className="block text-sm font-medium text-gray-700">Nom d'utilisateur</label>
+          <label htmlFor="username">Nom d'utilisateur</label>
           <input
             type="text"
             id="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className={`bg-white mt-1 block w-full rounded-md p-2 border ${
-                usernameError ? 'border-red-500' : 'border-gray-300'
-            } focus:border-blue-500 focus:outline-none`}
+            className={`${ usernameError ? 'border-red-500' : 'border-gray-300' } focus:border-blue-500 focus:outline-none`}
           />
           {usernameError && (
               <p className="text-red-500 text-sm mt-1">Un nom d'utilisateur est requis.</p>
@@ -154,15 +152,13 @@ export default function UserCreationForm() {
 
         {/* Email */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Adresse e-mail</label>
+          <label htmlFor="email">Adresse e-mail</label>
           <input
             type="email"
             id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={`bg-white mt-1 block w-full rounded-md p-2 border ${
-                emailError ? 'border-red-500' : 'border-gray-300'
-            } focus:border-blue-500 focus:outline-none`}
+            className={`${ emailError ? 'border-red-500' : 'border-gray-300' } focus:border-blue-500 focus:outline-none`}
             placeholder="exemple@domaine.com"
           />
           {emailError && (
@@ -172,14 +168,14 @@ export default function UserCreationForm() {
 
         {/* Mot de passe + icône info */}
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">Mot de passe</label>
+          <label htmlFor="password">Mot de passe</label>
           <div className="relative">
             <input
               type="password"
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={`${inputBase} pr-10 border ${passwordError ? "border-red-500" : "border-black"}`}
+              className={`${inputBase} pr-10 ${passwordError ? "border-red-500" : "border-black"}`}
             />
             <div className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 group cursor-pointer">
               <AiOutlineInfoCircle className="text-xl" />
@@ -195,14 +191,14 @@ export default function UserCreationForm() {
 
         {/* Confirmation mot de passe + icône info */}
         <div>
-          <label htmlFor="confirm_password" className="block text-sm font-medium text-gray-700">Confirmation du mot de passe</label>
+          <label htmlFor="confirm_password">Confirmation du mot de passe</label>
           <div className="relative">
             <input
               type="password"
               id="confirm_password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className={`${inputBase} pr-10 border ${confirmError ? "border-red-500" : "border-black"}`}
+              className={`${inputBase} pr-10 ${confirmError ? "border-red-500" : "border-black"}`}
             />
             <div className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 group cursor-pointer">
               <AiOutlineInfoCircle className="text-xl" />
@@ -217,9 +213,7 @@ export default function UserCreationForm() {
         </div>
 
         {/* Bouton */}
-        <button
-          type="submit"
-        >
+        <button type="submit">
           Créer un compte
         </button>
       </form>

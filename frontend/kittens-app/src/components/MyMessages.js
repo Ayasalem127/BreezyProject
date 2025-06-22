@@ -50,11 +50,11 @@ export default function MyMessages() {
 
     return (
         <div>
-            <h2 className="text-2xl font-bold text-gray-800 p-5">Mes messages</h2>
+            <h2>Mes messages</h2>
         
             <div className="flex flex-col items-center w-full px-4">
                 {messages.map((message, index) => (
-                <div key={index} className="w-full sm:w-[calc(50%-0.5rem)] p-2 m-4 box-border flex flex-col justify-between border border-gray-500 rounded-2xl shadow-2xl">
+                <div key={index} style={{ boxShadow: "0 12px 32px var(--shadow-color)", borderColor: 'var(--input-border)' }} className="w-full sm:w-[calc(50%-0.5rem)] p-2 m-4 box-border flex flex-col justify-between border rounded-2xl">
                     <form onSubmit={(e) => handleModification(e, index)} className="rounded-lg w-full space-y-2">
                         <div className="flex items-center gap-3 w-full">
                             <img src={message[1]} alt="logo" className="w-10 h-10 object-contain mb-2 rounded-full"/>
@@ -62,7 +62,7 @@ export default function MyMessages() {
                             <span className="flex ml-auto text-sm text-gray-500">{message[2]}</span>
                         </div>
 
-                        <textarea id={`message-${index}`} value={messageTexts[index]} onChange={(e) => { const newTexts = [...messageTexts]; newTexts[index] = e.target.value; setMessageTexts(newTexts); }} rows={3} className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"/>
+                        <textarea id={`message-${index}`} value={messageTexts[index]} onChange={(e) => { const newTexts = [...messageTexts]; newTexts[index] = e.target.value; setMessageTexts(newTexts); }} rows={3} className="focus:border-blue-500 focus:outline-none"/>
                         
                         <div className="flex justify-start gap-2 mt-3">
                             <div className="flex flex-col items-center">
@@ -84,14 +84,14 @@ export default function MyMessages() {
 
                     <form onSubmit={(e) => handleResponse(e, index)} style={{display: isVisible[index] ? 'block' : 'none'}} className="rounded-lg w-full space-y-2">
                         <div className="flex items-center gap-2">
-                        <img src={message[1]} alt="logo" className="w-10 h-10 object-contain mb-2 rounded-full"/>
-                        <textarea type="text" id={`response-${index}`} className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" rows={3} placeholder="Ecrire ici..."/>
+                            <img src={message[1]} alt="logo" className="w-10 h-10 object-contain mb-2 rounded-full"/>
+                            <textarea type="text" id={`response-${index}`} className="focus:border-blue-500 focus:outline-none" rows={3} placeholder="Ecrire ici..."/>
                         </div>
 
                         <div className="flex justify-end">
-                        <div className="w-30">
-                            <button type="submit">Publier</button>
-                        </div>
+                            <div className="w-30">
+                                <button type="submit">Publier</button>
+                            </div>
                         </div>
                     </form>
                 </div>

@@ -32,23 +32,20 @@ export default function InputBar({ userId }) {
     }
 
     return (
-        <div className="fixed bottom-0 w-full flex justify-center bg-white border-t border-gray-300 z-50">
+        <div style={{ backgroundColor: 'var(--input-background)', borderColor: 'var(--input-border)' }} className="fixed bottom-0 w-full flex justify-center border-t z-50">
             <form onSubmit={handleSubmit} className="flex w-full max-w-3xl items-center gap-2 p-2">
                 <div className="flex-grow">
                     <textarea
                         id="message"
                         ref={textareaRef}
                         onInput={autoResize}
-                        className="w-full resize-none overflow-hidden max-h-[100px] rounded-full border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="resize-none overflow-hidden max-h-[100px] rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Écris ton message..."
                         rows={1}
                     />
                 </div>
                 <div className="flex-shrink-0 p-2">
-                    <button
-                        type="submit"
-                        className="text-sm px-4 py-2 rounded-full transition"
-                    >
+                    <button type="submit">
                         Envoyer
                     </button>
                 </div>

@@ -7,8 +7,8 @@ export default function UsersSuggestionPC() {
 
     return (
         <div className="fixed top-12 left-0 w-1/4">
-            <div className="bg-white w-full p-2 rounded-xl overflow-y-auto" style={{ maxHeight: 'calc(100vh - var(--navbar-height))', minHeight: 'calc(100vh - var(--navbar-height))' }}>
-                <h3 className="text-xl font-bold text-gray-800 p-5">Suggestions de suivi</h3>
+            <div className="w-full p-2 rounded-xl overflow-y-auto" style={{ backgroundColor: 'var(--input-background)', borderColor: 'var(--input-border)', maxHeight: 'calc(100vh - var(--navbar-height))', minHeight: 'calc(100vh - var(--navbar-height))' }}>
+                <h3>Suggestions de suivi</h3>
                 {users.map((user, index) => (
                 <div key={index} className="w-full p-2 mt-4 box-border border rounded-xl sahdow-xl">
                     <div className="flex items-center gap-3 w-full">

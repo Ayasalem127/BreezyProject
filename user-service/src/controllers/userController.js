@@ -90,6 +90,27 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
+exports.searchUsersByDisplayName = async (req, res) => {
+  try {
+    const { query } = req.body;
+
+    if (!query || query.trim() === "") {
+      return res.status(400).json({ message: "Requête vide" });
+    }
+
+    // Recherche insensible à la casse (i) avec une expression régulière
+    const matchingUsers = await UserProfile.find({
+      displayName: { $regex: `^${query}`, $options: 'i' }
+    }).select('userId displayName');
+
+    res.json(matchingUsers);
+  } catch (err) {
+    console.error("Erreur lors de la recherche :", err.message);
+    res.status(500).json({ error: "Erreur serveur lors de la recherche." });
+  }
+};
+
+
 exports.followUser = async (req, res) => {
   const userId = req.headers["x-user-id"];
   const { followerId } = req.body;

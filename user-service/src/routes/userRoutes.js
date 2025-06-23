@@ -14,6 +14,8 @@ router.get('/:userId', controller.getProfile);
 
 router.put('/:userId', controller.updateProfile);
 
+router.post('/search', controller.searchUsersByDisplayName);
+
 router.post('/:userId/unfollow', controller.unfollowUser);
 router.post("/upload-avatar", upload.single("avatar"), controller.updateImage); 
 router.get("/:userId/following", controller.getFollowing);

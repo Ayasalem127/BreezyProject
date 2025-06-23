@@ -127,31 +127,29 @@ exports.getMyPosts = async (req, res) => {
 exports.getFeed = async (req, res) => {
   try {
     const idUser = req.headers['x-user-id'];
-    console.log("idUser:", idUser);
-
-    // 🔑 Récupération du token depuis le cookie
     const token = req.cookies?.token;
     const authHeader = token ? `Bearer ${token}` : undefined;
 
-    console.log("Authorization header:", authHeader); // Debug
-
     const response = await axios.get(`http://gateway:3001/user/api/users/${idUser}/following`, {
-      headers: {
-        Authorization: authHeader,
-        'x-user-id': idUser
-      }
-    });
+  headers: {
+    Authorization: authHeader,
+    'x-user-id': idUser
+  }
+});
 
-    const following = response.data.following;
-    console.log("Following:", following);
+// 👁️ Debug
+console.log("👁️ Contenu brut de response.data :", response.data);
 
-    if (!following || following.length === 0) {
-      return res.json([]); // Aucun feed
-    }
+// ✅ Extraction des IDs suivis
+const following = response.data.map(user => user.userId);
+console.log("✅ Following récupérés :", following);
 
-    const posts = await Post.find({ author: { $in: following } })
-      .sort({ createdAt: -1 })
-      .lean();
+if (!Array.isArray(following) || following.length === 0) {
+  return res.json([]);
+}
+
+
+    const posts = await Post.find({ author: { $in: following } }).sort({ createdAt: -1 }).lean();
 
     posts.forEach(post => {
       post.likeCount = post.likes?.length ?? 0;
@@ -160,10 +158,10 @@ exports.getFeed = async (req, res) => {
     res.json(posts);
   } catch (err) {
     console.error("Erreur récupération feed :", err.message);
-    console.error(err);
     res.status(500).json({ message: "Erreur serveur." });
   }
 };
+
 
 
 

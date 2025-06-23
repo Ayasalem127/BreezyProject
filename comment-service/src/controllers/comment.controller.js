@@ -19,7 +19,7 @@ exports.createComment = async (req, res) => {
     });
 
     // 🔔 Notifier l'auteur du post
-    const postRes = await axios.get(`http://localhost:3001/post/api/posts/${postId}`, {
+    const postRes = await axios.get(`http://gateway:3001/post/api/posts/${postId}`, {
       headers: {
         Authorization: `Bearer ${req.cookies.token}`,
         "x-user-id": req.user.id
@@ -30,7 +30,7 @@ exports.createComment = async (req, res) => {
     const postAuthorId = post.author?._id || post.author;
 
     if (postAuthorId && postAuthorId !== req.user.id) {
-      await axios.post("http://localhost:3001/notification/api/notifications", {
+      await axios.post("http://gateway:3001/notification/api/notifications", {
         recipientId: postAuthorId,
         senderId: req.user.id,
         type: "comment_post",
@@ -75,7 +75,7 @@ exports.replyToComment = async (req, res) => {
 
     // 🔔 Notifier l’auteur du commentaire parent
     if (String(parent.author) !== req.user.id) {
-      await axios.post("http://localhost:3001/notification/api/notifications", {
+      await axios.post("http://gateway:3001/notification/api/notifications", {
         recipientId: parent.author,
         senderId: req.user.id,
         type: "comment_reply",

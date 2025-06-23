@@ -253,3 +253,19 @@ exports.getLikes = async (req, res) => {
   }
 };
 
+
+
+exports.getPostById = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const post = await Post.findById(postId);
+
+    if (!post) return res.status(404).json({ message: "Post non trouvé." });
+
+    post.likeCount = post.likes.length;
+    res.json(post);
+  } catch (err) {
+    console.error("Erreur getPostById :", err);
+    res.status(500).json({ message: "Erreur serveur." });
+  }
+};

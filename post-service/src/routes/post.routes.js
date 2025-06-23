@@ -18,6 +18,9 @@ router.get("/feed", postController.getFeed);      //récup les tweet de mes abon
 router.post("/:id/like", postController.toggleLikePost); //like/dislike un post
 router.get("/:id/likes", postController.getLikes);
 
+router.get("/:id", postController.getPostById);
+
+
 
 
 module.exports = router;

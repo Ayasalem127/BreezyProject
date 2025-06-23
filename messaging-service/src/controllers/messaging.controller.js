@@ -106,8 +106,9 @@ exports.getChats = async (req, res) => {
 exports.getMessages = async (req, res) => {
     try {
         const me = req.headers['x-user-id'];
-        const other = req.params.otherId;
-
+        console.log("meeeeeeeeeeeeeee",me);
+        const other = req.params.otherId;;
+   console.log("otherrrrrrrrmeeeeeeeeeeeeeee",other);
         let meUserInfo = { displayName: null };
         try {
             const response = await axios.get(`http://user-service:4001/api/users/${me}`);

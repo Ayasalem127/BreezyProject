@@ -25,7 +25,7 @@ export default function ChatList() {
     useEffect(() => {
         getChats();
     }, []);
-
+console.log(chats);
     return (
         <div>
             <div className="flex flex-col items-center w-full px-4">

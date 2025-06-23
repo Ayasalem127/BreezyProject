@@ -1,4 +1,13 @@
 services:
+  language-service:
+    build: ./language-service
+    ports:
+      - "4007:4007"
+    env_file:
+      - ./language-service/.env
+    depends_on:
+      - mongo_language
+
   messaging-service:
     build: ./messaging-service
     ports:
@@ -54,6 +63,7 @@ services:
       - post-service
       - comment-service
       - messaging-service
+      - language-service
       
 
   # MongoDB pour auth-service
@@ -101,9 +111,19 @@ services:
     volumes:
       - messaging_data:/data/db
 
+  # MongoDB pour language-service
+  mongo_language:
+    image: mongo
+    container_name: breezy-mongo-language
+    ports:
+      - "27022:27017"
+    volumes:
+      - language_data:/data/db
+
 volumes:
   auth_data:
   user_data:
   post_data:
   comment_data:
   messaging_data:
+  language_data:

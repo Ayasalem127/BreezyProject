@@ -7,7 +7,7 @@ export default function MyInformations() {
     const router = useRouter();
     const { user } = useContext(AuthContext);
     console.log(user)
-    const infos = [user.displayName, "/logo.webp", user.bio||"Description"];
+    const infos = [user.displayName || "username", "/logo.webp", user.bio||"Description"];
 
     function handleModification() {
         try {

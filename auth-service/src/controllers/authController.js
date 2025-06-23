@@ -64,12 +64,13 @@ exports.login =async (req, res) => {
     const token = jwt.sign({ id: user._id, username: user.username,role:user.role}, process.env.JWT_SECRET, { expiresIn: '1h' });
     
     res.cookie('token', token, {
-  httpOnly: true,          //  pas accessible en JS
-  secure: true,            //  seulement en HTTPS
-  sameSite: 'lax',         // ou 'strict' ou 'none' selon ton besoin
-  maxAge: 3600000          // 1h en ms
-});
-res.status(200).json({ message: "Connexion réussie" });
+    httpOnly: true,          //  pas accessible en JS
+    secure: true,            //  seulement en HTTPS
+    sameSite: 'lax',         // ou 'strict' ou 'none' selon ton besoin
+    maxAge: 3600000          // 1h en ms
+    });
+
+    res.status(200).json({ message: "Connexion réussie" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

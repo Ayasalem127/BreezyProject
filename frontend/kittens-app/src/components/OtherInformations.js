@@ -6,23 +6,8 @@ export default function OtherInformations({ userId }) {
     const infos = ["username", "/logo.webp", "Description"];
     const [subscribe, setSubscribe] = useState(false);
 
-//     function handleFollow=async()=> {
-//     try {
-//     const response = await axios.post(
-//       'http://localhost:3001/user/api/users/follow',
-//       { followerId }, // dans le corps de la requête
-//       {
-//         headers: {
-//           'x-user-id': 'TON_USER_ID_ACTUEL', // Celui qui suit
-//         },
-//         withCredentials: true, // si tu utilises des cookies pour l'authentification
-//       }
-//     );
-//     console.log(response.data.message); // → "Follow réussi"
-//   } catch (error) {
-//     console.error('Erreur lors du follow :', error.response?.data || error.message);
-//   }
-// };
+
+
      const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -44,6 +29,22 @@ export default function OtherInformations({ userId }) {
 
     fetchProfile();
   }, [userId]);
+
+     const handleFollow = async () => {
+  try {
+    const response = await axios.post(
+      'http://localhost:3001/user/api/users/follow',
+      { followerId:profile?.userId }, 
+      {
+        withCredentials: true,
+      }
+    );
+    console.log(response.data.message);
+  } catch (error) {
+    console.error('Erreur lors du follow :', error.response?.data || error.message);
+  }
+};
+
 
   if (loading) return <p>Chargement...</p>;
   if (error) return <p>{error}</p>;

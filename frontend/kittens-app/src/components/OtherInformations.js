@@ -4,20 +4,23 @@ import axios from "axios";
 import { useEffect } from "react";
  import { AuthContext } from "@/context/AuthContext";
 export default function OtherInformations({ userId }) {
+      const { user,setUser } = useContext(AuthContext);
     const infos = ["username", "/logo.webp", "Description"];
-    const [subscribe, setSubscribe] = useState(false);
+    const [subscribe, setSubscribe] = useState(user?.following?.includes(userId) );
 
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
  
-    const { user } = useContext(AuthContext);
+
   useEffect(() => {
     if (!userId) return;
 
     const fetchProfile = async () => {
       try {
-        const res = await axios.get(`http://localhost:3001/user/api/users/${userId}`);
+        const res = await axios.get(`http://localhost:3001/user/api/users/${userId}`, {
+  withCredentials: true,
+});
         setProfile(res.data);
       } catch (err) {
         console.log("Erreur lors du chargement du profil :", err.message);
@@ -32,7 +35,20 @@ export default function OtherInformations({ userId }) {
 
      const handleFollow = async () => {
   try {
-    const response = await axios.post(
+    setSubscribe(!subscribe);
+    if(user.following?.includes(userId))
+    {
+   const response = await axios.post(
+      'http://localhost:3001/user/api/users/unfollow',
+      { followerId:profile?.userId }, 
+      {
+        withCredentials: true,
+      }
+    );
+    console.log(response.data.message);
+    }
+    else{
+   const response = await axios.post(
       'http://localhost:3001/user/api/users/follow',
       { followerId:profile?.userId }, 
       {
@@ -40,12 +56,16 @@ export default function OtherInformations({ userId }) {
       }
     );
     console.log(response.data.message);
+    }
+const updatedUser = await axios.get('http://localhost:3001/user/api/users/me', {
+        withCredentials: true,
+      });
+      setUser(updatedUser.data);
   } catch (error) {
-    console.error('Erreur lors du follow :', error.response?.data || error.message);
+    console.log('Erreur lors du follow :', error.response?.data || error.message);
   }
 };
 console.log("useridddddd",userId);
-console.log("fff",user.following );
 
 
   if (loading) return <p>Chargement...</p>;
@@ -62,7 +82,7 @@ console.log("fff",user.following );
 
                 <div className="flex justify-end">
                     <div className="w-50">
-                        <button onClick={(e) => handleFollow(e)}>{user.following?.includes(userId) ? "Ne plus suivre" : "Suivre"}</button>
+                        <button onClick={(e) => handleFollow(e)}>{subscribe ? "Ne plus suivre" : "Suivre"}</button>
                     </div>
                 </div>
             </div>

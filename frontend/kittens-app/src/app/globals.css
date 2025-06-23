@@ -4,7 +4,9 @@
   --background: #E1FBFF;
   --foreground: #171717;
   --buttons: #d1d2d4;
-  /*--buttons: #7c3dbc;*/
+  --input-background: #FFFFFF;
+  --input-border: #E8E8E8;
+  --shadow-color: rgba(0, 0, 0, 0.4);
   --navbar-height: 50px;
 }
 
@@ -12,16 +14,94 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-buttons: var(--buttons);
+  --input-background: var(--input-background);
+  --input-border: var(--input-border);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-} */
+
+[data-theme="dark"] {
+  --background: #0D1117;
+  --foreground: #E6EDF3;
+  --buttons: #238636;
+  --input-background: #1F242A;
+  --input-border: #CECECE;
+  --shadow-color: rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="pastel"] {
+  --background: #FFF8F0;
+  --foreground: #3C3C3C;
+  --buttons: #FFB4A2;
+  --input-background: #FFEFE7;
+  --input-border: #FFCDB2;
+  --shadow-color: rgba(255, 179, 162, 0.4);
+}
+
+[data-theme="midnight"] {
+  --background: #1E1E2F;
+  --foreground: #F5F7FA;
+  --buttons: #3B82F6;
+  --input-background: #2A2A40;
+  --input-border: #4B4B66;
+  --shadow-color: rgba(59, 130, 246, 0.4)
+}
+
+[data-theme="forest"] {
+  --background: #F1F8F5;
+  --foreground: #1B4332;
+  --buttons: #40916C;
+  --input-background: #D8F3DC;
+  --input-border: #95D5B2;
+  --shadow-color: rgba(64, 145, 108, 0.4);
+}
+
+[data-theme="blossom"] {
+  --background: #FFF0F5;
+  --foreground: #3D1E2F;
+  --buttons: #E5989B;
+  --input-background: #FFE4F1;
+  --input-border: #E6B0C3;
+  --shadow-color: rgba(229, 152, 155, 0.4);
+}
+
+[data-theme="sunset"] {
+  --background: #FFF5E1;
+  --foreground: #4E342E;
+  --buttons: #FB8500;
+  --input-background: #FFEDD5;
+  --input-border: #FFB347;
+  --shadow-color: rgba(251, 133, 0, 0.4);
+}
+
+[data-theme="grape"] {
+  --background: #F8F4FF;
+  --foreground: #2D022D;
+  --buttons: #9D4EDD;
+  --input-background: #F3E8FF;
+  --input-border: #D0A2F7;
+  --shadow-color: rgba(157, 78, 221, 0.4);
+}
+
+[data-theme="ocean"] {
+  --background: #E0F7FA;
+  --foreground: #003B46;
+  --buttons: #00B4D8;
+  --input-background: #CCF2F4;
+  --input-border: #90E0EF;
+  --shadow-color: rgba(0, 180, 216, 0.4);
+}
+
+[data-theme="earth"] {
+  --background: #FAF3E0;
+  --foreground: #3E2C1C;
+  --buttons: #A47149;
+  --input-background: #F5EBDD;
+  --input-border: #D6BAA2;
+  --shadow-color: rgba(164, 113, 73, 0.35);
+}
+
 
 body {
   background: var(--background);
@@ -35,6 +115,30 @@ body {
 }
 
 button {
-  @apply w-full p-2 rounded-2xl shadow-2xl text-center font-semibold border border-gray-400 hover:brightness-105 active:translate-y-[1px] transition-all duration-200;
+  @apply w-full p-2 rounded-2xl text-center font-semibold border hover:brightness-105 active:translate-y-[1px] transition-all duration-200;
   background-color: var(--buttons);
+  border-color: var(--input-border);
+  box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+h1 {
+  @apply text-4xl font-bold mb-4 p-10;
+}
+
+h2 {
+  @apply text-2xl font-bold p-5;
+}
+
+h3 {
+  @apply text-xl font-bold p-5;
+}
+
+label {
+  @apply block text-sm font-medium;
+}
+
+input, textarea {
+  @apply mt-1 block w-full rounded-md p-2 border;
+  background-color: var(--input-background);
+  border-color: var(--input-border);
 }

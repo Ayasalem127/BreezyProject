@@ -34,6 +34,7 @@ export default function UsersSuggestionPC() {
             <div className="bg-white w-full p-2 rounded-xl overflow-y-auto" style={{ maxHeight: 'calc(100vh - var(--navbar-height))', minHeight: 'calc(100vh - var(--navbar-height))' }}>
                 <h3 className="text-xl font-bold text-gray-800 p-5">Suggestions de suivi</h3>
                 {suggestions.map((user, index) => (
+
                 <div key={index} className="w-full p-2 mt-4 box-border border rounded-xl sahdow-xl">
                     <div className="flex items-center gap-3 w-full">
                        <Link

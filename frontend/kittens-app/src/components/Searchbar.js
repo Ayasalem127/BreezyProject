@@ -6,6 +6,7 @@ export default function Searchbar({ searchText, setSearchText }) {
     setSearchText(e.target.value);
   }
 
+
   return (
     <div className="flex items-center justify-center">
       <div className="relative w-full sm:w-[calc(50%-0.5rem)] p-2 m-4 box-border flex flex-col justify-between space-y-2">
@@ -22,3 +23,4 @@ export default function Searchbar({ searchText, setSearchText }) {
     </div>
   );
 }
+

@@ -81,6 +81,7 @@ exports.login = async (req, res) => {
       return res.status(401).json({ error: 'Identifiants invalides' });
     }
 
+
     // Vérifie que les secrets JWT sont définis
     if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
       return res.status(500).json({ error: "Clés JWT manquantes dans .env" });
@@ -118,6 +119,7 @@ exports.login = async (req, res) => {
 
     // Réponse JSON (tu peux ne pas envoyer le refreshToken côté client si tu ne veux pas)
     res.status(200).json({ message: 'Connexion réussie', refreshToken });
+
 
   } catch (err) {
     console.error("Erreur login:", err);

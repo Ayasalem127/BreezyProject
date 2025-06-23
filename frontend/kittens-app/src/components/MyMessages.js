@@ -1,7 +1,7 @@
 'use client';
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useEffect } from "react";
 import axios from "axios";
-
 export default function MyMessages() {
   const [posts, setPosts] = useState([]);
   const [likes, setLikes] = useState([]);
@@ -185,3 +185,4 @@ export default function MyMessages() {
     </div>
   );
 }
+

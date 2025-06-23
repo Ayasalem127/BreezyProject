@@ -1,3 +1,4 @@
+
 // 'use client';
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
@@ -154,6 +155,7 @@ function AddComment({ postId, onCommentAdded }) {
       setContent("");
     } catch (err) {
       console.log("Erreur ajout commentaire :", err.response?.data || err.message);
+
     }
   };
 
@@ -242,7 +244,6 @@ function CommentThread({ comment, authors }) {
       console.log("Erreur suppression :", err.response?.data || err.message);
     }
   };
-
   const isOwner = String(comment.author?._id || comment.author) === String(userId);
 
   return (
@@ -304,6 +305,7 @@ function CommentThread({ comment, authors }) {
           {replies.map((reply) => (
             <CommentThread key={reply._id} comment={reply} authors={authors} />
           ))}
+
         </div>
       )}
     </div>

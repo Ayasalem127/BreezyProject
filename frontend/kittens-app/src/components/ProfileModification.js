@@ -57,9 +57,22 @@ useEffect(() => {
 
   const handleClick = () => fileInputRef.current.click();
 
+
+  /*const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = () => setImage(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const inputBase = "block focus:outline-none focus:border-blue-500";*/
+
 const handleImageChange = (e) => {
   const file = e.target.files[0];
   if (!file || !file.type.startsWith("image/")) return;
+
 
   // Pour afficher un aperçu immédiatement (facultatif)
   const reader = new FileReader();
@@ -139,37 +152,40 @@ const uploadAvatar = async (formData) => {
           onClick={handleClick}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
-          className="w-32 h-32 mx-auto rounded-full overflow-hidden border-2 border-gray-300 cursor-pointer flex items-center justify-center bg-gray-100"
+          style={{ backgroundColor: 'var(--input-background)', borderColor: 'var(--input-border)' }}
+          className="w-32 h-32 mx-auto rounded-full overflow-hidden border-2 cursor-pointer"
         >
           <img src={image} alt="Profil" className="object-cover w-full h-full" />
           <input type="file" accept="image/*" onChange={handleImageChange} ref={fileInputRef} className="hidden" />
         </div>
 
         <div>
+
           <label htmlFor="username" className="block text-sm font-medium text-gray-700">Nom d'utilisateur</label>
-          <input type="text" id="username" className={`${inputBase} border border-black`}  defaultValue={user?.displayName} />
+          <input type="text" id="username"  className={`${inputBase}`}  defaultValue={user?.displayName} />
         </div>
 
         <div>
           <label htmlFor="biography" className="block text-sm font-medium text-gray-700">Biographie</label>
-          <textarea id="biography" className={`${inputBase} border border-black`} defaultValue={user?.bio}  />
+          <textarea id="biography" className={`${inputBase}`} defaultValue={user?.bio}  />
         </div>
 
         {/* <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">Adresse e-mail</label>
-          <input type="email" id="email" placeholder="exemple@domaine.com" className={`${inputBase} border border-black`} />
+          <input type="email" id="email" placeholder="exemple@domaine.com"  className={`${inputBase}`} />
+
         </div>
 
        
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">Mot de passe</label>
+          <label htmlFor="password">Mot de passe</label>
           <div className="relative">
             <input
               type="password"
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={`${inputBase} pr-10 border ${passwordError ? "border-red-500" : "border-black"}`}
+              className={`${inputBase} pr-10 ${passwordError ? "border-red-500" : "border-black"}`}
             />
             <div className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 group cursor-pointer">
               <AiOutlineInfoCircle className="text-xl" />
@@ -185,14 +201,14 @@ const uploadAvatar = async (formData) => {
 
      
         <div>
-          <label htmlFor="confirm_password" className="block text-sm font-medium text-gray-700">Confirmation du mot de passe</label>
+          <label htmlFor="confirm_password">Confirmation du mot de passe</label>
           <div className="relative">
             <input
               type="password"
               id="confirm_password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className={`${inputBase} pr-10 border ${confirmError ? "border-red-500" : "border-black"}`}
+              className={`${inputBase} pr-10 ${confirmError ? "border-red-500" : "border-black"}`}
             />
             <div className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 group cursor-pointer">
               <AiOutlineInfoCircle className="text-xl" />

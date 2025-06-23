@@ -1,4 +1,13 @@
 services:
+  messaging-service:
+    build: ./messaging-service
+    ports:
+      - "4006:4006"
+    env_file:
+      - ./messaging-service/.env
+    depends_on:
+      - mongo_messaging
+
   comment-service:
     build: ./comment-service
     ports:
@@ -55,10 +64,14 @@ services:
       - user-service
       - post-service
       - comment-service
+
+      - messaging-service
+
       - notification-service
     volumes: 
       - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./user-service/uploads:/app/uploads
+
 
       
 
@@ -98,6 +111,16 @@ services:
     volumes:
       - comment_data:/data/db
 
+
+  # MongoDB pour messaging-service
+  mongo_messaging:
+    image: mongo
+    container_name: breezy-mongo-messaging
+    ports:
+      - "27021:27017"
+    volumes:
+      - messaging_data:/data/db
+
 #  MongoDB pour notification-service
   mongo_notification:
     image: mongo
@@ -107,9 +130,14 @@ services:
     volumes:
       - notification_data:/data/db
 
+
 volumes:
   auth_data:
   user_data:
   post_data:
   comment_data:
+
+  messaging_data:
+
   notification_data:
+

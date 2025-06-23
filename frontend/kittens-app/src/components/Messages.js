@@ -153,7 +153,7 @@ function AddComment({ postId, onCommentAdded }) {
       onCommentAdded(res.data);
       setContent("");
     } catch (err) {
-      console.error("Erreur ajout commentaire :", err.response?.data || err.message);
+      console.log("Erreur ajout commentaire :", err.response?.data || err.message);
     }
   };
 

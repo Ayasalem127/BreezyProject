@@ -21,8 +21,7 @@ exports.getMyProfile = async (req, res) => {
          console.log("idduserprofile",userId);
     const profile = await UserProfile
     .findOne({ userId: userId })
-    .populate('followers', 'userId displayName avatarUrl') // on récupère les infos utiles seulement
-    .populate('following', 'userId displayName avatarUrl');
+   
     if (!profile) return res.status(404).json({ message: "Profil non trouvé" });
     res.json(profile);
   } catch (err) {
@@ -33,8 +32,6 @@ exports.getProfile = async (req, res) => {
   try {
     const profile = await UserProfile
     .findOne({ userId: req.params.userId })
-    .populate('followers', 'userId displayName avatarUrl') // on récupère les infos utiles seulement
-    .populate('following', 'userId displayName avatarUrl');
     if (!profile) return res.status(404).json({ message: "Profil non trouvé" });
     res.json(profile);
   } catch (err) {
@@ -157,7 +154,7 @@ exports.followUser = async (req, res) => {
 };
 
 exports.unfollowUser = async (req, res) => {
-  const { userId } = req.params;
+  const userId = req.headers["x-user-id"];
   const { followerId } = req.body;
 
   try {
@@ -166,8 +163,8 @@ exports.unfollowUser = async (req, res) => {
 
     if (!user || !follower) return res.status(404).json({ message: "Utilisateurs non trouvés" });
 
-    user.followers = user.followers.filter(id => id !== follower.userId);
-    follower.following = follower.following.filter(id => id !== user.userId);
+    user.following = user.following.filter(id => id !== follower.userId);
+    follower.followers = follower.followers.filter(id => id !== user.userId);
 
     await user.save();
     await follower.save();

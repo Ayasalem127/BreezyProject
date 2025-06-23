@@ -5,8 +5,9 @@ import { useContext } from "react";
 import { AuthContext } from "@/context/AuthContext";
 export default function MyInformations() {
     const router = useRouter();
+    
     const { user } = useContext(AuthContext);
-    console.log(user)
+    console.log(user);
     const infos = [user.displayName, `http://localhost:3001${user?.avatarUrl}` ||"/logo.webp", user.bio||"bio"];
 
     function handleModification() {

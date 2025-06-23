@@ -44,6 +44,8 @@ export default function OtherInformations({ userId }) {
     console.error('Erreur lors du follow :', error.response?.data || error.message);
   }
 };
+console.log("useridddddd",userId);
+console.log("fff",user.following );
 
 
   if (loading) return <p>Chargement...</p>;
@@ -60,7 +62,7 @@ export default function OtherInformations({ userId }) {
 
                 <div className="flex justify-end">
                     <div className="w-50">
-                        <button onClick={(e) => handleFollow(e)}>{userId in user.following ? "Ne plus suivre" : "Suivre"}</button>
+                        <button onClick={(e) => handleFollow(e)}>{user.following?.includes(userId) ? "Ne plus suivre" : "Suivre"}</button>
                     </div>
                 </div>
             </div>

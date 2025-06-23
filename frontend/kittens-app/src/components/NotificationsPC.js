@@ -19,29 +19,26 @@ export default function NotificationsPC() {
 
         const rawNotifications = res.data;
 
-        // On enrichit chaque notification avec senderUsername récupéré du user-service
-        // On enrichit chaque notification avec senderDisplayName récupéré du user-service
-const enrichedNotifications = await Promise.all(
-  rawNotifications.map(async (notif) => {
-    try {
-      const userRes = await axios.get(
-        `http://localhost:3001/user/api/users/${notif.senderId}`,
-        { withCredentials: true }
-      );
-      return {
-        ...notif,
-        senderDisplayName: userRes.data.displayName || notif.senderId,
-      };
-    } catch (err) {
-      console.warn(`❗ Impossible de récupérer le displayName pour ${notif.senderId}`);
-      return {
-        ...notif,
-        senderDisplayName: notif.senderId,
-      };
-    }
-  })
-);
-
+        const enrichedNotifications = await Promise.all(
+          rawNotifications.map(async (notif) => {
+            try {
+              const userRes = await axios.get(
+                `http://localhost:3001/user/api/users/${notif.recipientId}`,
+                { withCredentials: true }
+              );
+              return {
+                ...notif,
+                senderDisplayName: userRes.data.displayName || notif.senderId,
+              };
+            } catch (err) {
+              console.warn(`❗ Impossible de récupérer le displayName pour ${notif.senderId}`);
+              return {
+                ...notif,
+                senderDisplayName: notif.senderId,
+              };
+            }
+          })
+        );
 
         setNotifications(enrichedNotifications);
       } catch (err) {
@@ -52,6 +49,25 @@ const enrichedNotifications = await Promise.all(
     fetchNotifications();
   }, [visible]);
 
+  const formatNotificationMessage = (notif) => {
+    switch (notif.type) {
+      case "like_post":
+        return "a liké votre post";
+      case "like_comment":
+        return "a liké votre commentaire";
+      case "comment_post":
+        return "a commenté votre post";
+      case "comment_reply":
+        return "a répondu à votre commentaire";
+      case "mention":
+        return "vous a mentionné";
+      case "follow":
+        return "a commencé à vous suivre";
+      default:
+        return notif.message || "vous a notifié";
+    }
+  };
+
   if (!visible) return null;
 
   return (
@@ -61,9 +77,8 @@ const enrichedNotifications = await Promise.all(
       ) : (
         notifications.map((notif) => (
           <div key={notif._id} className="border p-2 rounded mb-2">
-  🔔 <strong>{notif.senderDisplayName}</strong> {notif.message}
-</div>
-
+            🔔 <strong>{notif.senderDisplayName}</strong> {formatNotificationMessage(notif)}
+          </div>
         ))
       )}
     </div>

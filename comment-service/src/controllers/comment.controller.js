@@ -139,26 +139,43 @@ exports.deleteComment = async (req, res) => {
 exports.toggleLikeComment = async (req, res) => {
   const { id } = req.params;
   const userId = req.user.id;
+  const token = req.headers.authorization;
 
   try {
     const comment = await Comment.findById(id);
     if (!comment) return res.status(404).json({ message: "Commentaire introuvable" });
 
     const index = comment.likes.indexOf(userId);
+    let liked = false;
 
     if (index === -1) {
-      comment.likes.push(userId); // Like
+      comment.likes.push(userId);
+      liked = true;
+
+      // ✅ Notification pour like de commentaire
+      if (userId !== comment.author) {
+        await axios.post("http://notification-service:4005/api/notifications", {
+          recipientId: comment.author,
+          senderId: userId,
+          type: "like_comment",
+          message: "a liké votre commentaire",
+          commentId: comment._id
+        }, {
+          headers: { Authorization: token }
+        });
+      }
     } else {
-      comment.likes.splice(index, 1); // Unlike
+      comment.likes.splice(index, 1);
     }
 
     await comment.save();
-    res.json({ message: "Mise à jour du like", likes: comment.likes.length });
+    res.json({ liked, likes: comment.likes.length });
   } catch (err) {
     console.error("Erreur likeComment :", err);
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
+
 
 //renvoie le nombre de likes d'un commentaires
 exports.getCommentLikes = async (req, res) => {

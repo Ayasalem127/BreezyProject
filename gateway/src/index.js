@@ -36,6 +36,11 @@ app.use('/comments', validateJWT, createProxyMiddleware({
   changeOrigin: true
 }));
 
+app.use('/notifications', validateJWT, createProxyMiddleware({
+  target: 'http://localhost:4005',
+  changeOrigin: true
+}));
+
 
 const PORT = 3001;
 app.listen(PORT, () => {

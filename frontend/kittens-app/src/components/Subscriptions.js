@@ -58,7 +58,7 @@ export default function Subscriptions({ searchText }) {
               key={index}
               style={{ boxShadow: "0 12px 32px var(--shadow-color)", borderColor: 'var(--input-border)' }} className="w-full sm:w-[calc(50%-0.5rem)] p-2 m-4 box-border flex flex-col justify-between border rounded-2xl">
                      
-              <Link href={`/otherProfile/${subscription.userId}`}>
+              <Link href={`/otherProfile?userId=${subscription.userId}`} >
                 <div className="p-2 box-border flex flex-row items-center justify-center rounded-lg gap-4">
                   <img
                     src={`http://localhost:3001${subscription?.avatarUrl}`}

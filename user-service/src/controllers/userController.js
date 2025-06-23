@@ -21,8 +21,7 @@ exports.getMyProfile = async (req, res) => {
          console.log("idduserprofile",userId);
     const profile = await UserProfile
     .findOne({ userId: userId })
-    .populate('followers', 'userId displayName avatarUrl') // on récupère les infos utiles seulement
-    .populate('following', 'userId displayName avatarUrl');
+   
     if (!profile) return res.status(404).json({ message: "Profil non trouvé" });
     res.json(profile);
   } catch (err) {

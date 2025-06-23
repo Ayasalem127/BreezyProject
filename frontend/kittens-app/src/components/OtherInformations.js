@@ -1,17 +1,17 @@
 'use client';
-import { useState } from "react";
+import { useContext, useState } from "react";
 import axios from "axios";
 import { useEffect } from "react";
+ import { AuthContext } from "@/context/AuthContext";
 export default function OtherInformations({ userId }) {
     const infos = ["username", "/logo.webp", "Description"];
     const [subscribe, setSubscribe] = useState(false);
 
-
-
-     const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
+    const [profile, setProfile] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+ 
+    const { user } = useContext(AuthContext);
   useEffect(() => {
     if (!userId) return;
 
@@ -60,7 +60,7 @@ export default function OtherInformations({ userId }) {
 
                 <div className="flex justify-end">
                     <div className="w-50">
-                        <button onClick={(e) => handleFollow(e)}>{subscribe ? "Ne plus suivre" : "Suivre"}</button>
+                        <button onClick={(e) => handleFollow(e)}>{userId in user.following ? "Ne plus suivre" : "Suivre"}</button>
                     </div>
                 </div>
             </div>

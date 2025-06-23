@@ -26,9 +26,6 @@ export default function UsersSuggestionPC() {
 
 
 
-
-
-
     return (
         <div className="fixed top-12 left-0 w-1/4">
             <div className="bg-white w-full p-2 rounded-xl overflow-y-auto" style={{ maxHeight: 'calc(100vh - var(--navbar-height))', minHeight: 'calc(100vh - var(--navbar-height))' }}>

@@ -1,15 +1,33 @@
+'use client';
 import Link from "next/link";
 import ThemeList from "./ThemeList";
 import { useToggleTargetComponent } from "@/context/ToggleTargetComponentContext";
+
 import { useState } from "react";
+
+
+
+import { AuthContext } from "@/context/AuthContext";
+import { useContext } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const { setVisible } = useToggleTargetComponent();
-
   const [showThemeList, setShowThemeList] = useState(false);
+   const router = useRouter();
 
   const photo = "/logo.webp";
-  
+  const { setUser } = useContext(AuthContext); 
+    const handleLogout = async () => {
+    try {
+      await axios.post("http://localhost:3001/auth/auth/logout", {}, { withCredentials: true });
+      setUser(null); // désauthentifier côté frontend
+      router.push("/connection"); // rediriger vers la page de connexion
+    } catch (err) {
+      console.error("Erreur lors du logout :", err.message);
+    }
+  };
   return (
     <nav
       style={{ backgroundColor: "var(--buttons)", boxShadow: "0 12px 32px var(--shadow-color)" }}
@@ -40,6 +58,7 @@ export default function Navbar() {
             />
           </Link>
         </div>
+        
 
         <div className="flex justify-end">
           <Link href="/chatList">
@@ -50,6 +69,15 @@ export default function Navbar() {
             />
           </Link>
         </div>
+          
+        <div className="flex justify-end cursor-pointer" onClick={handleLogout}>
+      <img
+        src="/logout.png"
+        alt="logout"
+        className="w-5 h-5 hover:scale-110 transition-transform"
+      />
+    </div>
+    
       </div>
 
       {/* Zone droite : Notifications, Theme, Profil */}

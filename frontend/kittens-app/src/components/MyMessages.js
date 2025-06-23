@@ -3,101 +3,186 @@ import { useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
 export default function MyMessages() {
-    const messages = [["username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 1], ["username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 1]];
-    const [posts, setPosts] = useState([]);
-    const [likes, setLikes] = useState(Array(messages.length).fill(false));
-    const [isVisible, setIsVisible] = useState(Array(messages.length).fill(false));
-    const [messageTexts, setMessageTexts] = useState(messages.map(message => message[3]));
-    
-    useEffect(() => {
-        axios.get('http://localhost:3001/post/api/posts/me', { withCredentials: true })
-            .then(res => {
-                setPosts(res.data);
-                setLikes(res.data.map(() => false)); // par défaut, pas liké
-                setIsVisible(res.data.map(() => false)); // réponses cachées
-                setMessageTexts(res.data.map(p => p.content)); // contenu des posts
-            })
-            .catch(err => console.error(err));
-    }, []);
-    function toggleLike(index) {
-        const newLikes = [...likes];
-        newLikes[index] = !newLikes[index];
-        setLikes(newLikes);
-    }
+  const [posts, setPosts] = useState([]);
+  const [likes, setLikes] = useState([]);
+  const [isVisible, setIsVisible] = useState([]);
+  const [messageTexts, setMessageTexts] = useState([]);
+  const [notification, setNotification] = useState("");
+  const [likesByPost, setLikesByPost] = useState({});
+  const [commentsByPost, setCommentsByPost] = useState({});
 
-    function toggleResponse(index) {
-        const newIsVisible = [...isVisible];
-        newIsVisible[index] = !newIsVisible[index];
-        setIsVisible(newIsVisible);
-    }
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await axios.get('http://localhost:3001/post/api/posts/me', { withCredentials: true });
+        const postList = res.data;
 
-    const handleModification = (e, index) => {
-        e.preventDefault();
+        setPosts(postList);
+        setLikes(postList.map(() => false));
+        setIsVisible(postList.map(() => false));
+        setMessageTexts(postList.map(p => p.content));
 
-        const newContent = messageTexts[index];
-        
-        console.log(`Message modifié : ${newContent}`);
+        const likesMap = {};
+        const commentsMap = {};
+
+        await Promise.all(postList.map(async (post) => {
+          try {
+            const likeRes = await axios.get(`http://localhost:3001/post/api/posts/${post._id}/likes`, { withCredentials: true });
+            likesMap[post._id] = likeRes.data.likes || 0;
+          } catch {
+            likesMap[post._id] = 0;
+          }
+
+          try {
+            const commentRes = await axios.get(`http://localhost:3001/comment/api/comments/${post._id}`, { withCredentials: true });
+            commentsMap[post._id] = commentRes.data.length;
+          } catch {
+            commentsMap[post._id] = 0;
+          }
+        }));
+
+        setLikesByPost(likesMap);
+        setCommentsByPost(commentsMap);
+      } catch (err) {
+        console.error("Erreur chargement posts :", err);
+      }
     };
 
-    const handleResponse = async (e, index) => {
-        e.preventDefault();
+    fetchPosts();
+  }, []);
 
-        const response = e.target.elements[`response-${index}`].value;
+  const toggleLike = (index) => {
+    const newLikes = [...likes];
+    newLikes[index] = !newLikes[index];
+    setLikes(newLikes);
+  };
 
-        //Affichage temporaire
-        console.log(`Réponse : ${response}`);
+  const toggleResponse = (index) => {
+    const newIsVisible = [...isVisible];
+    newIsVisible[index] = !newIsVisible[index];
+    setIsVisible(newIsVisible);
+  };
+
+  const handleModification = async (e, index) => {
+    e.preventDefault();
+
+    const postId = posts[index]._id;
+    const newContent = messageTexts[index];
+
+    try {
+      const response = await axios.put(
+        `http://localhost:3001/post/api/posts/${postId}`,
+        { content: newContent },
+        { withCredentials: true }
+      );
+
+      const updatedPosts = [...posts];
+      updatedPosts[index].content = newContent;
+      setPosts(updatedPosts);
+      setNotification("Post modifié avec succès ✅");
+      setTimeout(() => setNotification(""), 3000);
+    } catch (err) {
+      console.error("Erreur lors de la modification :", err.response?.data || err.message);
+      setNotification("Erreur lors de la modification ❌");
+      setTimeout(() => setNotification(""), 3000);
     }
+  };
 
-    return (
-        <div>
-            <h2>Mes messages</h2>
-        
-            <div className="flex flex-col items-center w-full px-4">
-                {messages.map((message, index) => (
-                <div key={index} style={{ boxShadow: "0 12px 32px var(--shadow-color)", borderColor: 'var(--input-border)' }} className="w-full sm:w-[calc(50%-0.5rem)] p-2 m-4 box-border flex flex-col justify-between border rounded-2xl">
-                    <form onSubmit={(e) => handleModification(e, index)} className="rounded-lg w-full space-y-2">
-                        <div className="flex items-center gap-3 w-full">
-                            <img src={message[1]} alt="logo" className="w-10 h-10 object-contain mb-2 rounded-full"/>
-                            <span className="font-semibold">{message[0]}</span>
-                            <span className="flex ml-auto text-sm text-gray-500">{message[2]}</span>
-                        </div>
+  const handleResponse = async (e, index) => {
+    e.preventDefault();
+    const responseText = e.target.elements[`response-${index}`].value;
+    console.log(`Réponse envoyée : ${responseText}`);
+  };
 
-                        <textarea id={`message-${index}`} value={messageTexts[index]} onChange={(e) => { const newTexts = [...messageTexts]; newTexts[index] = e.target.value; setMessageTexts(newTexts); }} rows={3} className="focus:border-blue-500 focus:outline-none"/>
-                        
-                        <div className="flex justify-start gap-2 mt-3">
-                            <div className="flex flex-col items-center">
-                                <span id={`likeButton-${index}`} className="text-3xl cursor-pointer" onClick={() => toggleLike(index)} role="button" aria-label="like button">{likes[index] ? "❤️" : "🤍"}</span>
-                                <span id={`numberLikes-${index}`}>{message[4]}</span>
-                            </div>
-                            <div className="flex flex-col items-center">
-                                <span id={`responseButton-${index}`} className="text-3xl cursor-pointer" onClick={() => toggleResponse(index)} role="button" aria-label="response button">💬</span>
-                                <span id={`numberResponses-${index}`}>{message[5]}</span>
-                            </div>
-                        </div>
+  return (
+    <div>
+      <h2 className="text-2xl font-bold text-gray-800 p-5">Mes messages</h2>
 
-                        <div className="flex justify-end">
-                            <div className="w-30">
-                                <button type="submit">Modifier</button>
-                            </div>
-                        </div>
-                    </form>
+      {notification && (
+        <p className="text-center text-sm text-green-600 font-semibold">{notification}</p>
+      )}
 
-                    <form onSubmit={(e) => handleResponse(e, index)} style={{display: isVisible[index] ? 'block' : 'none'}} className="rounded-lg w-full space-y-2">
-                        <div className="flex items-center gap-2">
-                            <img src={message[1]} alt="logo" className="w-10 h-10 object-contain mb-2 rounded-full"/>
-                            <textarea type="text" id={`response-${index}`} className="focus:border-blue-500 focus:outline-none" rows={3} placeholder="Ecrire ici..."/>
-                        </div>
+      <div className="flex flex-col items-center w-full px-4">
+        {posts.map((message, index) => (
+          <div key={index} className="w-full sm:w-[calc(50%-0.5rem)] p-4 m-4 box-border flex flex-col justify-between border border-gray-500 rounded-2xl shadow-2xl">
+            <form onSubmit={(e) => handleModification(e, index)} className="rounded-lg w-full space-y-2">
+              <div className="flex items-center gap-3 w-full">
+                <img src={message.avatarUrl} alt="avatar" className="w-10 h-10 object-contain mb-2 rounded-full" />
+                <span className="font-semibold">{message.author}</span>
+                <span className="flex ml-auto text-sm text-gray-500">
+                  {new Date(message.createdAt).toLocaleDateString()}
+                </span>
+              </div>
 
-                        <div className="flex justify-end">
-                            <div className="w-30">
-                                <button type="submit">Publier</button>
-                            </div>
-                        </div>
-                    </form>
+              <textarea
+                id={`message-${index}`}
+                value={messageTexts[index]}
+                onChange={(e) => {
+                  const newTexts = [...messageTexts];
+                  newTexts[index] = e.target.value;
+                  setMessageTexts(newTexts);
+                }}
+                rows={3}
+                className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
+              />
+
+              <div className="flex justify-start gap-6 mt-3">
+                <div className="flex flex-col items-center">
+                  <span
+                    className="text-3xl cursor-pointer"
+                    onClick={() => toggleLike(index)}
+                    role="button"
+                    aria-label="like button"
+                  >
+                    {likes[index] ? "❤️" : "🤍"}
+                  </span>
+                  <span>{likesByPost[message._id] || 0}</span>
                 </div>
-                ))}
-                
-            </div>
-        </div>
-    );
+                <div className="flex flex-col items-center">
+                  <span
+                    className="text-3xl cursor-pointer"
+                    onClick={() => toggleResponse(index)}
+                    role="button"
+                    aria-label="response button"
+                  >
+                    💬
+                  </span>
+                  <span>{commentsByPost[message._id] || 0}</span>
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <button type="submit" className="px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
+                  Modifier
+                </button>
+              </div>
+            </form>
+
+            <form
+              onSubmit={(e) => handleResponse(e, index)}
+              style={{ display: isVisible[index] ? "block" : "none" }}
+              className="rounded-lg w-full space-y-2 mt-3"
+            >
+              <div className="flex items-center gap-2">
+                <img src={message.avatarUrl} alt="logo" className="w-10 h-10 object-contain mb-2 rounded-full" />
+                <textarea
+                  id={`response-${index}`}
+                  className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
+                  rows={3}
+                  placeholder="Ecrire ici..."
+                />
+              </div>
+
+              <div className="flex justify-end">
+                <button type="submit" className="px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700">
+                  Publier
+                </button>
+              </div>
+            </form>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
+

@@ -3,7 +3,7 @@ import { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState({displayName:"test",bio:""});
+  const [user, setUser] = useState({displayName:"test",bio:"", avatarUrl:""});
 
   useEffect(() => {
     axios.get('http://localhost:3001/user/api/users/me', { withCredentials: true })

@@ -20,6 +20,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
+
 [data-theme="dark"] {
   --background: #0D1117;
   --foreground: #E6EDF3;
@@ -100,6 +101,7 @@
   --input-border: #D6BAA2;
   --shadow-color: rgba(164, 113, 73, 0.35);
 }
+
 
 body {
   background: var(--background);

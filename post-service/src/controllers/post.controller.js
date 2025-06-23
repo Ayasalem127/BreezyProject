@@ -1,6 +1,5 @@
 const Post = require("../models/post.model");
 const axios = require("axios");
-
 exports.createPost = async (req, res) => {
   try {
       const userId = req.headers['x-user-id'];
@@ -33,6 +32,9 @@ exports.createPost = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur." });
   }
 };
+
+
+
 
 //modif possible d'un post seulement par son auteur ou un admin
 exports.updatePost = async (req, res) => {
@@ -124,26 +126,33 @@ exports.getMyPosts = async (req, res) => {
 //voir mon feed avec les utilisateurs suivis
 exports.getFeed = async (req, res) => {
   try {
-         const idUser=req.headers['x-user-id']
-    //  Appel REST vers le user-service pour récupérer la liste des followings
-    const response = await axios.get(`http://localhost:3001/user/api/users/${idUser}/following`, {
+    const idUser = req.headers['x-user-id'];
+    const token = req.cookies?.token;
+    const authHeader = token ? `Bearer ${token}` : undefined;
+
+    const response = await axios.get(`http://gateway:3001/user/api/users/${idUser}/following`, {
   headers: {
-    Authorization: req.headers.authorization
+    Authorization: authHeader,
+    'x-user-id': idUser
   }
 });
 
-    const following = response.data.following;
+// 👁️ Debug
+console.log("👁️ Contenu brut de response.data :", response.data);
 
-    if (!following || following.length === 0) {
-      return res.json([]); // pas de feed si on suit personne
-    }
+// ✅ Extraction des IDs suivis
+const following = response.data.map(user => user.userId);
+console.log("✅ Following récupérés :", following);
 
-    const posts = await Post.find({ author: { $in: following } })   //in : filtre les auteurs
-      .sort({ createdAt: -1 })
-      .lean();      //optimise la requête pour retourner obj + légers
+if (!Array.isArray(following) || following.length === 0) {
+  return res.json([]);
+}
+
+
+    const posts = await Post.find({ author: { $in: following } }).sort({ createdAt: -1 }).lean();
 
     posts.forEach(post => {
-      post.likeCount = post.likes.length;
+      post.likeCount = post.likes?.length ?? 0;
     });
 
     res.json(posts);
@@ -154,23 +163,58 @@ exports.getFeed = async (req, res) => {
 };
 
 
+
+
+
+
 // like/dislike post
 exports.toggleLikePost = async (req, res) => {
   try {
     const postId = req.params.id;
+    const userId = req.headers['x-user-id'];
+    console.log("idUser:", userId);
 
-    const idUser=req.headers['x-user-id']
+    // 🔑 Récupération du token depuis les cookies
+    const token = req.cookies?.token;
+    const authHeader = token ? `Bearer ${token}` : null;
+
     const post = await Post.findById(postId);
     if (!post) return res.status(404).json({ message: "Post non trouvé." });
 
     const hasLiked = post.likes.includes(userId);
 
     if (hasLiked) {
-      // Dislike → on enlève l'ID
-      post.likes = post.likes.filter(id => id !== idUser);
+      post.likes = post.likes.filter(id => id !== userId);
     } else {
-      // Like → on ajoute l'ID
-      post.likes.push(idUser);
+      post.likes.push(userId);
+
+      // Envoi notification si like d'un autre utilisateur
+      if (userId !== post.author.toString()) {
+        try {
+          const notifHeaders = {
+            'x-user-id': userId
+          };
+          if (authHeader) notifHeaders.Authorization = authHeader;
+
+          console.log("📡 Envoi notification à", post.author.toString(), "avec headers", notifHeaders);
+
+          await axios.post(
+            "http://gateway:3001/notification/api/notifications",
+            {
+              recipientId: post.author.toString(),
+              senderId: userId,
+              type: "like_post",
+              message: "a liké votre post",
+              postId
+            },
+            {
+              headers: notifHeaders
+            }
+          );
+        } catch (notifErr) {
+          console.error("⚠️ Erreur lors de l'envoi de la notification :", notifErr.response?.data || notifErr.message);
+        }
+      }
     }
 
     await post.save();
@@ -179,8 +223,49 @@ exports.toggleLikePost = async (req, res) => {
       liked: !hasLiked,
       totalLikes: post.likes.length
     });
+
   } catch (err) {
-    console.error("Erreur toggle like :", err);
+    console.error("Erreur toggle like post :", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
+
+
+
+
+
+exports.getLikes = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const userId = req.headers['x-user-id']; // injecté par la gateway
+
+    const post = await Post.findById(postId);
+    if (!post) return res.status(404).json({ message: "Post introuvable" });
+
+    const liked = post.likes.includes(userId);
+    const totalLikes = post.likes.length;
+
+    res.json({ likes: totalLikes, liked });
+  } catch (err) {
+    console.error("Erreur getLikes :", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
+
+
+exports.getPostById = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const post = await Post.findById(postId);
+
+    if (!post) return res.status(404).json({ message: "Post non trouvé." });
+
+    post.likeCount = post.likes.length;
+    res.json(post);
+  } catch (err) {
+    console.error("Erreur getPostById :", err);
     res.status(500).json({ message: "Erreur serveur." });
   }
 };

@@ -1,4 +1,6 @@
 const Comment = require("../models/comment.model");
+const axios = require("axios"); // si ce n'est pas déjà en haut
+
 
 exports.createComment = async (req, res) => {
   try {
@@ -16,12 +18,40 @@ exports.createComment = async (req, res) => {
       parentId: null
     });
 
+    // 🔔 Notifier l'auteur du post
+    const postRes = await axios.get(`http://gateway:3001/post/api/posts/${postId}`, {
+      headers: {
+        Authorization: `Bearer ${req.cookies.token}`,
+        "x-user-id": req.user.id
+      }
+    });
+
+    const post = postRes.data;
+    const postAuthorId = post.author?._id || post.author;
+
+    if (postAuthorId && postAuthorId !== req.user.id) {
+      await axios.post("http://gateway:3001/notification/api/notifications", {
+        recipientId: postAuthorId,
+        senderId: req.user.id,
+        type: "comment_post",
+        message: "a commenté votre post",
+        postId
+      }, {
+        headers: {
+          Authorization: `Bearer ${req.cookies.token}`,
+          "x-user-id": req.user.id
+        }
+      });
+    }
+
     res.status(201).json(comment);
   } catch (err) {
     console.error("Erreur création commentaire :", err);
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
+
+
 
 // répondre à un commentaire
 exports.replyToComment = async (req, res) => {
@@ -43,12 +73,30 @@ exports.replyToComment = async (req, res) => {
       parentId: commentId
     });
 
+    // 🔔 Notifier l’auteur du commentaire parent
+    if (String(parent.author) !== req.user.id) {
+      await axios.post("http://gateway:3001/notification/api/notifications", {
+        recipientId: parent.author,
+        senderId: req.user.id,
+        type: "comment_reply",
+        message: "a répondu à votre commentaire",
+        commentId: parent._id
+      }, {
+        headers: {
+          Authorization: `Bearer ${req.cookies.token}`,
+          "x-user-id": req.user.id
+        }
+      });
+    }
+
     res.status(201).json(reply);
   } catch (err) {
     console.error("Erreur lors de la réponse :", err);
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
+
+
 
 // récup les commentaires pour 1 post
 exports.getCommentsByPost = async (req, res) => {
@@ -168,8 +216,15 @@ exports.getCommentLikes = async (req, res) => {
     const comment = await Comment.findById(id);
     if (!comment) return res.status(404).json({ message: "Commentaire introuvable" });
 
-    res.json({ likes: comment.likes.length });
+    const likesCount = comment.likes.length;
+
+    // 🔐 Récupère l'ID de l'utilisateur depuis les headers envoyés par le gateway (ou middleware)
+    const userId = req.headers['x-user-id'];
+    const liked = userId && comment.likes.includes(userId);
+
+    res.json({ likes: likesCount, liked }); // <-- retourne aussi le booléen liked
   } catch (err) {
+    console.error("Erreur getCommentLikes :", err);
     res.status(500).json({ message: "Erreur serveur" });
   }
 };

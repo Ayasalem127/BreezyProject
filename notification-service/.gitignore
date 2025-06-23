@@ -1,0 +1,48 @@
+# Node modules
+node_modules/
+**/node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env variables
+.env
+**/.env
+
+# Build / Output
+dist/
+build/
+
+# Docker
+**/Dockerfile
+**/docker-compose.override.yml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/
+
+# Nginx cache or temp
+**/nginx/cache/
+**/nginx/temp/
+
+# Coverage reports
+coverage/
+
+# PM2 logs
+pids/
+*.pid
+*.seed
+
+# Test outputs
+test-output/
+
+# IDEs
+.idea/
+*.swp

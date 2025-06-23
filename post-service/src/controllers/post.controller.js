@@ -173,7 +173,12 @@ exports.getFeed = async (req, res) => {
 exports.toggleLikePost = async (req, res) => {
   try {
     const postId = req.params.id;
-    const userId = req.headers['x-user-id']; // ✅ cohérent avec le nom utilisé ensuite
+    const userId = req.headers['x-user-id'];
+    console.log("idUser:", userId);
+
+    // 🔑 Récupération du token depuis les cookies
+    const token = req.cookies?.token;
+    const authHeader = token ? `Bearer ${token}` : null;
 
     const post = await Post.findById(postId);
     if (!post) return res.status(404).json({ message: "Post non trouvé." });
@@ -181,11 +186,37 @@ exports.toggleLikePost = async (req, res) => {
     const hasLiked = post.likes.includes(userId);
 
     if (hasLiked) {
-      // Dislike → on enlève l'ID
       post.likes = post.likes.filter(id => id !== userId);
     } else {
-      // Like → on ajoute l'ID
       post.likes.push(userId);
+
+      // Envoi notification si like d'un autre utilisateur
+      if (userId !== post.author.toString()) {
+        try {
+          const notifHeaders = {
+            'x-user-id': userId
+          };
+          if (authHeader) notifHeaders.Authorization = authHeader;
+
+          console.log("📡 Envoi notification à", post.author.toString(), "avec headers", notifHeaders);
+
+          await axios.post(
+            "http://gateway:3001/notification/api/notifications",
+            {
+              recipientId: post.author.toString(),
+              senderId: userId,
+              type: "like_post",
+              message: "a liké votre post",
+              postId
+            },
+            {
+              headers: notifHeaders
+            }
+          );
+        } catch (notifErr) {
+          console.error("⚠️ Erreur lors de l'envoi de la notification :", notifErr.response?.data || notifErr.message);
+        }
+      }
     }
 
     await post.save();
@@ -194,9 +225,33 @@ exports.toggleLikePost = async (req, res) => {
       liked: !hasLiked,
       totalLikes: post.likes.length
     });
+
   } catch (err) {
-    console.error("Erreur toggle like :", err);
-    res.status(500).json({ message: "Erreur serveur." });
+    console.error("Erreur toggle like post :", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
+
+
+
+
+
+exports.getLikes = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const userId = req.headers['x-user-id']; // injecté par la gateway
+
+    const post = await Post.findById(postId);
+    if (!post) return res.status(404).json({ message: "Post introuvable" });
+
+    const liked = post.likes.includes(userId);
+    const totalLikes = post.likes.length;
+
+    res.json({ likes: totalLikes, liked });
+  } catch (err) {
+    console.error("Erreur getLikes :", err);
+    res.status(500).json({ message: "Erreur serveur" });
   }
 };
 

@@ -91,12 +91,13 @@ exports.updateProfile = async (req, res) => {
 };
 
 exports.followUser = async (req, res) => {
-  const { userId } = req.params;
+ 
+  const userId = req.headers["x-user-id"];
   const { followerId } = req.body;
   if (userId === followerId) return res.status(400).json({ message: "Impossible de se suivre soi-même" });
 
   try {
-    const user = await UserProfile.findOne({ userId });
+    const user = await UserProfile.findOne({ userId: userId });
     const follower = await UserProfile.findOne({ userId: followerId });
 
     if (!user || !follower) return res.status(404).json({ message: "Utilisateurs non trouvés" });
@@ -140,7 +141,7 @@ exports.getFollowing = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const user = await UserProfile.findOne( { _id: userId });
+    const user = await UserProfile.findOne( { userId: userId });
 
     if (!user) return res.status(404).json({ message: "Utilisateur non trouvé." });
 
@@ -151,6 +152,32 @@ exports.getFollowing = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur." });
   }
 };
+
+exports.getSuggestions = async (req, res) => {
+  try {
+         const userId = req.headers['x-user-id'];
+         console.log("id",userId);
+
+    // Récupère le profil de l'utilisateur actuel pour obtenir sa liste de followings
+    const currentUser = await UserProfile.findOne({userId: userId});
+    console.log("lcurrentUser",userId);
+    if (!currentUser) return res.status(404).json({ message: "Utilisateur non trouvé." });
+
+    // On ajoute aussi son propre ID pour ne pas se suggérer lui-même
+    const excludedIds = [...currentUser.following, userId];
+
+    // Récupère jusqu'à 15 profils qu'il ne suit pas encore
+    const suggestions = await UserProfile.find({ userId: { $nin: excludedIds } })
+      .limit(15)
+      .select('userId displayName avatarUrl');
+
+    res.json(suggestions);
+  } catch (err) {
+    console.error("Erreur getSuggestions :", err.message);
+    res.status(500).json({ message: "Erreur serveur." });
+  }
+};
+
 
 // BAN
 exports.banUser = async (req, res) => {

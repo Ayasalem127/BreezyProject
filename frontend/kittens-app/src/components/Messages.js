@@ -11,47 +11,61 @@ export default function Messages() {
   const [likedPosts, setLikedPosts] = useState({});
   const [isVisible, setIsVisible] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const postRes = await axios.get('http://localhost:3001/post/api/posts/feed');
-        const postsData = postRes.data;
-        setPosts(postsData);
-        setIsVisible(postsData.map(() => false));
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const postRes = await axios.get('http://localhost:3001/post/api/posts/feed');
+      const postsData = postRes.data;
 
-        const likeCounts = {};
-        const commentsMap = {};
-        const likedState = {};
+      const likeCounts = {};
+      const commentsMap = {};
+      const likedState = {};
 
-        for (const post of postsData) {
-          // Likes
-          try {
-            const likeRes = await axios.get(`http://localhost:3001/post/api/posts/${post._id}/likes`);
-            likeCounts[post._id] = likeRes.data.likes || 0;
-            likedState[post._id] = false;
-          } catch {
-            likeCounts[post._id] = 0;
-          }
+      const token = document.cookie
+        .split('; ')
+        .find(c => c.startsWith('token='))
+        ?.split('=')[1];
 
-          // Comments
-          try {
-            const res = await axios.get(`http://localhost:3001/comment/api/comments/${post._id}`);
-            commentsMap[post._id] = res.data;
-          } catch {
-            commentsMap[post._id] = [];
-          }
+      for (const post of postsData) {
+        // Likes
+        try {
+          const likeRes = await axios.get(
+            `http://localhost:3001/post/api/posts/${post._id}/likes`,
+            {
+            //   headers: { Authorization: `Bearer ${token}` },
+              withCredentials: true
+            }
+          );
+          likeCounts[post._id] = likeRes.data.likes || 0;
+          likedState[post._id] = likeRes.data.liked || false;
+        } catch {
+          likeCounts[post._id] = 0;
+          likedState[post._id] = false;
         }
 
-        setLikesByPost(likeCounts);
-        setCommentsByPost(commentsMap);
-        setLikedPosts(likedState);
-      } catch (err) {
-        console.error("Erreur récupération des posts :", err);
+        // Comments
+        try {
+          const res = await axios.get(`http://localhost:3001/comment/api/comments/${post._id}`);
+          commentsMap[post._id] = res.data;
+        } catch {
+          commentsMap[post._id] = [];
+        }
       }
-    };
 
-    fetchData();
-  }, []);
+      // Une fois TOUT récupéré, on set l’état :
+      setPosts(postsData);
+      setIsVisible(postsData.map(() => false));
+      setLikesByPost(likeCounts);
+      setCommentsByPost(commentsMap);
+      setLikedPosts(likedState);
+    } catch (err) {
+      console.error("Erreur récupération des posts :", err);
+    }
+  };
+
+  fetchData();
+}, []);
+
 
   const handlePostLike = async (postId) => {
     try {

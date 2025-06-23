@@ -1,5 +1,5 @@
 const UserProfile = require('../models/UserProfile');
-
+const axios = require("axios");
 
 exports.createProfile = async (req, res) => {
   try {
@@ -106,6 +106,28 @@ exports.followUser = async (req, res) => {
 
     await user.save();
     await follower.save();
+
+    // 🔔 Notifier l'utilisateur suivi
+    const token = req.cookies?.token;
+    if (token) {
+      try {
+        await axios.post("http://gateway:3001/notification/api/notifications", {
+          recipientId: followerId,
+          senderId: userId,
+          type: "follow",
+          message: "a commencé à vous suivre"
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "x-user-id": userId
+          }
+        });
+      } catch (notifErr) {
+        console.error("⚠️ Erreur envoi notification follow :", notifErr.response?.data || notifErr.message);
+      }
+    } else {
+      console.warn("🔒 Aucun token trouvé pour envoyer la notification de follow.");
+    }
 
     res.json({ message: "Follow réussi" });
   } catch (err) {

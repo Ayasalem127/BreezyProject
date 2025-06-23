@@ -23,7 +23,7 @@ export default function NotificationsPC() {
           rawNotifications.map(async (notif) => {
             try {
               const userRes = await axios.get(
-                `http://localhost:3001/user/api/users/${notif.recipientId}`,
+                `http://localhost:3001/user/api/users/${notif.senderId}`,
                 { withCredentials: true }
               );
               return {

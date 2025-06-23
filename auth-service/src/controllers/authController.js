@@ -55,6 +55,20 @@ exports.register = async (req, res, next) => {
     next(err);
   }
 };
+exports.logout = async (req, res) => {
+  try {
+    // Supprimer le cookie HttpOnly côté serveur
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: false, // true en production HTTPS
+      sameSite: "lax"
+    });
+
+    res.status(200).json({ message: "Déconnexion réussie" });
+  } catch (err) {
+    res.status(500).json({ message: "Erreur serveur lors de la déconnexion" });
+  }
+};
 
 exports.login = async (req, res) => {
   const { email, password } = req.body;
@@ -184,14 +198,3 @@ exports.refreshToken = async (req, res) => {
 };
 
 
-
-
-exports.logout = async (req, res) => {
-  const { token } = req.body;
-  const user = await User.findOne({ refreshTokens: token });
-  if (user) {
-    user.refreshTokens = user.refreshTokens.filter(t => t !== token);
-    await user.save();
-  }
-  res.sendStatus(204);
-};

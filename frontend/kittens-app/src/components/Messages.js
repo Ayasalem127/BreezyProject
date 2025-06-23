@@ -69,7 +69,7 @@ export default function Messages() {
         setCommentsByPost(commentsMap);
         setLikedPosts(likedState);
       } catch (err) {
-        console.error("Erreur récupération des posts :", err);
+        console.log("Erreur récupération des posts :", err);
       }
     };
 
@@ -83,7 +83,7 @@ export default function Messages() {
       setLikesByPost(prev => ({ ...prev, [postId]: totalLikes }));
       setLikedPosts(prev => ({ ...prev, [postId]: liked }));
     } catch (err) {
-      console.error("Erreur like post :", err);
+      console.log("Erreur like post :", err);
     }
   };
 
@@ -153,7 +153,7 @@ function AddComment({ postId, onCommentAdded }) {
       onCommentAdded(res.data);
       setContent("");
     } catch (err) {
-      console.error("Erreur ajout commentaire :", err.response?.data || err.message);
+      console.log("Erreur ajout commentaire :", err.response?.data || err.message);
     }
   };
 
@@ -193,7 +193,7 @@ function CommentThread({ comment, authors }) {
         setLikes(res.data.likes || 0);
         setLiked(res.data.liked || false);
       } catch (err) {
-        console.error("Erreur récupération des likes commentaire :", err);
+        console.log("Erreur récupération des likes commentaire :", err);
       }
     };
     fetchLikes();
@@ -205,7 +205,7 @@ function CommentThread({ comment, authors }) {
       setLikes(res.data.likes);
       setLiked(res.data.liked);
     } catch (err) {
-      console.error("Erreur like commentaire :", err);
+      console.log("Erreur like commentaire :", err);
     }
   };
 
@@ -218,7 +218,7 @@ function CommentThread({ comment, authors }) {
       setReplyContent("");
       setShowReplyBox(false);
     } catch (err) {
-      console.error("Erreur envoi réponse :", err.response?.data || err.message);
+      console.log("Erreur envoi réponse :", err.response?.data || err.message);
     }
   };
 
@@ -228,7 +228,7 @@ function CommentThread({ comment, authors }) {
       comment.content = editContent;
       setEditing(false);
     } catch (err) {
-      console.error("Erreur modification :", err.response?.data || err.message);
+      console.log("Erreur modification :", err.response?.data || err.message);
     }
   };
 
@@ -239,7 +239,7 @@ function CommentThread({ comment, authors }) {
       await axios.delete(`http://localhost:3001/comment/api/comments/${comment._id}`, { withCredentials: true });
       window.location.reload();
     } catch (err) {
-      console.error("Erreur suppression :", err.response?.data || err.message);
+      console.log("Erreur suppression :", err.response?.data || err.message);
     }
   };
 

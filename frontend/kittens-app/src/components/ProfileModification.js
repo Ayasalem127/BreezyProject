@@ -6,15 +6,20 @@ import { useContext } from "react";
 import axios from 'axios';
 import { AuthContext } from "@/context/AuthContext";
 export default function ProfilModification() {
+    // Récupère userId depuis AuthContext
   const infos = ["username", "/logo.webp", "Description"];
-  const [image, setImage] = useState(infos[1]); 
+ const { user,setUser } = useContext(AuthContext);
+   useEffect(() => {
+   setImage(`http://localhost:3001${user?.avatarUrl}` || infos[1])
+  }, [user]);
+
   const fileInputRef = useRef(null);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [confirmError, setConfirmError] = useState('');
   const [formSubmitted, setFormSubmitted] = useState(false);
- const { user } = useContext(AuthContext);
+
   const isValidPassword = (pwd) => {
     if (!pwd) return "Mot de passe requis.";
     if (pwd.length < 6 || !/\d/.test(pwd)) {
@@ -22,6 +27,7 @@ export default function ProfilModification() {
     }
     return "";
   };
+    const [image, setImage] = useState( `http://localhost:3001${user?.avatarUrl}` || infos[1]); 
 
 useEffect(() => {
   if (formSubmitted || password.length > 0 || confirmPassword.length > 0) {
@@ -79,40 +85,53 @@ const uploadAvatar = async (formData) => {
     console.error("Upload error", error);
   }
 };
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setFormSubmitted(true);
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setFormSubmitted(true);
+
   const file = fileInputRef.current.files[0];
   const formData = new FormData();
   formData.append("avatar", file);
 
-  uploadAvatar(formData);
+
+  const userId = user?._id; // ou currentUser._id selon ta structure
+  console.log(user);
+  // Vérification basique
+  if (!userId) {
+    console.log("Utilisateur non authentifié");
+    return;
+  }
+
+  try {
+    // Upload avatar (si géré ailleurs)
+    await uploadAvatar(formData);
+
+    // Récupération des données du formulaire
     const form = e.target;
-    const username = form.username.value;
-  //  const email = form.email.value;
-    const biography = form.biography.value;
+    const displayName = form.username.value;
+    const bio = form.biography.value;
 
-    // Affichage
-    console.log(`Username : ${username}`);
-    console.log(`Bio : ${biography}`);
+    // Envoi des données au backend via axios
+    const res = await axios.put(
+      `http://localhost:3001/user/api/users/${userId}`,
+      { displayName, bio },
+      { withCredentials: true } // important si cookies d'auth
+    );
 
-    console.log(`Confirmation : ${confirmPassword}`);
+    console.log("Profil mis à jour :", res.data);
+    const updatedUser = response.data;
+
+    // ✅ Met à jour le contexte global avec les nouvelles infos
+    setUser((prevUser) => ({
+      ...prevUser,
+      ...updatedUser
+    }))
     alert("Modifications enregistrées !");
-    
-    // const pwdError = isValidPassword(password);
-    // setPasswordError(pwdError);
-
-    // if (!confirmPassword || confirmPassword !== password) {
-    //   setConfirmError("Le mot de passe ne correspond pas.");
-    // } else {
-    //   setConfirmError("");
-    // }
-
-    // if (pwdError || confirmPassword !== password) {
-    //   return; // ne pas soumettre
-    // }
-  };
-
+  } catch (error) {
+    console.log("Erreur lors de la mise à jour :", error.response?.data || error.message);
+    alert("Erreur lors de la mise à jour du profil");
+  }
+};
   return (
     <div className="flex items-center justify-center">
       <form onSubmit={handleSubmit} className="p-4 rounded-lg w-full max-w-sm space-y-6">
@@ -122,18 +141,18 @@ const uploadAvatar = async (formData) => {
           onDragOver={handleDragOver}
           className="w-32 h-32 mx-auto rounded-full overflow-hidden border-2 border-gray-300 cursor-pointer flex items-center justify-center bg-gray-100"
         >
-          <img src={`http://localhost:3001${user.avatar || image}`} alt="Profil" className="object-cover w-full h-full" />
+          <img src={image} alt="Profil" className="object-cover w-full h-full" />
           <input type="file" accept="image/*" onChange={handleImageChange} ref={fileInputRef} className="hidden" />
         </div>
 
         <div>
           <label htmlFor="username" className="block text-sm font-medium text-gray-700">Nom d'utilisateur</label>
-          <input type="text" id="username" className={`${inputBase} border border-black`}  defaultValue={user.displayName} />
+          <input type="text" id="username" className={`${inputBase} border border-black`}  defaultValue={user?.displayName} />
         </div>
 
         <div>
           <label htmlFor="biography" className="block text-sm font-medium text-gray-700">Biographie</label>
-          <textarea id="biography" className={`${inputBase} border border-black`} defaultValue={user.bio}  />
+          <textarea id="biography" className={`${inputBase} border border-black`} defaultValue={user?.bio}  />
         </div>
 
         {/* <div>

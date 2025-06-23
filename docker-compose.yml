@@ -35,7 +35,7 @@ services:
     depends_on:
       - mongo_user
     volumes:
-      - ./uploads:/app/uploads
+      -  ./user-service/uploads:/app/uploads
 
   notification-service:
     build: ./notification-service
@@ -58,6 +58,8 @@ services:
       - notification-service
     volumes: 
       - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./user-service/uploads:/app/uploads
+
       
 
   # MongoDB pour auth-service

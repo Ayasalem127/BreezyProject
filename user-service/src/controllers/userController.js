@@ -1,5 +1,5 @@
 const UserProfile = require('../models/UserProfile');
-const multer = require("multer")
+
 
 exports.createProfile = async (req, res) => {
   try {
@@ -41,57 +41,49 @@ exports.getProfile = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-// Config multer
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/"); // dossier où on stockes
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, Date.now() + ext); // nom unique
-  }
-});  
-const upload = multer({ storage });
-exports.updateImage =  async (req, res) => {
+
+
+exports.updateImage = async (req, res) => {
   try {
-     if (!req.file) {
+    if (!req.file) {
       return res.status(400).json({ error: "Aucun fichier reçu" });
     }
-console.log("req.file:", req.file);
-        const userId = req.headers['x-user-id'];
-    const imagePath = `/uploads/${req.file.filename}`;
-console.log("userid",userId);
-console.log("imagePath",imagePath);
-    // Mise à jour de l'utilisateur
- console.log("✅ Fichier reçu :", req.file.path);
-console.log("✅ Chemin image enregistré :", `/uploads/${req.file.filename}`);
-console.log("✅ userId reçu :", req.headers['x-user-id']);
 
+    const userId = req.headers["x-user-id"];
+    const imagePath = `/uploads/${req.file.filename}`;
+
+    console.log("✅ Fichier reçu :", req.file.path);
+    console.log("✅ Image enregistrée :", imagePath);
+    console.log("✅ userId :", userId);
 
     const user = await UserProfile.findOneAndUpdate(
-  { userId: userId },
-  { avatarUrl: imagePath },
-  { new: true }
-);
+      { userId },
+      { avatarUrl: imagePath },
+      { new: true }
+    );
 
-if (!user) {
-  return res.status(404).json({ error: "Utilisateur non trouvé avec cet userId" });
-}
+    if (!user) {
+      return res.status(404).json({ error: "Utilisateur non trouvé" });
+    }
 
-res.json({ success: true, avatar: user.avatar });
-
+    res.status(200).json({ message: "Avatar mis à jour", avatarUrl: imagePath });
   } catch (err) {
-    res.status(500).json({ error: "Erreur upload avatar" });
+    console.error("❌ Erreur :", err);
+    res.status(500).json({ error: err.message });
   }
 };
 
+
 exports.updateProfile = async (req, res) => {
   try {
+    console.log("req body",req.body);
+    console.log("req id" ,req.params.userId);
     const updated = await UserProfile.findOneAndUpdate(
-      { userId: req.params.userId },
+      { _id: req.params.userId },
       req.body,
       { new: true }
     );
+    console.log("update",updated);
     res.json(updated);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -99,12 +91,13 @@ exports.updateProfile = async (req, res) => {
 };
 
 exports.followUser = async (req, res) => {
-  const { userId } = req.params;
+ 
+  const userId = req.headers["x-user-id"];
   const { followerId } = req.body;
   if (userId === followerId) return res.status(400).json({ message: "Impossible de se suivre soi-même" });
 
   try {
-    const user = await UserProfile.findOne({ userId });
+    const user = await UserProfile.findOne({ userId: userId });
     const follower = await UserProfile.findOne({ userId: followerId });
 
     if (!user || !follower) return res.status(404).json({ message: "Utilisateurs non trouvés" });
@@ -148,7 +141,7 @@ exports.getFollowing = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const user = await UserProfile.findOne({ userId });
+    const user = await UserProfile.findOne( { userId: userId });
 
     if (!user) return res.status(404).json({ message: "Utilisateur non trouvé." });
 
@@ -159,6 +152,32 @@ exports.getFollowing = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur." });
   }
 };
+
+exports.getSuggestions = async (req, res) => {
+  try {
+         const userId = req.headers['x-user-id'];
+         console.log("id",userId);
+
+    // Récupère le profil de l'utilisateur actuel pour obtenir sa liste de followings
+    const currentUser = await UserProfile.findOne({userId: userId});
+    console.log("lcurrentUser",userId);
+    if (!currentUser) return res.status(404).json({ message: "Utilisateur non trouvé." });
+
+    // On ajoute aussi son propre ID pour ne pas se suggérer lui-même
+    const excludedIds = [...currentUser.following, userId];
+
+    // Récupère jusqu'à 15 profils qu'il ne suit pas encore
+    const suggestions = await UserProfile.find({ userId: { $nin: excludedIds } })
+      .limit(15)
+      .select('userId displayName avatarUrl');
+
+    res.json(suggestions);
+  } catch (err) {
+    console.error("Erreur getSuggestions :", err.message);
+    res.status(500).json({ message: "Erreur serveur." });
+  }
+};
+
 
 // BAN
 exports.banUser = async (req, res) => {

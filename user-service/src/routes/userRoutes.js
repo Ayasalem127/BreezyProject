@@ -24,6 +24,8 @@ router.post('/:userId/ban', checkRole(['admin', 'moderator']), controller.banUse
 router.post('/:userId/suspend', checkRole(['admin', 'moderator']), controller.suspendUser);
 router.post('/:userId/reactivate', checkRole(['admin', 'moderator']), controller.reactivateUser);
 
+router.get('/', controller.getAllUsersPaginated);
+
 
 
 module.exports = router;

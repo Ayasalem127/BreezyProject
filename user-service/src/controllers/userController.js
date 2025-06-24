@@ -1,5 +1,6 @@
 const UserProfile = require('../models/UserProfile');
 const axios = require("axios");
+const ms= require("ms");
 
 exports.createProfile = async (req, res) => {
   try {
@@ -15,29 +16,56 @@ exports.createProfile = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+
 exports.getMyProfile = async (req, res) => {
   try {
-         const userId = req.headers['x-user-id'];
-         console.log("idduserprofile",userId);
-    const profile = await UserProfile
-    .findOne({ userId: userId })
-   
+    const userId = req.headers['x-user-id'];
+    let profile = await UserProfile.findOne({ userId });
+
     if (!profile) return res.status(404).json({ message: "Profil non trouvé" });
+
+    // ✅ Réactivation automatique si la suspension a expiré
+    if (profile.status === "suspended" && profile.suspendedUntil) {
+      const now = new Date();
+      const until = new Date(profile.suspendedUntil);
+
+      if (now > until) {
+        profile.status = "active";
+        profile.suspendedUntil = null;
+        await profile.save();
+      }
+    }
+
     res.json(profile);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 exports.getProfile = async (req, res) => {
   try {
-    const profile = await UserProfile
-    .findOne({ userId: req.params.userId })
+    let profile = await UserProfile.findOne({ userId: req.params.userId });
     if (!profile) return res.status(404).json({ message: "Profil non trouvé" });
+
+    // ✅ Réactivation automatique si la suspension a expiré
+    if (profile.status === "suspended" && profile.suspendedUntil) {
+      const now = new Date();
+      const until = new Date(profile.suspendedUntil);
+
+      if (now > until) {
+        profile.status = "active";
+        profile.suspendedUntil = null;
+        await profile.save();
+      }
+    }
+
     res.json(profile);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 
 exports.updateImage = async (req, res) => {
@@ -242,17 +270,31 @@ exports.banUser = async (req, res) => {
 exports.suspendUser = async (req, res) => {
   try {
     const { userId } = req.params;
+    const { duration } = req.body; // exemple: "2h", "30m", "5d"
+
+    if (!duration || !ms(duration)) {
+      return res.status(400).json({ message: "Durée invalide (ex: '2h', '30m', '1d')" });
+    }
+
+    const until = new Date(Date.now() + ms(duration));
+
     const updated = await UserProfile.findOneAndUpdate(
       { userId },
-      { status: 'suspended' },
+      { status: 'suspended', suspendedUntil: until },
       { new: true }
     );
+
     if (!updated) return res.status(404).json({ message: "Utilisateur non trouvé" });
-    res.json({ message: "Utilisateur suspendu", user: updated });
+
+    res.json({
+      message: `Utilisateur suspendu jusqu'à ${until.toISOString()}`,
+      user: updated
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 // REACTIVATE
 exports.reactivateUser = async (req, res) => {
@@ -260,12 +302,39 @@ exports.reactivateUser = async (req, res) => {
     const { userId } = req.params;
     const updated = await UserProfile.findOneAndUpdate(
       { userId },
-      { status: 'active' },
+      { status: 'active', suspendedUntil: null },
       { new: true }
     );
     if (!updated) return res.status(404).json({ message: "Utilisateur non trouvé" });
     res.json({ message: "Utilisateur réactivé", user: updated });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+
+exports.getAllUsersPaginated = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;        // page actuelle
+  const limit = parseInt(req.query.limit) || 15;     // nb par page
+  const skip = (page - 1) * limit;
+
+  try {
+    const users = await UserProfile.find()
+      .select('-password') // éviter de renvoyer les mdp hashés si stockés
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const total = await UserProfile.countDocuments();
+
+    res.json({
+      users,
+      total,
+      page,
+      pages: Math.ceil(total / limit)
+    });
+  } catch (err) {
+    console.error("Erreur getAllUsersPaginated:", err);
+    res.status(500).json({ message: "Erreur serveur." });
   }
 };

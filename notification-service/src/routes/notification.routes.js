@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const controller = require("../controllers/notification.controller");
-const auth = require("../middleware/auth");
 
+const requireRole=require("../middleware/requireRole");
 router.post("/", controller.createNotification);
-router.get("/", controller.getMyNotifications);
+router.get("/",requireRole('user'), controller.getMyNotifications);
 router.patch("/:id/read", controller.markAsRead);
 
 module.exports = router;

@@ -18,7 +18,7 @@ export default function Navbar() {
    const router = useRouter();
 
   const photo = "/logo.webp";
-  const { setUser } = useContext(AuthContext); 
+  const { user,setUser } = useContext(AuthContext); 
     const handleLogout = async () => {
     try {
       await axios.post("http://localhost:3001/auth/auth/logout", {}, { withCredentials: true });
@@ -106,6 +106,8 @@ export default function Navbar() {
           )}
         </div>
 
+        
+
         <Link className="block sm:hidden" href="/notifications">
           <img
             src="/notification.png"
@@ -114,9 +116,20 @@ export default function Navbar() {
           />
         </Link>
 
+       {(user?.role === "moderator" || user?.role === "admin") && (
+  <Link href="/suspend">
+    <img
+      src="/suspended.png"
+      alt="Suspension"
+      className="w-5 h-5 hover:scale-110 transition-transform"
+    />
+  </Link>
+)}
+
+
         <Link href="/myProfile">
           <img
-            src={photo}
+            src={ `http://localhost:3001${user?.avatarUrl}` }
             alt="Profil"
             className="w-5 h-5 hover:scale-110 transition-transform rounded-full"
           />

@@ -72,60 +72,87 @@ exports.logout = async (req, res) => {
 
 exports.login = async (req, res) => {
   const { email, password } = req.body;
-  console.log("email reçu:", email);
 
   try {
-    // Vérification utilisateur
+    console.log("Recherche de l'utilisateur avec email:", email);
     const user = await User.findOne({ email });
     if (!user || !(await user.comparePassword(password))) {
-      return res.status(401).json({ error: 'Identifiants invalides' });
+      console.log("Échec des identifiants");
+      return res.status(401).json({ error: "Identifiants invalides" });
     }
 
+    console.log("Utilisateur trouvé:", user._id);
 
-    // Vérifie que les secrets JWT sont définis
-    if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
-      return res.status(500).json({ error: "Clés JWT manquantes dans .env" });
+    const profileRes = await axios.get(`http://user-service:4001/api/users/${user._id}`);
+    const profile = profileRes.data;
+
+    console.log("Profil utilisateur:", profile);
+
+    if (profile.status === "suspended" && profile.suspendedUntil) {
+      const now = new Date();
+      const until = new Date(profile.suspendedUntil);
+      if (now > until) {
+        console.log("Réactivation automatique du compte suspendu");
+        await axios.post(`http://user-service:4001/api/users/${user._id}/reactivate`);
+        profile.status = "active";
+      }
     }
 
-    // Génération des tokens
+    if (profile.status === "suspended") {
+      console.log("Connexion bloquée: compte suspendu");
+      return res.status(403).json({ error: "Votre compte est suspendu." });
+    }
+    if (profile.status === "banned") {
+      console.log("Connexion bloquée: compte banni");
+      return res.status(403).json({ error: "Votre compte est banni." });
+    }
+
     const accessToken = jwt.sign(
       {
         id: user._id,
         username: user.username,
         role: user.role,
-        status: user.status
+        status: profile.status,
       },
       process.env.JWT_SECRET,
-      { expiresIn: '15m' }
+      { expiresIn: "15m" }
     );
 
     const refreshToken = jwt.sign(
       { id: user._id },
       process.env.JWT_REFRESH_SECRET,
-      { expiresIn: '30d' }
+      { expiresIn: "30d" }
     );
 
-    // Stockage du refreshToken en base
     user.refreshTokens.push(refreshToken);
     await user.save();
 
-    // Envoie du token via cookie HttpOnly
-    res.cookie('token', accessToken, {
+    res.cookie("token", accessToken, {
       httpOnly: true,
       secure: false,
-      sameSite: 'lax',
-      maxAge: 15 * 60 * 1000 // 15 minutes
+      sameSite: "lax",
+      maxAge: 15 * 60 * 1000,
     });
 
-    // Réponse JSON (tu peux ne pas envoyer le refreshToken côté client si tu ne veux pas)
-    res.status(200).json({ message: 'Connexion réussie', refreshToken });
-
+    res.status(200).json({
+      message: "Connexion réussie",
+      refreshToken,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        status: profile.status,
+      },
+    });
 
   } catch (err) {
-    console.error("Erreur login:", err);
-    res.status(500).json({ error: err.message });
+    console.error("Erreur login:", err.message);
+    res.status(500).json({ error: "Erreur serveur" });
   }
 };
+
+
 
 
 exports.authenticate = async (req, res) => {

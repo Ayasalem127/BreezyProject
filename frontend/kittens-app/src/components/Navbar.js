@@ -18,7 +18,7 @@ export default function Navbar() {
    const router = useRouter();
 
   const photo = "/logo.webp";
-  const { setUser } = useContext(AuthContext); 
+  const { user,setUser } = useContext(AuthContext); 
     const handleLogout = async () => {
     try {
       await axios.post("http://localhost:3001/auth/auth/logout", {}, { withCredentials: true });
@@ -126,7 +126,7 @@ export default function Navbar() {
 
         <Link href="/myProfile">
           <img
-            src={photo}
+            src={ `http://localhost:3001${user?.avatarUrl}` }
             alt="Profil"
             className="w-5 h-5 hover:scale-110 transition-transform rounded-full"
           />

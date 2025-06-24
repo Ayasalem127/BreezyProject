@@ -61,7 +61,7 @@ export default function Subscriptions({ searchText }) {
               <Link href={`/otherProfile?userId=${subscription.userId}`} >
                 <div className="p-2 box-border flex flex-row items-center justify-center rounded-lg gap-4">
                   <img
-                    src={`http://localhost:3001${subscription?.avatarUrl}`}
+                    src={`http://localhost:3001${subscription?.avatarUrl}`|| "/avatarcat.jpg"}
                     alt="photo de profil"
                     className="w-10 h-10 object-contain rounded-full"
                   />

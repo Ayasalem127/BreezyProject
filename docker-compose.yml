@@ -59,18 +59,19 @@ services:
     build: ./gateway
     ports:
       - "3001:3001"
+      - "443:443"  # ✅ HTTPS
     depends_on:
       - auth-service
       - user-service
       - post-service
       - comment-service
-
       - messaging-service
-
       - notification-service
-    volumes: 
+    volumes:
       - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./user-service/uploads:/app/uploads
+      - ./certs:/etc/nginx/certs:ro  # ✅ Monte les certificats
+
 
 
       

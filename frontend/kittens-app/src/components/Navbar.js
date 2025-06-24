@@ -106,10 +106,20 @@ export default function Navbar() {
           )}
         </div>
 
+        
+
         <Link className="block sm:hidden" href="/notifications">
           <img
             src="/notification.png"
             alt="Notifications"
+            className="w-5 h-5 hover:scale-110 transition-transform"
+          />
+        </Link>
+
+        <Link href="/suspend">
+          <img
+            src="/notification.png"
+            alt="Suspension"
             className="w-5 h-5 hover:scale-110 transition-transform"
           />
         </Link>

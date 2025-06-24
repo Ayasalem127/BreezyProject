@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import RedirectIfAuthenticated from "../context/RedirectIfAuthenticated";
 
 import { ToggleProvider } from "@/context/ToggleTargetComponentContext";
 import NavbarClient from "@/components/NavbarClient";
@@ -36,9 +37,12 @@ export default function RootLayout({ children }) {
             <NotificationsPC />
 
             {/* ✅ Le reste de l'app */}
-              <ProtectedRoute>
-              {children}
-            </ProtectedRoute>
+              <RedirectIfAuthenticated>
+  <ProtectedRoute>
+    {children}
+  </ProtectedRoute>
+</RedirectIfAuthenticated>
+
           </AuthProvider>
         </ToggleProvider>
       </body>

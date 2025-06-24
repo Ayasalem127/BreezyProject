@@ -5,8 +5,7 @@ import PopupWrongCredentials from "./PopupWrongCredentials";
 
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import axios from "axios";
-
+import { AuthContext } from "@/context/AuthContext";
 export default function ConnectionForm() {
     const router = useRouter();
 
@@ -57,7 +56,8 @@ export default function ConnectionForm() {
         try {
             const res = await axios.post('http://localhost:3001/auth/auth/login', { email, password }, { withCredentials: true } //  pour envoyer/recevoir le cookie
                 )
-              console.log(`TOKEN : ${res.data.token}`);
+            const { user } = useContext(AuthContext);
+            console.log(`TOKEN : ${res.data.token}`);
             router.push("/home");
         } catch (error) {
             console.error("Erreur : ", error);

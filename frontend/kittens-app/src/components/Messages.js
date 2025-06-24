@@ -24,6 +24,36 @@ export default function Messages() {
         [15, "username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 0, []],
     ];
 
+    const [translatedTexts, setTranslatedTexts] = useState([]);
+
+    const textsToTranslate = ["Publier", "Afficher plus", "Laisse parler ton coeur..."];
+
+    const translateMany = async (texts) => {
+        try {
+            const results = [];
+
+            for (const text of texts) {
+                const res = await axios.post(
+                    'http://localhost:3001/language/language/translate',
+                    { text },
+                    { withCredentials: true }
+                );
+
+                results.push(res.data.message);
+
+                await new Promise((resolve) => setTimeout(resolve, 200));
+            }
+
+            setTranslatedTexts(results);
+        } catch (error) {
+            console.error("Erreur de traduction :", error);
+        }
+    };
+
+    useEffect(() => {
+        translateMany(textsToTranslate);
+    }, []);
+
     function Comment({ commentId }) {
         const commentsById = Object.fromEntries(comments.map(c => [c[0], c]));
         const comment = commentsById[commentId];
@@ -66,11 +96,11 @@ export default function Messages() {
                 <form onSubmit={handleResponse} className="mt-2 space-y-2">
                 <div className="flex items-center gap-2">
                     <img src={comment[2]} alt="avatar" className="w-8 h-8 rounded-full" />
-                    <textarea id={`response-${commentId}`} className="focus:border-blue-500 focus:outline-none" rows={3} placeholder="Laisse parler ton coeur..."/>
+                    <textarea id={`response-${commentId}`} className="focus:border-blue-500 focus:outline-none" rows={3} placeholder={translatedTexts[2]}/>
                 </div>
                 <div className="flex justify-end">
                     <div className="w-30">
-                        <button type="submit">Publier</button>
+                        <button type="submit">{translatedTexts[0]}</button>
                     </div>
                 </div>
                 </form>
@@ -158,7 +188,7 @@ export default function Messages() {
 
                     {visibleCommentsCount[index] < message[6].length && (
                     <span role="button" onClick={() => showMoreComments(index)} className="mt-2 text-sm text-blue-600 cursor-pointer">
-                        Afficher plus
+                        {translatedTexts[1]}
                     </span>
                     )}
                 </div>
@@ -166,12 +196,12 @@ export default function Messages() {
                 <form onSubmit={(e) => handleResponse(e, index)} style={{display: isVisible[index] ? 'block' : 'none'}} className="rounded-lg w-full space-y-2">
                     <div className="flex items-center gap-2">
                         <img src={message[1]} alt="logo" className="w-10 h-10 object-contain mb-2 rounded-full"/>
-                        <textarea type="text" id={`response-${index}`} className="focus:border-blue-500 focus:outline-none" rows={3} placeholder="Laisse parler ton coeur..."/>
+                        <textarea type="text" id={`response-${index}`} className="focus:border-blue-500 focus:outline-none" rows={3} placeholder={translatedTexts[2]}/>
                     </div>
 
                     <div className="flex justify-end">
                         <div className="w-30">
-                            <button type="submit">Publier</button>
+                            <button type="submit">{translatedTexts[0]}</button>
                         </div>
                     </div>
                 </form>

@@ -1,11 +1,42 @@
 'use client';
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 export default function Messages() {
     const messages = [["username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 1], ["username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 1]];
 
     const [likes, setLikes] = useState(Array(messages.length).fill(false));
     const [isVisible, setIsVisible] = useState(Array(messages.length).fill(false));
+
+    const [translatedTexts, setTranslatedTexts] = useState([]);
+
+    const textsToTranslate = ["Laisse parler ton coeur...", "Publier"];
+
+    const translateMany = async (texts) => {
+        try {
+            const results = [];
+
+            for (const text of texts) {
+                const res = await axios.post(
+                    'http://localhost:3001/language/language/translate',
+                    { text },
+                    { withCredentials: true }
+                );
+
+                results.push(res.data.message);
+
+                await new Promise((resolve) => setTimeout(resolve, 200));
+            }
+
+            setTranslatedTexts(results);
+        } catch (error) {
+            console.error("Erreur de traduction :", error);
+        }
+    };
+
+    useEffect(() => {
+        translateMany(textsToTranslate);
+    }, []);
 
     function toggleLike(index) {
         const newLikes = [...likes];
@@ -54,11 +85,11 @@ export default function Messages() {
                 <form onSubmit={(e) => handleResponse(e, index)} style={{display: isVisible[index] ? 'block' : 'none'}} className="rounded-lg w-full space-y-2">
                     <div className="flex items-center gap-2">
                         <img src={message[1]} alt="logo" className="w-10 h-10 object-contain mb-2 rounded-full"/>
-                        <textarea type="text" id={`response-${index}`} className="focus:border-blue-500 focus:outline-none" rows={3} placeholder="Ecrire ici..."/>
+                        <textarea type="text" id={`response-${index}`} className="focus:border-blue-500 focus:outline-none" rows={3} placeholder={translatedTexts[0]}/>
                     </div>
 
                     <div className="flex justify-end">
-                        <button type="submit">Publier</button>
+                        <button type="submit">{translatedTexts[1]}</button>
                     </div>
                 </form>
             </div>

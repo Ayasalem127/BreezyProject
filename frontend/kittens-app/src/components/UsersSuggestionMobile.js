@@ -1,13 +1,34 @@
 'use client';
 
 import Link from "next/link";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 export default function UsersSuggestionMobile() {
     const users = [["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"]];
 
+    const [translatedText, setTranslatedText] = useState("Suggestions de suivi");
+
+    const translate = async (text) => {
+        try {
+        const res = await axios.post('http://localhost:3001/language/language/translate', {text}, { withCredentials: true });
+        console.log(res.data);
+        setTranslatedText(res.data.message);
+
+        await new Promise((resolve) => setTimeout(resolve, 200));
+
+        } catch (error) {
+        console.error("Erreur : ", error);
+        }
+    }
+
+    useEffect(() => {
+        translate("Suggestions de suivi");
+    }, []);
+
     return (
         <div>
-            <h2>Suggestions de suivi</h2>
+            <h2>{translatedText}</h2>
             <div className="flex flex-col items-center w-full px-4">
                 {users.map((user, index) => (
                 <div key={index} style={{ boxShadow: "0 12px 32px var(--shadow-color)", borderColor: 'var(--input-border)' }} className="w-full p-2 m-4 box-border flex flex-col justify-between border rounded-2xl">

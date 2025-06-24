@@ -1,4 +1,4 @@
-const translate = require('@vitalets/google-translate-api').translate;
+/*const translate = require('@vitalets/google-translate-api').translate;
 
 async function translateText(text, to) {
   try {
@@ -8,7 +8,44 @@ async function translateText(text, to) {
     console.error("Erreur de traduction :", error);
     return null;
   }
-}
+}*/
+
+const axios = require("axios");
+
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+const translateText = async (text, to, from = "fr") => {
+
+  await sleep(200);
+  
+  const subscriptionKey = "A2knQIT8pnHQYvczNq2m481aju5A6jtbmv4VGT2eotb6Af6Y2mXUJQQJ99BFAC5T7U2XJ3w3AAAbACOGjGlN";
+  const endpoint = "https://devweb.cognitiveservices.azure.com/";
+  const location = "francecentral";
+
+  const url = `${endpoint}/translator/text/v3.0/translate?from=${from}&to=${to}`;
+
+  try {
+    const res = await axios.post(
+      url,
+      [{ Text: text }],
+      {
+        headers: {
+          "Ocp-Apim-Subscription-Key": subscriptionKey,
+          "Ocp-Apim-Subscription-Region": location,
+          "Content-type": "application/json",
+        },
+      }
+    );
+
+    console.log(res.data[0].translations[0].text);
+    return res.data[0].translations[0].text;
+
+  } catch (err) {
+    console.error("Erreur Azure Translator:", err.response?.data || err.message);
+    return null;
+  }
+};
+
 
 const googleLanguages = {
   "af": "Afrikaans",

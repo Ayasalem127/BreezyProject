@@ -1,10 +1,33 @@
+'use client';
+
 import OtherInformations from "@/components/OtherInformations";
 import OtherMessages from "@/components/OtherMessages";
+import axios from "axios";
+import { useState, useEffect } from "react";
 
 export default function Home() {
+  const [translatedTitle, setTranslatedTitle] = useState("Profil utilisateur");
+
+  const translate = async (text) => {
+    try {
+      const res = await axios.post('http://localhost:3001/language/language/translate', {text}, { withCredentials: true });
+      console.log(res.data);
+      setTranslatedTitle(res.data.message);
+
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+    } catch (error) {
+      console.error("Erreur : ", error);
+    }
+  }
+
+  useEffect(() => {
+    translate("Profil utilisateur");
+  }, []);
+
   return (
     <div className="w-full px-2 text-center">
-        <h1>Profil utilisateur</h1>
+        <h1>{translatedTitle}</h1>
         <OtherInformations />
         <OtherMessages />
     </div>

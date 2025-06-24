@@ -2,12 +2,43 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
+
 export default function MyMessages() {
     const messages = [["username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 1], ["username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 1]];
     const [posts, setPosts] = useState([]);
     const [likes, setLikes] = useState(Array(messages.length).fill(false));
     const [isVisible, setIsVisible] = useState(Array(messages.length).fill(false));
     const [messageTexts, setMessageTexts] = useState(messages.map(message => message[3]));
+
+    const [translatedTexts, setTranslatedTexts] = useState([]);
+
+    const textsToTranslate = ["Mes posts", "Modifier", "Laisse parler ton coeur...", "Publier"];
+
+    const translateMany = async (texts) => {
+        try {
+            const results = [];
+
+            for (const text of texts) {
+                const res = await axios.post(
+                    'http://localhost:3001/language/language/translate',
+                    { text },
+                    { withCredentials: true }
+                );
+
+                results.push(res.data.message);
+
+                await new Promise((resolve) => setTimeout(resolve, 200));
+            }
+
+            setTranslatedTexts(results);
+        } catch (error) {
+            console.error("Erreur de traduction :", error);
+        }
+    };
+
+    useEffect(() => {
+        translateMany(textsToTranslate);
+    }, []);
     
     useEffect(() => {
         axios.get('http://localhost:3001/post/api/posts/me', { withCredentials: true })
@@ -50,7 +81,7 @@ export default function MyMessages() {
 
     return (
         <div>
-            <h2>Mes messages</h2>
+            <h2>{translatedTexts[0]}</h2>
         
             <div className="flex flex-col items-center w-full px-4">
                 {messages.map((message, index) => (
@@ -77,7 +108,7 @@ export default function MyMessages() {
 
                         <div className="flex justify-end">
                             <div className="w-30">
-                                <button type="submit">Modifier</button>
+                                <button type="submit">{translatedTexts[1]}</button>
                             </div>
                         </div>
                     </form>
@@ -85,12 +116,12 @@ export default function MyMessages() {
                     <form onSubmit={(e) => handleResponse(e, index)} style={{display: isVisible[index] ? 'block' : 'none'}} className="rounded-lg w-full space-y-2">
                         <div className="flex items-center gap-2">
                             <img src={message[1]} alt="logo" className="w-10 h-10 object-contain mb-2 rounded-full"/>
-                            <textarea type="text" id={`response-${index}`} className="focus:border-blue-500 focus:outline-none" rows={3} placeholder="Ecrire ici..."/>
+                            <textarea type="text" id={`response-${index}`} className="focus:border-blue-500 focus:outline-none" rows={3} placeholder={translatedTexts[2]}/>
                         </div>
 
                         <div className="flex justify-end">
                             <div className="w-30">
-                                <button type="submit">Publier</button>
+                                <button type="submit">{translatedTexts[3]}</button>
                             </div>
                         </div>
                     </form>

@@ -1,10 +1,39 @@
 'use client';
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import axios from "axios";
 
 export default function InputBar({ userId }) {
     const textareaRef = useRef(null);
+    const [translatedTexts, setTranslatedTexts] = useState([]);
+
+    const textsToTranslate = ["Ecris ton message...", "Envoyer"];
+
+    const translateMany = async (texts) => {
+        try {
+            const results = [];
+
+            for (const text of texts) {
+                const res = await axios.post(
+                    'http://localhost:3001/language/language/translate',
+                    { text },
+                    { withCredentials: true }
+                );
+
+                results.push(res.data.message);
+
+                await new Promise((resolve) => setTimeout(resolve, 200));
+            }
+
+            setTranslatedTexts(results);
+        } catch (error) {
+            console.error("Erreur de traduction :", error);
+        }
+    };
+
+    useEffect(() => {
+        translateMany(textsToTranslate);
+    }, []);
 
     const handleSubmit = async (e) => {
         //e.preventDefault();
@@ -40,13 +69,13 @@ export default function InputBar({ userId }) {
                         ref={textareaRef}
                         onInput={autoResize}
                         className="resize-none overflow-hidden max-h-[100px] rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Écris ton message..."
+                        placeholder={translatedTexts[0]}
                         rows={1}
                     />
                 </div>
                 <div className="flex-shrink-0 p-2">
                     <button type="submit">
-                        Envoyer
+                        {translatedTexts[1]}
                     </button>
                 </div>
             </form>

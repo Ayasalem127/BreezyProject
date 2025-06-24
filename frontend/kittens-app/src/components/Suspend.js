@@ -23,7 +23,7 @@ useEffect(() => {
       setAllUsers(res.data.users);
       setTotalPages(res.data.pages);
     } catch (err) {
-      console.error("❌ Erreur récupération utilisateurs :", err);
+      console.log("❌ Erreur récupération utilisateurs :", err);
       setError("Erreur lors du chargement des utilisateurs");
     } finally {
       setLoading(false);
@@ -49,7 +49,7 @@ useEffect(() => {
         )
       );
     } catch (err) {
-      console.error(`❌ Erreur lors de l'action ${action} :`, err.response?.data || err.message);
+      console.log(`❌ Erreur lors de l'action ${action} :`, err.response?.data || err.message);
     }
   };
 

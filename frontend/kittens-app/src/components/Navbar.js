@@ -116,13 +116,16 @@ export default function Navbar() {
           />
         </Link>
 
-        <Link href="/suspend">
-          <img
-            src="/suspended.png"
-            alt="Suspension"
-            className="w-5 h-5 hover:scale-110 transition-transform"
-          />
-        </Link>
+       {(user?.role === "moderator" || user?.role === "admin") && (
+  <Link href="/suspend">
+    <img
+      src="/suspended.png"
+      alt="Suspension"
+      className="w-5 h-5 hover:scale-110 transition-transform"
+    />
+  </Link>
+)}
+
 
         <Link href="/myProfile">
           <img

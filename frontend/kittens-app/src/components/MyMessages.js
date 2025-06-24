@@ -117,7 +117,7 @@ const handleModification = async (e, index) => {
   const postId = posts[index]._id;
 
   try {
-    await axios.put(`http://localhost:3001/post/api/posts/${postId}`, { content: updatedContent });
+    await axios.put(`https://localhost/post/api/posts/${postId}`, { content: updatedContent },  {withCredentials: true});
     setNotification("Message modifié avec succès ✔️");
     setTimeout(() => setNotification(""), 3000);
   } catch (err) {

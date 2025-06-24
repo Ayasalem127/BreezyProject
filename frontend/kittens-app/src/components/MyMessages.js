@@ -108,50 +108,50 @@ export default function MyMessages() {
     fetchPosts();
   }, []);
 
-  const toggleResponse = (index) => {
-    const updated = [...isVisible];
-    updated[index] = !updated[index];
-    setIsVisible(updated);
-  };
+  // const toggleResponse = (index) => {
+  //   const updated = [...isVisible];
+  //   updated[index] = !updated[index];
+  //   setIsVisible(updated);
+  // };
 
-  const toggleLike = async (index) => {
-    const post = posts[index];
-    try {
-      const res = await axios.post(`http://localhost:3001/post/api/posts/${post._id}/like`);
-      const { liked, totalLikes } = res.data;
+  // const toggleLike = async (index) => {
+  //   const post = posts[index];
+  //   try {
+  //     const res = await axios.post(`http://localhost:3001/post/api/posts/${post._id}/like`);
+  //     const { liked, totalLikes } = res.data;
 
-      setLikedPosts(prev => ({ ...prev, [post._id]: liked }));
-      setLikesByPost(prev => ({ ...prev, [post._id]: totalLikes }));
-    } catch (err) {
-      console.error("Erreur like post :", err);
-    }
-  };
+  //     setLikedPosts(prev => ({ ...prev, [post._id]: liked }));
+  //     setLikesByPost(prev => ({ ...prev, [post._id]: totalLikes }));
+  //   } catch (err) {
+  //     console.error("Erreur like post :", err);
+  //   }
+  // };
 
-  const handleModification = async (e, index) => {
-    e.preventDefault();
+  // const handleModification = async (e, index) => {
+  //   e.preventDefault();
 
-    const updatedContent = messageTexts[index];
-    const postId = posts[index]._id;
+  //   const updatedContent = messageTexts[index];
+  //   const postId = posts[index]._id;
 
-    try {
-      await axios.put(`http://localhost:3001/post/api/posts/${postId}`, { content: updatedContent });
-      setNotification("Message modifié avec succès ✔️");
-      setTimeout(() => setNotification(""), 3000);
-    } catch (err) {
-      console.error("Erreur modification post :", err);
-      setNotification("❌ Échec de la modification");
-    }
-  };
+  //   try {
+  //     await axios.put(`http://localhost:3001/post/api/posts/${postId}`, { content: updatedContent });
+  //     setNotification("Message modifié avec succès ✔️");
+  //     setTimeout(() => setNotification(""), 3000);
+  //   } catch (err) {
+  //     console.error("Erreur modification post :", err);
+  //     setNotification("❌ Échec de la modification");
+  //   }
+  // };
 
-  const handleLikeComment = async (commentId, setLikes, setLiked) => {
-    try {
-      const res = await axios.post(`http://localhost:3001/comment/api/comments/${commentId}/like`, {}, { withCredentials: true });
-      setLikes(res.data.likes);
-      setLiked(res.data.liked);
-    } catch (err) {
-      console.log("Erreur like commentaire :", err);
-    }
-  };
+  // const handleLikeComment = async (commentId, setLikes, setLiked) => {
+  //   try {
+  //     const res = await axios.post(`http://localhost:3001/comment/api/comments/${commentId}/like`, {}, { withCredentials: true });
+  //     setLikes(res.data.likes);
+  //     setLiked(res.data.liked);
+  //   } catch (err) {
+  //     console.log("Erreur like commentaire :", err);
+  //   }
+  // };
 
 
   const toggleResponse = (index) => {

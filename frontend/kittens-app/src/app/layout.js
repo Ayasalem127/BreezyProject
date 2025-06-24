@@ -5,7 +5,7 @@ import { ToggleProvider } from "@/context/ToggleTargetComponentContext";
 import NavbarClient from "@/components/NavbarClient";
 import NotificationsPC from "@/components/NotificationsPC"; // ✅ à importer
 import { AuthProvider } from "../context/AuthContext";
-
+import ProtectedRoute from "../context/ProtectedRoute";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -36,7 +36,9 @@ export default function RootLayout({ children }) {
             <NotificationsPC />
 
             {/* ✅ Le reste de l'app */}
-            {children}
+              <ProtectedRoute>
+              {children}
+            </ProtectedRoute>
           </AuthProvider>
         </ToggleProvider>
       </body>

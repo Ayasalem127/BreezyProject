@@ -15,6 +15,8 @@ router.get('/:userId', controller.getProfile);
 
 router.put('/:userId', controller.updateProfile);
 
+router.post('/search', controller.searchUsersByDisplayName);
+
 router.post("/upload-avatar", upload.single("avatar"), controller.updateImage); 
 router.get("/:userId/following", controller.getFollowing);
 
@@ -23,7 +25,6 @@ router.post('/:userId/suspend', checkRole(['admin', 'moderator']), controller.su
 router.post('/:userId/reactivate', checkRole(['admin', 'moderator']), controller.reactivateUser);
 
 router.get('/', controller.getAllUsersPaginated);
-
 
 
 module.exports = router;

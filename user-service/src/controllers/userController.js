@@ -1,5 +1,6 @@
 const UserProfile = require('../models/UserProfile');
 const axios = require("axios");
+const ms= require("ms");
 
 exports.createProfile = async (req, res) => {
   try {
@@ -15,30 +16,54 @@ exports.createProfile = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 exports.getMyProfile = async (req, res) => {
   try {
-         const userId = req.headers['x-user-id'];
-         console.log("idduserprofile",userId);
-    const profile = await UserProfile
-    .findOne({ userId: userId })
-   
+    const userId = req.headers['x-user-id'];
+    let profile = await UserProfile.findOne({ userId });
+
     if (!profile) return res.status(404).json({ message: "Profil non trouvé" });
-    res.json(profile);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-exports.getProfile = async (req, res) => {
-  try {
-    const profile = await UserProfile
-    .findOne({ userId: req.params.userId })
-    if (!profile) return res.status(404).json({ message: "Profil non trouvé" });
+
+    // ✅ Réactivation automatique si la suspension a expiré
+    if (profile.status === "suspended" && profile.suspendedUntil) {
+      const now = new Date();
+      const until = new Date(profile.suspendedUntil);
+
+      if (now > until) {
+        profile.status = "active";
+        profile.suspendedUntil = null;
+        await profile.save();
+      }
+    }
+
     res.json(profile);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
+exports.getProfile = async (req, res) => {
+  try {
+    let profile = await UserProfile.findOne({ userId: req.params.userId });
+    if (!profile) return res.status(404).json({ message: "Profil non trouvé" });
+
+    // ✅ Réactivation automatique si la suspension a expiré
+    if (profile.status === "suspended" && profile.suspendedUntil) {
+      const now = new Date();
+      const until = new Date(profile.suspendedUntil);
+
+      if (now > until) {
+        profile.status = "active";
+        profile.suspendedUntil = null;
+        await profile.save();
+      }
+    }
+
+    res.json(profile);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 exports.updateImage = async (req, res) => {
   try {
@@ -70,7 +95,6 @@ exports.updateImage = async (req, res) => {
   }
 };
 
-
 exports.updateProfile = async (req, res) => {
   try {
     console.log("req body",req.body);
@@ -84,6 +108,26 @@ exports.updateProfile = async (req, res) => {
     res.json(updated);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+exports.searchUsersByDisplayName = async (req, res) => {
+  try {
+    const { query } = req.body;
+
+    if (!query || query.trim() === "") {
+      return res.status(400).json({ message: "Requête vide" });
+    }
+
+    // Recherche insensible à la casse (i) avec une expression régulière
+    const matchingUsers = await UserProfile.find({
+      displayName: { $regex: `^${query}`, $options: 'i' }
+    }).select('userId displayName');
+
+    res.json(matchingUsers);
+  } catch (err) {
+    console.error("Erreur lors de la recherche :", err.message);
+    res.status(500).json({ error: "Erreur serveur lors de la recherche." });
   }
 };
 
@@ -221,17 +265,31 @@ exports.banUser = async (req, res) => {
 exports.suspendUser = async (req, res) => {
   try {
     const { userId } = req.params;
+    const { duration } = req.body; // exemple: "2h", "30m", "5d"
+
+    if (!duration || !ms(duration)) {
+      return res.status(400).json({ message: "Durée invalide (ex: '2h', '30m', '1d')" });
+    }
+
+    const until = new Date(Date.now() + ms(duration));
+
     const updated = await UserProfile.findOneAndUpdate(
       { userId },
-      { status: 'suspended' },
+      { status: 'suspended', suspendedUntil: until },
       { new: true }
     );
+
     if (!updated) return res.status(404).json({ message: "Utilisateur non trouvé" });
-    res.json({ message: "Utilisateur suspendu", user: updated });
+
+    res.json({
+      message: `Utilisateur suspendu jusqu'à ${until.toISOString()}`,
+      user: updated
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 // REACTIVATE
 exports.reactivateUser = async (req, res) => {
@@ -239,7 +297,7 @@ exports.reactivateUser = async (req, res) => {
     const { userId } = req.params;
     const updated = await UserProfile.findOneAndUpdate(
       { userId },
-      { status: 'active' },
+      { status: 'active', suspendedUntil: null },
       { new: true }
     );
     if (!updated) return res.status(404).json({ message: "Utilisateur non trouvé" });

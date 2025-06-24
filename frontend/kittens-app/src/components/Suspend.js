@@ -11,36 +11,47 @@ export default function UserModerationPanel({ searchText = "" }) {
   const [error, setError] = useState("");
 
   const [page, setPage] = useState(1);
-const [totalPages, setTotalPages] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-useEffect(() => {
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const res = await axios.get(`http://localhost:3001/user/api/users?page=${page}&limit=15`, {
-        withCredentials: true,
-      });
-      setAllUsers(res.data.users);
-      setTotalPages(res.data.pages);
-    } catch (err) {
-      console.log("❌ Erreur récupération utilisateurs :", err);
-      setError("Erreur lors du chargement des utilisateurs");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [showSuspendModal, setShowSuspendModal] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [suspendDuration, setSuspendDuration] = useState("");
+  const [suspendUnit, setSuspendUnit] = useState("m");
 
-  fetchUsers();
-}, [page]);
 
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(`http://localhost:3001/user/api/users?page=${page}&limit=15`, {
+          withCredentials: true,
+        });
+        setAllUsers(res.data.users);
+        setTotalPages(res.data.pages);
+      } catch (err) {
+        console.error("❌ Erreur récupération utilisateurs :", err);
+        setError("Erreur lors du chargement des utilisateurs");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [page]);
 
   const filteredUsers = allUsers.filter(u =>
     u.displayName?.toLowerCase().includes(searchText.toLowerCase())
   );
 
-  const updateUserStatus = async (userId, action) => {
+  const updateUserStatus = async (userId, action, duration = null) => {
     try {
-      await axios.post(`http://localhost:3001/user/api/users/${userId}/${action}`, {}, { withCredentials: true });
+      const body = duration ? { duration } : {};
+      await axios.post(
+        `http://localhost:3001/user/api/users/${userId}/${action}`,
+        body,
+        { withCredentials: true }
+      );
+
       setAllUsers(prev =>
         prev.map(u =>
           u.userId === userId
@@ -87,7 +98,10 @@ useEffect(() => {
                   {u.status !== "banned" && u.status !== "suspended" && (
                     <>
                       <button
-                        onClick={() => updateUserStatus(u.userId, "suspend")}
+                        onClick={() => {
+                          setSelectedUserId(u.userId);
+                          setShowSuspendModal(true);
+                        }}
                         className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
                       >
                         Suspendre
@@ -114,6 +128,7 @@ useEffect(() => {
           )}
         </div>
       )}
+
       {totalPages > 1 && (
         <div className="mt-6 flex gap-2 justify-center">
           <button
@@ -133,6 +148,54 @@ useEffect(() => {
           >
             Suivant →
           </button>
+        </div>
+      )}
+
+      {showSuspendModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-md w-[90%] sm:w-96">
+            <h3 className="text-lg font-bold mb-4">Durée de la suspension</h3>
+            <div className="flex items-center gap-2 mb-4">
+              <input
+                type="number"
+                value={suspendDuration}
+                onChange={(e) => setSuspendDuration(e.target.value)}
+                className="border p-2 w-1/2 rounded"
+                placeholder="Durée"
+                min="1"
+              />
+              <select
+                value={suspendUnit}
+                onChange={(e) => setSuspendUnit(e.target.value)}
+                className="border p-2 rounded"
+              >
+                <option value="m">minutes</option>
+                <option value="h">heures</option>
+                <option value="d">jours</option>
+              </select>
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowSuspendModal(false)}
+                className="px-3 py-1 bg-gray-300 rounded"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={async () => {
+                  const durationString = `${suspendDuration}${suspendUnit}`;
+                  await updateUserStatus(selectedUserId, "suspend", durationString);
+                  setShowSuspendModal(false);
+                  setSuspendDuration("");
+                  setSuspendUnit("m");
+                }}
+                className="px-3 py-1 bg-yellow-500 text-white rounded"
+              >
+                Confirmer
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

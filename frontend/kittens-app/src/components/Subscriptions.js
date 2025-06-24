@@ -12,6 +12,34 @@ export default function Subscriptions({ searchText }) {
   const [subscriptions, setSubscriptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  const [translatedTexts, setTranslatedTexts] = useState([]);
+
+    const textsToTranslate = ["Mes abonnements", "Chargement...", "Erreur : ", "Aucun abonnement trouvé."];
+
+    const translateMany = async (texts) => {
+        try {
+            const results = [];
+
+            for (const text of texts) {
+                const res = await axios.post(
+                    'http://localhost:3001/language/language/translate',
+                    { text },
+                    { withCredentials: true }
+                );
+
+                results.push(res.data.message);
+            }
+
+            setTranslatedTexts(results);
+        } catch (error) {
+            console.error("Erreur de traduction :", error);
+        }
+    };
+
+    useEffect(() => {
+        translateMany(textsToTranslate);
+    }, []);
 
   useEffect(() => {
     if (!userId) return;
@@ -44,14 +72,14 @@ export default function Subscriptions({ searchText }) {
   );
   return (
     <div>
-      <h2>Mes abonnements</h2>
+      <h2>{translatedTexts[0]}</h2>
 
 
       <div className="flex flex-col items-center w-full px-4">
         {loading ? (
-          <p className="text-gray-500">Chargement...</p>
+          <p className="text-gray-500">{translatedTexts[1]}</p>
         ) : error ? (
-          <p className="text-red-500">Erreur : {error}</p>
+          <p className="text-red-500">{translatedTexts[2]} {error}</p>
         ) : filteredSubscriptions.length > 0 ? (
           filteredSubscriptions.map((subscription, index) => (
             <div
@@ -68,11 +96,10 @@ export default function Subscriptions({ searchText }) {
                   <span className="font-semibold">{subscription.displayName}</span>
                 </div>
               </Link>
-
             </div>
           ))
         ) : (
-          <p className="text-gray-500 mt-4">Aucun abonnement trouvé.</p>
+          <p className="text-gray-500 mt-4">{translatedTexts[3]}</p>
         )}
       </div>
     </div>

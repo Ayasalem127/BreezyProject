@@ -1,20 +1,50 @@
 'use client';
-import { useContext, useState } from "react";
+
+import { useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useEffect } from "react";
- import { AuthContext } from "@/context/AuthContext";
+import { AuthContext } from "@/context/AuthContext";
+
 export default function OtherInformations({ userId }) {
-      const { user,setUser } = useContext(AuthContext);
+    const { user,setUser } = useContext(AuthContext);
     const infos = ["username", "/logo.webp", "Description"];
     const [subscribe, setSubscribe] = useState(user?.following?.includes(userId) );
 
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [translatedTexts, setTranslatedTexts] = useState([]);
+
+    const textsToTranslate = ["Suivre", "Ne plus suivre"];
+
+    const translateMany = async (texts) => {
+        try {
+            const results = [];
+
+            for (const text of texts) {
+                const res = await axios.post(
+                    'http://localhost:3001/language/language/translate',
+                    { text },
+                    { withCredentials: true }
+                );
+
+                results.push(res.data.message);
+            }
+
+            setTranslatedTexts(results);
+        } catch (error) {
+            console.error("Erreur de traduction :", error);
+        }
+    };
+
+    useEffect(() => {
+        translateMany(textsToTranslate);
+    }, []);
  
 
   useEffect(() => {
     if (!userId) return;
+
 
     const fetchProfile = async () => {
       try {
@@ -82,7 +112,7 @@ console.log("useridddddd",userId);
 
                 <div className="flex justify-end">
                     <div className="w-50">
-                        <button onClick={(e) => handleFollow(e)}>{subscribe ? "Ne plus suivre" : "Suivre"}</button>
+                        <button onClick={(e) => handleFollow(e)}>{subscribe ? translatedTexts[1] : translatedTexts[0]}</button>
                     </div>
                 </div>
             </div>

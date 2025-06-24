@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useContext } from 'react';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
-import { useContext } from "react";
 import axios from 'axios';
 import { AuthContext } from "@/context/AuthContext";
+
 export default function ProfilModification() {
     // Récupère userId depuis AuthContext
   const infos = ["username", "/logo.webp", "Description"];
@@ -19,6 +19,34 @@ export default function ProfilModification() {
   const [passwordError, setPasswordError] = useState('');
   const [confirmError, setConfirmError] = useState('');
   const [formSubmitted, setFormSubmitted] = useState(false);
+
+  const [translatedTexts, setTranslatedTexts] = useState([]);
+
+    const textsToTranslate = ["Nom d'utilisateur", "Biographie", "Adresse e-mail", "Mot de passe", "8 caractères minimum dont 1 chiffre", "Confirmation du mot de passe", "Doit être identique au mot de passe", "Modifier"];
+
+    const translateMany = async (texts) => {
+        try {
+            const results = [];
+
+            for (const text of texts) {
+                const res = await axios.post(
+                    'http://localhost:3001/language/language/translate',
+                    { text },
+                    { withCredentials: true }
+                );
+
+                results.push(res.data.message);
+            }
+
+            setTranslatedTexts(results);
+        } catch (error) {
+            console.error("Erreur de traduction :", error);
+        }
+    };
+
+    useEffect(() => {
+        translateMany(textsToTranslate);
+    }, []);
 
   const isValidPassword = (pwd) => {
     if (!pwd) return "Mot de passe requis.";
@@ -160,25 +188,24 @@ const uploadAvatar = async (formData) => {
         </div>
 
         <div>
-
-          <label htmlFor="username" className="block text-sm font-medium text-gray-700">Nom d'utilisateur</label>
-          <input type="text" id="username"  className={`${inputBase}`}  defaultValue={user?.displayName} />
+          <label htmlFor="username">{translatedTexts[0]}</label>
+          <input type="text" id="username" className={`${inputBase}`} defaultValue={user?.displayName}/>
         </div>
 
         <div>
-          <label htmlFor="biography" className="block text-sm font-medium text-gray-700">Biographie</label>
-          <textarea id="biography" className={`${inputBase}`} defaultValue={user?.bio}  />
+          <label htmlFor="biography">{translatedTexts[1]}</label>
+          <textarea id="biography" className={`${inputBase}`} defaultValue={user?.bio}/>
+
         </div>
 
         {/* <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">Adresse e-mail</label>
           <input type="email" id="email" placeholder="exemple@domaine.com"  className={`${inputBase}`} />
-
         </div>
 
        
         <div>
-          <label htmlFor="password">Mot de passe</label>
+          <label htmlFor="password">{translatedTexts[3]}</label>
           <div className="relative">
             <input
               type="password"
@@ -190,7 +217,7 @@ const uploadAvatar = async (formData) => {
             <div className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 group cursor-pointer">
               <AiOutlineInfoCircle className="text-xl" />
               <span className="absolute hidden group-hover:block text-white bg-black text-xs p-1 rounded w-48 right-6 top-6 z-10">
-                6 caractères minimum dont 1 chiffre
+                {translatedTexts[4]}
               </span>
             </div>
           </div>
@@ -201,7 +228,7 @@ const uploadAvatar = async (formData) => {
 
      
         <div>
-          <label htmlFor="confirm_password">Confirmation du mot de passe</label>
+          <label htmlFor="confirm_password">{translatedTexts[5]}</label>
           <div className="relative">
             <input
               type="password"
@@ -213,7 +240,7 @@ const uploadAvatar = async (formData) => {
             <div className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 group cursor-pointer">
               <AiOutlineInfoCircle className="text-xl" />
               <span className="absolute hidden group-hover:block text-white bg-black text-xs p-1 rounded w-48 right-6 top-6 z-10">
-                Doit être identique au mot de passe
+                {translatedTexts[6]}
               </span>
             </div>
           </div>
@@ -222,7 +249,7 @@ const uploadAvatar = async (formData) => {
           )}
         </div> */}
 
-        <button type="submit">Modifier</button>
+        <button type="submit">{translatedTexts[7]}</button>
       </form>
     </div>
   );

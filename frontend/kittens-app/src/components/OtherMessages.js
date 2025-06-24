@@ -1,5 +1,6 @@
 // 'use client';
-// import { useState } from "react";
+// import { useState, useEffect } from "react";
+// import axios from "axios";
 
 // export default function Messages() {
 //     const messages = [["username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 1], ["username", "/logo.webp", "01/01/2001", "J'ai écris ce message.", 5, 1]];
@@ -87,6 +88,34 @@ export default function OtherMessages({ userId }) {
 
   const { user } = useContext(AuthContext);
   const viewerId = user?.userId || user?._id;
+  
+  const [translatedTexts, setTranslatedTexts] = useState([]);
+
+    const textsToTranslate = ["Message de ", "Aucun message trouvé.", "Auteur", "Publier", "Répondre", "Valider"];
+
+    const translateMany = async (texts) => {
+        try {
+            const results = [];
+
+            for (const text of texts) {
+                const res = await axios.post(
+                    'http://localhost:3001/language/language/translate',
+                    { text },
+                    { withCredentials: true }
+                );
+
+                results.push(res.data.message);
+            }
+
+            setTranslatedTexts(results);
+        } catch (error) {
+            console.error("Erreur de traduction :", error);
+        }
+    };
+
+    useEffect(() => {
+        translateMany(textsToTranslate);
+    }, []);
 
   useEffect(() => {
     if (!userId) return;
@@ -173,14 +202,14 @@ export default function OtherMessages({ userId }) {
 
   return (
     <div className="flex flex-col items-center w-full px-4">
-      <h2 className="text-xl font-semibold mb-4">Messages de {displayName}</h2>
+      <h2 className="text-xl font-semibold mb-4">{translatedTexts[0]}{displayName}</h2>
       {posts.length === 0 ? (
-        <p className="text-gray-500">Aucun message trouvé.</p>
+        <p className="text-gray-500">{translatedTexts[1]}</p>
       ) : (
         posts.map((post, index) => (
           <div key={post._id} className="w-full sm:w-[calc(50%-0.5rem)] p-4 m-4 border border-gray-300 rounded-2xl shadow">
             <div className="flex justify-between text-sm">
-              <span className="font-semibold">Auteur : {authors[post.author]}</span>
+              <span className="font-semibold">{translatedTexts[2]} : {authors[post.author]}</span>
               <span className="text-gray-500">{new Date(post.createdAt).toLocaleString()}</span>
             </div>
 
@@ -245,7 +274,7 @@ function AddComment({ postId, onCommentAdded }) {
         rows={2}
       />
       <button onClick={handleSubmit} className="mt-1 px-3 py-1 bg-green-600 text-white rounded">
-        Publier
+        {translatedTexts[3]}
       </button>
     </div>
   );
@@ -310,7 +339,7 @@ function CommentThread({ comment, authors, viewerId }) {
 </span>
 
         <button onClick={() => setShowReplyBox(prev => !prev)} className="text-blue-600">
-          Répondre
+          {translatedTexts[4]}
         </button>
       </div>
       {showReplyBox && (
@@ -323,7 +352,7 @@ function CommentThread({ comment, authors, viewerId }) {
             rows={2}
           />
           <button onClick={handleReply} className="mt-1 px-3 py-1 bg-blue-600 text-white rounded">
-            Valider
+            {translatedTexts[5]}
           </button>
         </div>
       )}

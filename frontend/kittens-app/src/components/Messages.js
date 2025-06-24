@@ -1,5 +1,5 @@
 
-// 'use client';
+'use client';
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '@/context/AuthContext';
@@ -14,12 +14,40 @@ export default function Messages() {
   const [isVisible, setIsVisible] = useState([]);
   const [authors, setAuthors] = useState({});
 
+    const [translatedTexts, setTranslatedTexts] = useState([]);
+
+    const textsToTranslate = ["Publier", "Auteur", "Valider", "Annuler", "Répondre"];
+
+    const translateMany = async (texts) => {
+        try {
+            const results = [];
+
+            for (const text of texts) {
+                const res = await axios.post(
+                    'http://localhost:3001/language/language/translate',
+                    { text },
+                    { withCredentials: true }
+                );
+
+                results.push(res.data.message);
+            }
+
+            setTranslatedTexts(results);
+        } catch (error) {
+            console.error("Erreur de traduction :", error);
+        }
+    };
+
+    useEffect(() => {
+        translateMany(textsToTranslate);
+    }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const postRes = await axios.get('http://localhost:3001/post/api/posts/feed');
         const postsData = postRes.data;
-
+        
         const likeCounts = {};
         const commentsMap = {};
         const likedState = {};
@@ -169,7 +197,7 @@ function AddComment({ postId, onCommentAdded }) {
         rows={2}
       />
       <button onClick={handleSubmit} className="mt-1 px-3 py-1 bg-green-600 text-white rounded">
-        Publier
+        {translatedTexts[0]}
       </button>
     </div>
   );
@@ -249,7 +277,7 @@ function CommentThread({ comment, authors }) {
   return (
     <div className="ml-4 border-l-2 border-gray-300 pl-4 mt-4 relative bg-blue-50 p-2 rounded">
       <div className="flex justify-between text-sm text-gray-600">
-        <span>Auteur : {authors[comment.author] || comment.author}</span>
+        <span>{translatedTexts[1]} : {authors[comment.author] || comment.author}</span>
         <span>{new Date(comment.createdAt).toLocaleString()}</span>
       </div>
 
@@ -264,8 +292,8 @@ function CommentThread({ comment, authors }) {
             onChange={(e) => setEditContent(e.target.value)}
           />
           <div className="mt-1 flex gap-2">
-            <button onClick={handleUpdate} className="px-3 py-1 bg-yellow-600 text-white rounded">Valider</button>
-            <button onClick={() => setEditing(false)} className="px-3 py-1 bg-gray-500 text-white rounded">Annuler</button>
+            <button onClick={handleUpdate} className="px-3 py-1 bg-yellow-600 text-white rounded">{translatedTexts[2]}</button>
+            <button onClick={() => setEditing(false)} className="px-3 py-1 bg-gray-500 text-white rounded">{translatedTexts[3]}</button>
           </div>
         </div>
       )}
@@ -275,7 +303,7 @@ function CommentThread({ comment, authors }) {
           {liked ? "❤️" : "🤍"} {likes}
         </span>
         <button className="text-blue-600" onClick={() => setShowReplyBox(prev => !prev)}>
-          Répondre
+          {translatedTexts[4]}
         </button>
         {isOwner && (
           <>
@@ -295,7 +323,7 @@ function CommentThread({ comment, authors }) {
             placeholder="Votre réponse..."
           />
           <button className="mt-1 px-3 py-1 bg-blue-600 text-white rounded" onClick={handleReplySubmit}>
-            Valider
+            {translatedTexts[2]}
           </button>
         </div>
       )}

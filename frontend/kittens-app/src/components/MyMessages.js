@@ -1,4 +1,4 @@
- 'use client';
+'use client';
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '@/context/AuthContext';
@@ -15,6 +15,33 @@ export default function MyMessages() {
   const [commentsByPost, setCommentsByPost] = useState({});
   const [authors, setAuthors] = useState({});
   const { user } = useContext(AuthContext);
+  const [translatedTexts, setTranslatedTexts] = useState([]);
+
+    const textsToTranslate = ["Mes posts", "Modifier", "Publier", "Auteur", "Valider", "Annuler", "Répondre"];
+
+    const translateMany = async (texts) => {
+        try {
+            const results = [];
+
+            for (const text of texts) {
+                const res = await axios.post(
+                    'http://localhost:3001/language/language/translate',
+                    { text },
+                    { withCredentials: true }
+                );
+
+                results.push(res.data.message);
+            }
+
+            setTranslatedTexts(results);
+        } catch (error) {
+            console.error("Erreur de traduction :", error);
+        }
+    };
+
+    useEffect(() => {
+        translateMany(textsToTranslate);
+    }, []);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -128,7 +155,7 @@ export default function MyMessages() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-800 p-5">Mes messages</h2>
+      <h2 className="text-2xl font-bold text-gray-800 p-5">{translatedTexts[0]}</h2>
 
       {notification && (
         <p className="text-center text-sm text-green-600 font-semibold">{notification}</p>
@@ -182,7 +209,7 @@ export default function MyMessages() {
                 onClick={(e) => handleModification(e, index)}
                 className="px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
               >
-                Modifier
+                {translatedTexts[1]}
               </button>
             </div>
 
@@ -240,7 +267,7 @@ function AddComment({ postId, onCommentAdded }) {
         rows={2}
       />
       <button onClick={handleSubmit} className="mt-1 px-3 py-1 bg-green-600 text-white rounded">
-        Publier
+        {translatedTexts[2]}
       </button>
     </div>
   );
@@ -297,13 +324,13 @@ function CommentThread({ comment, authors, userId, onLike }) {
       console.log("Erreur suppression :", err.response?.data || err.message);
     }
   };
-
+  
   const isOwner = String(comment.author?._id || comment.author) === String(userId);
 
   return (
     <div className="ml-4 border-l-2 border-gray-300 pl-4 mt-4 bg-blue-50 p-2 rounded">
       <div className="flex justify-between text-sm text-gray-600">
-        <span>Auteur : {authors[comment.author] || comment.author}</span>
+        <span>{translatedTexts[3]} : {authors[comment.author] || comment.author}</span>
         <span>{new Date(comment.createdAt).toLocaleString()}</span>
       </div>
 
@@ -318,8 +345,8 @@ function CommentThread({ comment, authors, userId, onLike }) {
             onChange={(e) => setEditContent(e.target.value)}
           />
           <div className="mt-1 flex gap-2">
-            <button onClick={handleUpdate} className="px-3 py-1 bg-yellow-600 text-white rounded">Valider</button>
-            <button onClick={() => setEditing(false)} className="px-3 py-1 bg-gray-500 text-white rounded">Annuler</button>
+            <button onClick={handleUpdate} className="px-3 py-1 bg-yellow-600 text-white rounded">{translatedTexts[4]}</button>
+            <button onClick={() => setEditing(false)} className="px-3 py-1 bg-gray-500 text-white rounded">{translatedTexts[5]}</button>
           </div>
         </div>
       )}
@@ -328,7 +355,7 @@ function CommentThread({ comment, authors, userId, onLike }) {
         <span onClick={() => onLike(comment._id, setLikes, setLiked)} className={`cursor-pointer ${liked ? 'text-red-500' : ''}`}>
           {liked ? "❤️" : "🤍"} {likes}
         </span>
-        <button onClick={() => setShowReplyBox(prev => !prev)} className="text-blue-600">Répondre</button>
+        <button onClick={() => setShowReplyBox(prev => !prev)} className="text-blue-600">{translatedTexts[6]}</button>
         {isOwner && (
           <>
             <button onClick={() => setEditing(true)} className="text-blue-600">✏️</button>

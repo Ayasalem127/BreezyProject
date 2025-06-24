@@ -8,7 +8,6 @@ import { AuthContext } from "@/context/AuthContext";
 import PopupEmptyFields from "./PopupEmptyFields";
 import PopupWrongCredentials from "./PopupWrongCredentials";
 
-
 export default function ConnectionForm() {
   const router = useRouter();
   const { setUser } = useContext(AuthContext);
@@ -19,8 +18,8 @@ export default function ConnectionForm() {
   const [passwordError, setPasswordError] = useState(true);
   const [showPopupEmpty, setShowPopupEmpty] = useState(false);
   const [showPopupWrong, setShowPopupWrong] = useState(false);
+  const [messageStatus, setMessageStatus] = useState(""); // 👈 Message utilisateur
 
-  // Mise à jour des erreurs à chaque frappe
   useEffect(() => {
     setEmailError(email.trim() === '');
   }, [email]);
@@ -50,7 +49,20 @@ export default function ConnectionForm() {
         { withCredentials: true }
       );
 
-      setUser(res.data.user);
+      const user = res.data?.user;
+      if (!user) {
+        throw new Error("Utilisateur manquant dans la réponse");
+      }
+
+      // 🚫 Bloquer l’accès si suspendu ou banni
+      if (user.status === "suspended" || user.status === "banned") {
+        const msg = user.status === "banned" ? "banni" : "suspendu";
+        setMessageStatus(`Votre compte est ${msg}.`);
+        await axios.post("http://localhost:3001/auth/auth/logout", {}, { withCredentials: true });
+        return;
+      }
+
+      setUser(user);
       router.push("/home");
 
     } catch (error) {
@@ -58,9 +70,9 @@ export default function ConnectionForm() {
 
       if (error.response?.data?.error === "Identifiants invalides") {
         setShowPopupWrong(true);
-        setTimeout(() => {
-          setShowPopupWrong(false);
-        }, 3000);
+        setTimeout(() => setShowPopupWrong(false), 3000);
+      } else if (error.response?.data?.error?.includes("suspendu") || error.response?.data?.error?.includes("banni")) {
+        setMessageStatus(error.response.data.error);
       } else {
         alert("Erreur inattendue. Veuillez réessayer.");
       }
@@ -72,9 +84,14 @@ export default function ConnectionForm() {
       {showPopupEmpty && (
         <PopupEmptyFields onClose={() => setShowPopupEmpty(false)} />
       )}
-
       {showPopupWrong && (
         <PopupWrongCredentials onClose={() => setShowPopupWrong(false)} />
+      )}
+
+      {messageStatus && (
+        <div className="absolute top-6 text-center text-red-600 font-semibold">
+          {messageStatus}
+        </div>
       )}
 
       <form onSubmit={handleSubmit} className="p-4 rounded-lg w-full max-w-sm space-y-6 bg-white shadow">

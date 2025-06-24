@@ -118,7 +118,7 @@ export default function Navbar() {
 
         <Link href="/suspend">
           <img
-            src="/notification.png"
+            src="/suspended.png"
             alt="Suspension"
             className="w-5 h-5 hover:scale-110 transition-transform"
           />

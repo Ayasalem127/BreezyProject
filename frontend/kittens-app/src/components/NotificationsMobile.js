@@ -21,7 +21,7 @@
             
         </div>
     );
-}
+
 
 //     return (
 //         <div className="flex flex-col fixed top-12 left-0 items-end w-full overflow-y-auto" style={{ maxHeight: 'calc(100vh - var(--navbar-height))' }}>

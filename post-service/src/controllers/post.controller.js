@@ -88,15 +88,13 @@ exports.deletePost = async (req, res) => {
 //voir les posts d'un utilisateur
 exports.getPostsByUser = async (req, res) => {
   try {
-          const idUser=req.headers['x-user-id']
+    const userId = String(req.params.userId); // 🔐 on prend l'userId depuis l'URL et on le force en string
+    const posts = await Post.find({ author: userId }).sort({ createdAt: -1 });
 
-    const posts = await Post.find({ author: idUser })
-      .sort({ createdAt: -1 }); // Tri du plus récent au plus ancien
-
-    //nmbre de likes du post
+    // Ajoute un champ likeCount (optionnel si tu ne l'utilises pas)
     posts.forEach(post => {
-        post.likeCount = post.likes.length;
-      });
+      post.likeCount = post.likes.length;
+    });
 
     res.json(posts);
   } catch (err) {
@@ -104,6 +102,7 @@ exports.getPostsByUser = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur." });
   }
 };
+
 
 //voir mes posts
 exports.getMyPosts = async (req, res) => {

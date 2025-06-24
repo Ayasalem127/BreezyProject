@@ -13,7 +13,7 @@ const RedirectIfAuthenticated = ({ children }) => {
 
   useEffect(() => {
     if (user && REDIRECT_ROUTES.includes(pathname)) {
-      router.push('/myProfile'); // redirection si déjà connecté
+      router.push('/home'); // redirection si déjà connecté
     }
   }, [user, pathname]);
 

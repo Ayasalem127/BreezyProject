@@ -7,8 +7,6 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 
 
-import { useState } from "react";
-
 
 export default function Home() {
   const [translatedTitle, setTranslatedTitle] = useState("Utilisateurs");

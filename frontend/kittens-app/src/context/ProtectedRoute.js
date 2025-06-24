@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { AuthContext } from './AuthContext';
 
 // Routes publiques accessibles sans connexion
-const PUBLIC_ROUTES = ['/home', '/connection', '/userCreation'];
+const PUBLIC_ROUTES = ['/', '/connection', '/userCreation'];
 
 // Routes protégées par rôle spécifique
 const ROLE_PROTECTED_ROUTES = {
@@ -24,12 +24,12 @@ const ProtectedRoute = ({ children }) => {
   useEffect(() => {
     // Si l'utilisateur n'est pas connecté et la page n'est pas publique → redirection
     if (!user && !isPublic) {
-      router.push('/home');
+      router.push('/');
     }
 
     // Si la page est protégée par rôle et l'utilisateur n'a pas le bon rôle
     if (user && requiredRoles && !requiredRoles.includes(user.role)) {
-      router.push('/home'); // ou afficher une 403 si tu veux
+      router.push('/'); // ou afficher une 403 si tu veux
     }
   }, [user, pathname]);
 

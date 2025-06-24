@@ -134,7 +134,7 @@ services:
     image: mongo
     container_name: breezy-mongo-language
     ports:
-      - "27022:27017"
+      - "27023:27017"
     volumes:
       - language_data:/data/db
 

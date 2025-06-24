@@ -17,7 +17,6 @@ exports.createProfile = async (req, res) => {
   }
 };
 
-
 exports.getMyProfile = async (req, res) => {
   try {
     const userId = req.headers['x-user-id'];
@@ -66,8 +65,6 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-
-
 exports.updateImage = async (req, res) => {
   try {
     if (!req.file) {
@@ -97,7 +94,6 @@ exports.updateImage = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
 
 exports.updateProfile = async (req, res) => {
   try {
@@ -134,7 +130,6 @@ exports.searchUsersByDisplayName = async (req, res) => {
     res.status(500).json({ error: "Erreur serveur lors de la recherche." });
   }
 };
-
 
 exports.followUser = async (req, res) => {
   const userId = req.headers["x-user-id"];

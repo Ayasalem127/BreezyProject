@@ -27,5 +27,4 @@ router.post('/:userId/reactivate', checkRole(['admin', 'moderator']), controller
 router.get('/', controller.getAllUsersPaginated);
 
 
-
 module.exports = router;

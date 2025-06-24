@@ -73,4 +73,3 @@ export default function ChatSearchbar() {
         </div>
     );
 }
-

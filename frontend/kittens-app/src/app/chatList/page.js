@@ -3,6 +3,7 @@
 import ChatList from "@/components/ChatList";
 import axios from "axios";
 import { useState, useEffect } from "react";
+import ChatSearchbar from "@/components/ChatSearchbar";
 
 export default function Home() {
   const [translatedTitle, setTranslatedTitle] = useState("Mes conversations");
@@ -27,7 +28,8 @@ export default function Home() {
   return (
     <div className="w-full px-2 text-center">
         <h1>{translatedTitle}</h1>
+        <ChatSearchbar />
         <ChatList />
     </div>
-  );
+  ); 
 }

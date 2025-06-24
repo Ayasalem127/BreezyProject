@@ -2,13 +2,18 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-
+const path = require("path");
 const app = express();
+const cookieParser = require("cookie-parser");
 // app.use(cors({
 //   origin: 'http://localhost:3000',
 //   credentials: true
 // }));
 app.use(express.json());
+app.use(cookieParser());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+console.log("__dirname backend = ", __dirname);
 
 const PORT = process.env.PORT || 4001;
 const MONGO_URI = process.env.MONGO_URI;

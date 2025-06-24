@@ -1,12 +1,18 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useContext } from 'react';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
 import axios from 'axios';
+import { AuthContext } from "@/context/AuthContext";
 
 export default function ProfilModification() {
+    // Récupère userId depuis AuthContext
   const infos = ["username", "/logo.webp", "Description"];
-  const [image, setImage] = useState(infos[1]);
+ const { user,setUser } = useContext(AuthContext);
+   useEffect(() => {
+   setImage(`http://localhost:3001${user?.avatarUrl}` || infos[1])
+  }, [user]);
+
   const fileInputRef = useRef(null);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -49,6 +55,7 @@ export default function ProfilModification() {
     }
     return "";
   };
+    const [image, setImage] = useState( `http://localhost:3001${user?.avatarUrl}` || infos[1]); 
 
 useEffect(() => {
   if (formSubmitted || password.length > 0 || confirmPassword.length > 0) {
@@ -78,7 +85,8 @@ useEffect(() => {
 
   const handleClick = () => fileInputRef.current.click();
 
-  const handleImageChange = (e) => {
+
+  /*const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file && file.type.startsWith("image/")) {
       const reader = new FileReader();
@@ -87,39 +95,84 @@ useEffect(() => {
     }
   };
 
-  const inputBase = "block focus:outline-none focus:border-blue-500";
+  const inputBase = "block focus:outline-none focus:border-blue-500";*/
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setFormSubmitted(true);
+const handleImageChange = (e) => {
+  const file = e.target.files[0];
+  if (!file || !file.type.startsWith("image/")) return;
 
-    const pwdError = isValidPassword(password);
-    setPasswordError(pwdError);
 
-    if (!confirmPassword || confirmPassword !== password) {
-      setConfirmError("Le mot de passe ne correspond pas.");
-    } else {
-      setConfirmError("");
-    }
+  // Pour afficher un aperçu immédiatement (facultatif)
+  const reader = new FileReader();
+  reader.onload = () => setImage(reader.result);
+  reader.readAsDataURL(file);
 
-    if (pwdError || confirmPassword !== password) {
-      return; // ne pas soumettre
-    }
+};
+  const inputBase = "bg-white mt-1 block w-full rounded-md p-2 focus:outline-none focus:border-blue-500";
+const uploadAvatar = async (formData) => {
+  try {
+    const response = await axios.post(
+      "http://localhost:3001/user/api/users/upload-avatar",
+      formData,
+      {
+        withCredentials: true, // pour inclure les cookies
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+    );
+    console.log("Image uploaded", response.data);
+  } catch (error) {
+    console.error("Upload error", error);
+  }
+};
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setFormSubmitted(true);
 
+  const file = fileInputRef.current.files[0];
+  const formData = new FormData();
+  formData.append("avatar", file);
+
+
+  const userId = user?._id; // ou currentUser._id selon ta structure
+  console.log(user);
+  // Vérification basique
+  if (!userId) {
+    console.log("Utilisateur non authentifié");
+    return;
+  }
+
+  try {
+    // Upload avatar (si géré ailleurs)
+    await uploadAvatar(formData);
+
+    // Récupération des données du formulaire
     const form = e.target;
-    const username = form.username.value;
-    const email = form.email.value;
-    const biography = form.biography.value;
+    const displayName = form.username.value;
+    const bio = form.biography.value;
 
-    // Affichage
-    console.log(`Username : ${username}`);
-    console.log(`Bio : ${biography}`);
-    console.log(`Email : ${email}`);
-    console.log(`Mot de passe : ${password}`);
-    console.log(`Confirmation : ${confirmPassword}`);
+    // Envoi des données au backend via axios
+    const res = await axios.put(
+      `http://localhost:3001/user/api/users/${userId}`,
+      { displayName, bio },
+      { withCredentials: true } // important si cookies d'auth
+    );
+
+    console.log("Profil mis à jour :", res.data);
+    const updatedUser = response.data;
+
+    // ✅ Met à jour le contexte global avec les nouvelles infos
+    setUser((prevUser) => ({
+      ...prevUser,
+      ...updatedUser
+    }))
     alert("Modifications enregistrées !");
-  };
-
+  } catch (error) {
+    console.log("Erreur lors de la mise à jour :", error.response?.data || error.message);
+    alert("Erreur lors de la mise à jour du profil");
+  }
+};
   return (
     <div className="flex items-center justify-center">
       <form onSubmit={handleSubmit} className="p-4 rounded-lg w-full max-w-sm space-y-6">
@@ -136,21 +189,21 @@ useEffect(() => {
 
         <div>
           <label htmlFor="username">{translatedTexts[0]}</label>
-          <input type="text" id="username" className={`${inputBase}`} />
+          <input type="text" id="username" className={`${inputBase}`} defaultValue={user?.displayName}/>
         </div>
 
         <div>
           <label htmlFor="biography">{translatedTexts[1]}</label>
-          <textarea id="biography" className={`${inputBase}`} />
+          <textarea id="biography" className={`${inputBase}`} defaultValue={user?.bio}/>
 
         </div>
 
-        <div>
-          <label htmlFor="email">{translatedTexts[2]}</label>
-          <input type="email" id="email" placeholder="exemple@domaine.com" className={`${inputBase}`} />
+        {/* <div>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Adresse e-mail</label>
+          <input type="email" id="email" placeholder="exemple@domaine.com"  className={`${inputBase}`} />
         </div>
 
-        {/* Mot de passe */}
+       
         <div>
           <label htmlFor="password">{translatedTexts[3]}</label>
           <div className="relative">
@@ -173,7 +226,7 @@ useEffect(() => {
           )}
         </div>
 
-        {/* Confirmation */}
+     
         <div>
           <label htmlFor="confirm_password">{translatedTexts[5]}</label>
           <div className="relative">
@@ -194,7 +247,7 @@ useEffect(() => {
           {confirmError && (
             <p className="text-red-500 text-sm mt-1">{confirmError}</p>
           )}
-        </div>
+        </div> */}
 
         <button type="submit">{translatedTexts[7]}</button>
       </form>

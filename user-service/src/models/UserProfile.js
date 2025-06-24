@@ -11,7 +11,9 @@ const userProfileSchema = new mongoose.Schema({
   },
   avatarUrl: { type: String },
   followers: [{ type: String, ref: 'UserProfile' }],
-  following: [{ type: String, ref: 'UserProfile' }]
+  following: [{ type: String, ref: 'UserProfile' }],
+  status: { type: String, enum: ['active', 'suspended', 'banned'], default: 'active' },
+  suspendedUntil: { type: Date, default: null }
 }, { timestamps: true });
 
 module.exports = mongoose.model('UserProfile', userProfileSchema);

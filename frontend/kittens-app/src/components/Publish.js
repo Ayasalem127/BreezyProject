@@ -1,9 +1,11 @@
 'use client';
 
+import { Content } from "next/font/google";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
 export default function Publish() {
+     const [content, setContent] = useState("");
     const photo = "/logo.webp";
 
     const [translatedTexts, setTranslatedTexts] = useState([]);
@@ -36,9 +38,16 @@ export default function Publish() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+       
         const message = e.target.elements.message.value;
-
+        try {
+            const res = await axios.post('http://localhost:3001/post/api/posts', { content:content }, { withCredentials: true } //  pour envoyer/recevoir le cookie
+                )
+              console.log(`TOKEN : ${res.data.token}`);
+           // router.push("/home");
+        } catch (error) {
+            console.error("Erreur : ", error);
+        }
         //Affichage temporaire
         console.log(`Message : ${message}`);
     }
@@ -48,7 +57,7 @@ export default function Publish() {
             <form onSubmit={handleSubmit} className="w-full sm:w-[calc(50%-0.5rem)] p-2 m-4 box-border flex flex-col justify-between rounded-lg space-y-2">
                 <div className="flex items-center gap-2">
                     <img src={photo} alt="logo" className="w-10 h-10 object-contain mb-2 rounded-full"/>
-                    <textarea type="text" id="message" className="focus:border-blue-500 focus:outline-none" rows={3} placeholder={translatedTexts[0]}/>
+                    <textarea type="text" id="message" className="focus:border-blue-500 focus:outline-none" rows={3} placeholder={translatedTexts[0]} value={content} onChange={(e) => setContent(e.target.value)}/>
                 </div>
 
                 <div className="flex justify-end">

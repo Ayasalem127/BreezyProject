@@ -7,7 +7,9 @@ import axios from "axios";
 
 export default function MyInformations() {
     const router = useRouter();
+    
     const { user } = useContext(AuthContext);
+  
     console.log(user)
     const infos = [user.displayName || "username", "/logo.webp", user.bio||"Description"];
 

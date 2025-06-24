@@ -6,8 +6,13 @@ import UsersSuggestionMobile from "@/components/UsersSuggestionMobile";
 import axios from "axios";
 import { useState, useEffect } from "react";
 
+
+import { useState } from "react";
+
+
 export default function Home() {
   const [translatedTitle, setTranslatedTitle] = useState("Utilisateurs");
+  const [searchText, setSearchText] = useState("");
 
   const translate = async (text) => {
     try {
@@ -29,8 +34,11 @@ export default function Home() {
   return (
     <div className="w-full px-2 text-center">
         <h1>{translatedTitle}</h1>
-        <Searchbar />
-        <Subscriptions />
+      
+        <Searchbar searchText={searchText} setSearchText={setSearchText} />
+      
+        <Subscriptions searchText={searchText} />
+
 
         <div className="block sm:hidden mt-10">
           <UsersSuggestionMobile />
@@ -38,3 +46,4 @@ export default function Home() {
     </div>
   );
 }
+

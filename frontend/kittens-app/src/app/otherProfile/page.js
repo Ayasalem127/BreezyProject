@@ -4,9 +4,16 @@ import OtherInformations from "@/components/OtherInformations";
 import OtherMessages from "@/components/OtherMessages";
 import axios from "axios";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 export default function Home() {
   const [translatedTitle, setTranslatedTitle] = useState("Profil utilisateur");
+  const searchParams = useSearchParams();
+  const userId = searchParams.get("userId");
+
+   useEffect(() => {
+    console.log("🔍 userId reçu dans la page Home:", userId);
+  }, [userId]);
 
   const translate = async (text) => {
     try {
@@ -28,8 +35,9 @@ export default function Home() {
   return (
     <div className="w-full px-2 text-center">
         <h1>{translatedTitle}</h1>
-        <OtherInformations />
-        <OtherMessages />
+        {userId && <OtherInformations userId={userId} />}
+        {userId && <OtherMessages userId={userId} />}
+
     </div>
   );
 }

@@ -8,13 +8,15 @@ dotenv.config();
 const postRoutes = require("./routes/post.routes");
 
 const app = express();
+const cookieParser = require('cookie-parser');
 
 
-    // Middleware
+
 app.use(express.json()); // pour parser le JSON
 
-
+app.use(cookieParser());
 app.use("/api/posts", postRoutes);
+
 
 
 mongoose.connect(process.env.MONGO_URI)

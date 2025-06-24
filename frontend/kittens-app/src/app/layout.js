@@ -1,10 +1,12 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import RedirectIfAuthenticated from "../context/RedirectIfAuthenticated";
 
 import { ToggleProvider } from "@/context/ToggleTargetComponentContext";
 import NavbarClient from "@/components/NavbarClient";
-import { use } from "react";
-import {AuthProvider} from "../context/AuthContext"
+import NotificationsPC from "@/components/NotificationsPC"; // ✅ à importer
+import { AuthProvider } from "../context/AuthContext";
+import ProtectedRoute from "../context/ProtectedRoute";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -25,14 +27,23 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ToggleProvider>
           <AuthProvider>
-            {children}
+            {/* ✅ Navbar (une seule fois) */}
+            <NavbarClient hideNavbar={hideNavbar} />
+
+            {/* ✅ Notifications visibles si toggle activé */}
+            <NotificationsPC />
+
+            {/* ✅ Le reste de l'app */}
+              <RedirectIfAuthenticated>
+  <ProtectedRoute>
+    {children}
+  </ProtectedRoute>
+</RedirectIfAuthenticated>
+
           </AuthProvider>
-          <NavbarClient hideNavbar={hideNavbar} />
         </ToggleProvider>
       </body>
     </html>

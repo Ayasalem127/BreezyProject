@@ -18,6 +18,7 @@ export default function UserModerationPanel({ searchText = "" }) {
   const [suspendDuration, setSuspendDuration] = useState("");
   const [suspendUnit, setSuspendUnit] = useState("m");
 
+
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);
@@ -59,7 +60,7 @@ export default function UserModerationPanel({ searchText = "" }) {
         )
       );
     } catch (err) {
-      console.error(`❌ Erreur lors de l'action ${action} :`, err.response?.data || err.message);
+      console.log(`❌ Erreur lors de l'action ${action} :`, err.response?.data || err.message);
     }
   };
 

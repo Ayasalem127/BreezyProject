@@ -248,3 +248,30 @@ exports.reactivateUser = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+
+exports.getAllUsersPaginated = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;        // page actuelle
+  const limit = parseInt(req.query.limit) || 15;     // nb par page
+  const skip = (page - 1) * limit;
+
+  try {
+    const users = await UserProfile.find()
+      .select('-password') // éviter de renvoyer les mdp hashés si stockés
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const total = await UserProfile.countDocuments();
+
+    res.json({
+      users,
+      total,
+      page,
+      pages: Math.ceil(total / limit)
+    });
+  } catch (err) {
+    console.error("Erreur getAllUsersPaginated:", err);
+    res.status(500).json({ message: "Erreur serveur." });
+  }
+};

@@ -10,22 +10,29 @@ export default function UserModerationPanel({ searchText = "" }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true);
-      try {
-        const res = await axios.get("http://localhost:3001/user/api/users", { withCredentials: true });
-        setAllUsers(res.data);
-      } catch (err) {
-        console.error("❌ Erreur récupération utilisateurs :", err);
-        setError("Erreur lors du chargement des utilisateurs");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const [page, setPage] = useState(1);
+const [totalPages, setTotalPages] = useState(1);
 
-    fetchUsers();
-  }, []);
+useEffect(() => {
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`http://localhost:3001/user/api/users?page=${page}&limit=15`, {
+        withCredentials: true,
+      });
+      setAllUsers(res.data.users);
+      setTotalPages(res.data.pages);
+    } catch (err) {
+      console.error("❌ Erreur récupération utilisateurs :", err);
+      setError("Erreur lors du chargement des utilisateurs");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchUsers();
+}, [page]);
+
 
   const filteredUsers = allUsers.filter(u =>
     u.displayName?.toLowerCase().includes(searchText.toLowerCase())
@@ -105,6 +112,27 @@ export default function UserModerationPanel({ searchText = "" }) {
               </div>
             ))
           )}
+        </div>
+      )}
+      {totalPages > 1 && (
+        <div className="mt-6 flex gap-2 justify-center">
+          <button
+            onClick={() => setPage(prev => Math.max(prev - 1, 1))}
+            disabled={page === 1}
+            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+          >
+            ← Précédent
+          </button>
+          <span className="text-sm font-semibold self-center">
+            Page {page} / {totalPages}
+          </span>
+          <button
+            onClick={() => setPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={page === totalPages}
+            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+          >
+            Suivant →
+          </button>
         </div>
       )}
     </div>

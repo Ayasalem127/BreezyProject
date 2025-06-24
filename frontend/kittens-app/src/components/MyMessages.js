@@ -94,6 +94,40 @@ export default function MyMessages() {
     setIsVisible(updated);
   };
 
+  const toggleLike = async (index) => {
+  const post = posts[index];
+  try {
+    const res = await axios.post(`http://localhost:3001/post/api/posts/${post._id}/like`);
+    const { liked, totalLikes } = res.data;
+
+    const updatedLikes = [...likes];
+    updatedLikes[index] = liked;
+    setLikes(updatedLikes);
+
+    setLikesByPost(prev => ({ ...prev, [post._id]: totalLikes }));
+  } catch (err) {
+    console.error("Erreur like post :", err);
+  }
+};
+
+const handleModification = async (e, index) => {
+  e.preventDefault();
+
+  const updatedContent = messageTexts[index];
+  const postId = posts[index]._id;
+
+  try {
+    await axios.put(`http://localhost:3001/post/api/posts/${postId}`, { content: updatedContent });
+    setNotification("Message modifié avec succès ✔️");
+    setTimeout(() => setNotification(""), 3000);
+  } catch (err) {
+    console.error("Erreur modification post :", err);
+    setNotification("❌ Échec de la modification");
+  }
+};
+
+
+
   return (
     <div>
       <h2 className="text-2xl font-bold text-gray-800 p-5">Mes messages</h2>

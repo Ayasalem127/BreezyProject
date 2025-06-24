@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useContext, useEffect } from 'react';
@@ -40,3 +41,4 @@ const ProtectedRoute = ({ children }) => {
 };
 
 export default ProtectedRoute;
+

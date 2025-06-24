@@ -22,8 +22,6 @@ export default function Publish() {
                 );
 
                 results.push(res.data.message);
-
-                await new Promise((resolve) => setTimeout(resolve, 200));
             }
 
             setTranslatedTexts(results);

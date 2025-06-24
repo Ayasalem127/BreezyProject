@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ThemeList from "./ThemeList";
+import LanguagesList from "./LanguagesList";
 import { useToggleTargetComponent } from "@/context/ToggleTargetComponentContext";
 import { useState } from "react";
 
@@ -7,6 +8,7 @@ export default function Navbar() {
   const { setVisible } = useToggleTargetComponent();
 
   const [showThemeList, setShowThemeList] = useState(false);
+  const [showLanguagesList, setShowLanguagesList] = useState(false);
 
   const photo = "/logo.webp";
   
@@ -62,6 +64,14 @@ export default function Navbar() {
           />
         </div>
 
+        <Link className="block sm:hidden" href="/notifications">
+          <img
+            src="/notification.png"
+            alt="Notifications"
+            className="w-5 h-5 hover:scale-110 transition-transform"
+          />
+        </Link>
+
         <div role="button">
           <img
             src="/theme.png"
@@ -78,13 +88,21 @@ export default function Navbar() {
           )}
         </div>
 
-        <Link className="block sm:hidden" href="/notifications">
+        <div role="button">
           <img
-            src="/notification.png"
-            alt="Notifications"
-            className="w-5 h-5 hover:scale-110 transition-transform"
+            src="/language.png"
+            alt="Language"
+            className="w-5 h-5 hover:scale-110 transition-transform cursor-pointer"
+            onClick={() => setShowLanguagesList((v) => !v)}
           />
-        </Link>
+
+          {showLanguagesList && (
+            <LanguagesList
+              onClose={() => setShowLanguagesList(false)}
+              onSelect={(code) => console.log('Langue choisie :', code)}
+            />
+          )}
+        </div>
 
         <Link href="/myProfile">
           <img

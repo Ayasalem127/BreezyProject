@@ -1,26 +1,14 @@
-/*const translate = require('@vitalets/google-translate-api').translate;
-
-async function translateText(text, to) {
-  try {
-    const result = await translate(text, { to, from: "fr" });
-    return result.text;
-  } catch (error) {
-    console.error("Erreur de traduction :", error);
-    return null;
-  }
-}*/
-
 const axios = require("axios");
+
+const subscriptionKey = "A2knQIT8pnHQYvczNq2m481aju5A6jtbmv4VGT2eotb6Af6Y2mXUJQQJ99BFAC5T7U2XJ3w3AAAbACOGjGlN";
+const endpoint = "https://devweb.cognitiveservices.azure.com/";
+const location = "francecentral";
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-const translateText = async (text, to, from = "fr") => {
+const translateText = async (text, to, from = "fr", retry = 5) => {
 
   await sleep(200);
-  
-  const subscriptionKey = "A2knQIT8pnHQYvczNq2m481aju5A6jtbmv4VGT2eotb6Af6Y2mXUJQQJ99BFAC5T7U2XJ3w3AAAbACOGjGlN";
-  const endpoint = "https://devweb.cognitiveservices.azure.com/";
-  const location = "francecentral";
 
   const url = `${endpoint}/translator/text/v3.0/translate?from=${from}&to=${to}`;
 
@@ -41,118 +29,38 @@ const translateText = async (text, to, from = "fr") => {
     return res.data[0].translations[0].text;
 
   } catch (err) {
+    if (err.response?.status === 429 && retry > 0) {
+      await sleep(200);
+      return translateText(text, to, from, retry - 1);
+    }
     console.error("Erreur Azure Translator:", err.response?.data || err.message);
     return null;
   }
 };
 
+const getAvailableLanguages = async () => {
+  const url = `${endpoint}/translator/text/v3.0/languages?api-version=3.0&scope=translation`;
 
-const googleLanguages = {
-  "af": "Afrikaans",
-  "sq": "Albanian",
-  "am": "Amharic",
-  "ar": "Arabic",
-  "hy": "Armenian",
-  "az": "Azerbaijani",
-  "eu": "Basque",
-  "be": "Belarusian",
-  "bn": "Bengali",
-  "bs": "Bosnian",
-  "bg": "Bulgarian",
-  "ca": "Catalan",
-  "ceb": "Cebuano",
-  "ny": "Chichewa",
-  "zh-CN": "Chinese (Simplified)",
-  "zh-TW": "Chinese (Traditional)",
-  "co": "Corsican",
-  "hr": "Croatian",
-  "cs": "Czech",
-  "da": "Danish",
-  "nl": "Dutch",
-  "en": "English",
-  "eo": "Esperanto",
-  "et": "Estonian",
-  "tl": "Filipino",
-  "fi": "Finnish",
-  "fr": "French",
-  "fy": "Frisian",
-  "gl": "Galician",
-  "ka": "Georgian",
-  "de": "German",
-  "el": "Greek",
-  "gu": "Gujarati",
-  "ht": "Haitian Creole",
-  "ha": "Hausa",
-  "haw": "Hawaiian",
-  "he": "Hebrew",
-  "hi": "Hindi",
-  "hmn": "Hmong",
-  "hu": "Hungarian",
-  "is": "Icelandic",
-  "ig": "Igbo",
-  "id": "Indonesian",
-  "ga": "Irish",
-  "it": "Italian",
-  "ja": "Japanese",
-  "jw": "Javanese",
-  "kn": "Kannada",
-  "kk": "Kazakh",
-  "km": "Khmer",
-  "ko": "Korean",
-  "ku": "Kurdish (Kurmanji)",
-  "ky": "Kyrgyz",
-  "lo": "Lao",
-  "la": "Latin",
-  "lv": "Latvian",
-  "lt": "Lithuanian",
-  "lb": "Luxembourgish",
-  "mk": "Macedonian",
-  "mg": "Malagasy",
-  "ms": "Malay",
-  "ml": "Malayalam",
-  "mt": "Maltese",
-  "mi": "Maori",
-  "mr": "Marathi",
-  "mn": "Mongolian",
-  "my": "Myanmar (Burmese)",
-  "ne": "Nepali",
-  "no": "Norwegian",
-  "ps": "Pashto",
-  "fa": "Persian",
-  "pl": "Polish",
-  "pt": "Portuguese",
-  "pa": "Punjabi",
-  "ro": "Romanian",
-  "ru": "Russian",
-  "sm": "Samoan",
-  "gd": "Scots Gaelic",
-  "sr": "Serbian",
-  "st": "Sesotho",
-  "sn": "Shona",
-  "sd": "Sindhi",
-  "si": "Sinhala",
-  "sk": "Slovak",
-  "sl": "Slovenian",
-  "so": "Somali",
-  "es": "Spanish",
-  "su": "Sundanese",
-  "sw": "Swahili",
-  "sv": "Swedish",
-  "tg": "Tajik",
-  "ta": "Tamil",
-  "te": "Telugu",
-  "th": "Thai",
-  "tr": "Turkish",
-  "uk": "Ukrainian",
-  "ur": "Urdu",
-  "ug": "Uyghur",
-  "uz": "Uzbek",
-  "vi": "Vietnamese",
-  "cy": "Welsh",
-  "xh": "Xhosa",
-  "yi": "Yiddish",
-  "yo": "Yoruba",
-  "zu": "Zulu"
+  try {
+    const res = await axios.get(url, {
+      headers: {
+        "Ocp-Apim-Subscription-Key": subscriptionKey,
+        "Ocp-Apim-Subscription-Region": location,
+      },
+    });
+
+    const languages = res.data.translation;
+
+    return Object.entries(languages).map(([code, info]) => ({
+      code,
+      name: info.name,
+    }));
+    
+  } catch (err) {
+    console.error("Erreur récupération langues Azure:", err.response?.data || err.message);
+    throw err;
+  }
 };
 
-module.exports = { translateText, googleLanguages };
+
+module.exports = { translateText, getAvailableLanguages };

@@ -11,11 +11,11 @@ export default function UsersSuggestionPC() {
 
     const translate = async (text) => {
         try {
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        
         const res = await axios.post('http://localhost:3001/language/language/translate', {text}, { withCredentials: true });
         console.log(res.data);
         setTranslatedText(res.data.message);
-
-        await new Promise((resolve) => setTimeout(resolve, 200));
 
         } catch (error) {
         console.error("Erreur : ", error);

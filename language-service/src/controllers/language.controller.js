@@ -1,4 +1,4 @@
-const { translateText, googleLanguages } = require('../utils/translate');
+const { translateText, getAvailableLanguages } = require('../utils/translate');
 const { userExists } = require('../utils/checkUser');
 const { langExists } = require('../utils/checkLang');
 const mongoose = require("mongoose");
@@ -83,12 +83,11 @@ exports.updateLanguage = async (req, res) => {
 }
 
 exports.getLanguages = async (req, res) => {
-    const languages = googleLanguages;
-
     try {
+        const languages = await getAvailableLanguages();
         res.status(200).json(languages);
+        
     } catch (error) {
-        console.error("Erreur lors de la récupération des langages : ", error);
         res.status(500).json({ message: "Erreur serveur récupération langages." });
     }
 }

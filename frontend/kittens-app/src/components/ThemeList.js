@@ -22,8 +22,6 @@ export default function ThemeList({ onClose, onSelect }) {
                 );
 
                 results.push(res.data.message);
-
-                await new Promise((resolve) => setTimeout(resolve, 200));
             }
 
             setTranslatedTexts(results);
@@ -54,7 +52,7 @@ export default function ThemeList({ onClose, onSelect }) {
     };
 
     return (
-        <div ref={ref} style={{ backgroundColor: 'var(--input-background)', borderColor: 'var(--input-border)', boxShadow: "0 12px 32px var(--shadow-color)" }} className="absolute right-6 top-14 w-32 border rounded z-50">
+        <div ref={ref} style={{ backgroundColor: 'var(--input-background)', borderColor: 'var(--input-border)', boxShadow: "0 12px 32px var(--shadow-color)" }} className="absolute right-6 top-14 w-50 border rounded z-50">
             <ul>
                 <li className="px-4 py-2 cursor-pointer" onClick={() => handleThemeChange('light')}>
                 {translatedTexts[0]}

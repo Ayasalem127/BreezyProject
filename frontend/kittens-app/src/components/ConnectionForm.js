@@ -2,13 +2,14 @@
 
 import PopupEmptyFields from "./PopupEmptyFields";
 import PopupWrongCredentials from "./PopupWrongCredentials";
-
+import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { AuthContext } from "@/context/AuthContext";
+import { useContext } from "react";
 export default function ConnectionForm() {
     const router = useRouter();
-
+  const { setUser } = useContext(AuthContext); 
     const [email, setEmail] = useState('');
     const [emailError, setEmailError] = useState(true);
     const [password, setPassword] = useState('');
@@ -56,7 +57,7 @@ export default function ConnectionForm() {
         try {
             const res = await axios.post('http://localhost:3001/auth/auth/login', { email, password }, { withCredentials: true } //  pour envoyer/recevoir le cookie
                 )
-            const { user } = useContext(AuthContext);
+             setUser(res.data.user);
             console.log(`TOKEN : ${res.data.token}`);
             router.push("/home");
         } catch (error) {

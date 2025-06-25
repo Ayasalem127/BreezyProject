@@ -11,7 +11,7 @@ export default function MyInformations() {
     const { user } = useContext(AuthContext);
   
     console.log(user)
-    const infos = [user?.displayName || "username", user?.avatarUrl ? `http://localhost:3001${user.avatarUrl}` : "/logo.webp", user?.bio || "Description"];
+    const infos = [user?.displayName || "username", user?.avatarUrl ? `http://localhost:3001${user.avatarUrl}` : "/avatarcat.jpg", user?.bio || "Description"];
 
     const [translatedText, setTranslatedText] = useState("Modifier mon profil");
 

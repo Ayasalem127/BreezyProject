@@ -1,12 +1,14 @@
 'use client';
 
 import { Content } from "next/font/google";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
+import { AuthContext } from "@/context/AuthContext";
 
 export default function Publish() {
-     const [content, setContent] = useState("");
+    const [content, setContent] = useState("");
     const photo = "/logo.webp";
+    const { user } = useContext(AuthContext);
 
     const [translatedTexts, setTranslatedTexts] = useState([]);
 
@@ -51,12 +53,20 @@ export default function Publish() {
         //Affichage temporaire
         console.log(`Message : ${message}`);
     }
+    // Calcul de l'avatar
+    const avatarUrl = user?.avatarUrl
+        ? `http://localhost:3001${user.avatarUrl}`
+        : "/logo.webp";
 
     return (
         <div className="flex items-center justify-center">
             <form onSubmit={handleSubmit} className="w-full sm:w-[calc(50%-0.5rem)] p-2 m-4 box-border flex flex-col justify-between rounded-lg space-y-2">
                 <div className="flex items-center gap-2">
-                    <img src={photo} alt="logo" className="w-10 h-10 object-contain mb-2 rounded-full"/>
+                    <img
+                        src={avatarUrl}
+                        alt="avatar"
+                        className="w-10 h-10 object-contain mb-2 rounded-full"
+                    />
                     <textarea type="text" id="message" className="focus:border-blue-500 focus:outline-none" rows={3} placeholder={translatedTexts[0]} value={content} onChange={(e) => setContent(e.target.value)}/>
                 </div>
 

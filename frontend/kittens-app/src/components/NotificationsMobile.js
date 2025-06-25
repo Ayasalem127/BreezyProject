@@ -1,42 +1,120 @@
-// 'use client';
+'use client';
 
-// export default function NotificationsPC() {
-//     const notifications = [["username", "/logo.webp", "Description"], ["username", "/logo.webp", "Description"], ["username", "/logo.webp", "Description"], ["username", "/logo.webp", "Description"], ["username", "/logo.webp", "Description"], ["username", "/logo.webp", "Description"], ["username", "/logo.webp", "Description"], ["username", "/logo.webp", "Description"], ["username", "/logo.webp", "Description"], ["username", "/logo.webp", "Description"]];
+import { useEffect, useState } from "react";
+import axios from "axios";
 
-//     function remove(index) {
-//         console.log(`Notification ${index} supprimée.`)
-//     }
+export default function NotificationsMobile() {
+  const [notifications, setNotifications] = useState([]);
+  const [translatedTexts, setTranslatedTexts] = useState([]);
 
+  const textsToTranslate = [
+    "a liké votre post.",
+    "a liké votre commentaire.",
+    "a commenté votre post.",
+    "a répondu à votre commentaire.",
+    "vous a mentioné.",
+    "a commencé à vous suivre.",
+    "vous a notifié.",
+    "Aucune notification."
+  ];
 
-    return (
-        <div className="flex flex-col items-center w-full px-4">
-            {notifications.map((notification, index) => (
-            <div key={index} style={{ boxShadow: "0 12px 32px var(--shadow-color)", borderColor: 'var(--input-border)' }} className="w-full sm:w-[calc(50%-0.5rem)] p-2 m-4 box-border flex flex-col justify-between border rounded-2xl">
-                <div className="flex items-center gap-3 w-full">
-                    <span id={`notification-${index}`} rows={3} className="mt-1 block w-full rounded-md p-2 focus:border-blue-500 focus:outline-none">{notification}</span>
-                    <span id={`deleteButton-${index}`} className="text-l cursor-pointer" onClick={() => remove(index)} role="button" aria-label="delete button">❌</span>
-                </div>
+  const translateMany = async (texts) => {
+    try {
+      const results = [];
+
+      for (const text of texts) {
+        const res = await axios.post(
+          'http://localhost:3001/language/language/translate',
+          { text },
+          { withCredentials: true }
+        );
+
+        results.push(res.data.message);
+      }
+
+      setTranslatedTexts(results);
+    } catch (error) {
+      console.error("Erreur de traduction :", error);
+    }
+  };
+
+  useEffect(() => {
+    translateMany(textsToTranslate);
+  }, []);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const res = await axios.get("http://localhost:3001/notification/api/notifications", {
+          withCredentials: true,
+        });
+
+        const rawNotifications = res.data;
+
+        const enrichedNotifications = await Promise.all(
+          rawNotifications.map(async (notif) => {
+            try {
+              const userRes = await axios.get(
+                `http://localhost:3001/user/api/users/${notif.senderId}`,
+                { withCredentials: true }
+              );
+              return {
+                ...notif,
+                senderDisplayName: userRes.data.displayName || notif.senderId,
+              };
+            } catch (err) {
+              console.warn(`❗ Impossible de récupérer le displayName pour ${notif.senderId}`);
+              return {
+                ...notif,
+                senderDisplayName: notif.senderId,
+              };
+            }
+          })
+        );
+
+        setNotifications(enrichedNotifications);
+      } catch (err) {
+        console.error("❌ Erreur fetch notifications :", err);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
+
+  const formatNotificationMessage = (notif) => {
+    switch (notif.type) {
+      case "like_post":
+        return translatedTexts[0];
+      case "like_comment":
+        return translatedTexts[1];
+      case "comment_post":
+        return translatedTexts[2];
+      case "comment_reply":
+        return translatedTexts[3];
+      case "mention":
+        return translatedTexts[4];
+      case "follow":
+        return translatedTexts[5];
+      default:
+        return notif.message || translatedTexts[6];
+    }
+  };
+
+  return (
+    <div className="min-h-screen p-4">
+      {/* <h1 className="text-2xl font-bold mb-4">Notifications</h1> */}
+
+      {notifications.length === 0 ? (
+        <p className="text-gray-500 text-sm">{translatedTexts[7]}</p>
+      ) : (
+        <div className="space-y-3">
+          {notifications.map((notif) => (
+            <div key={notif._id} className="border p-3 rounded-lg shadow-sm bg-gray-50">
+              🔔 <strong>@{notif.senderDisplayName}</strong> {formatNotificationMessage(notif)}
             </div>
-            ))}
-            
+          ))}
         </div>
-    );
-
-
-//     return (
-//         <div className="flex flex-col fixed top-12 left-0 items-end w-full overflow-y-auto" style={{ maxHeight: 'calc(100vh - var(--navbar-height))' }}>
-//             <div className="bg-white w-1/4 p-2 rounded-xl">
-//                 {notifications.map((notification, index) => (
-//                 <div key={index} className="w-full p-2 mt-4 box-border border rounded-lg relative">
-//                     <span id={`deleteButton-${index}`} className="absolute top-2 right-2 text-l cursor-pointer" onClick={() => remove(index)} role="button" aria-label="delete button">❌</span>
-//                     <div className="flex items-center gap-3 w-full">
-//                         <img src={notification[1]} alt="photo de profil" className="w-10 h-10 object-contain rounded-full"/>
-//                         <span id={`notification-${index}`} rows={3} className="mt-1 block w-full rounded-md p-2 focus:border-blue-500 focus:outline-none">@{notification[0]} {notification[2]}</span>
-//                     </div>
-//                 </div>
-//                 ))}
-//             </div>
-//         </div>
-//     );
-// }
-
+      )}
+    </div>
+  );
+}

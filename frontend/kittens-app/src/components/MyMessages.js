@@ -143,15 +143,15 @@ export default function MyMessages() {
     }
   };
 
-  // const handleLikeComment = async (commentId, setLikes, setLiked) => {
-  //   try {
-  //     const res = await axios.post(`http://localhost:3001/comment/api/comments/${commentId}/like`, {}, { withCredentials: true });
-  //     setLikes(res.data.likes);
-  //     setLiked(res.data.liked);
-  //   } catch (err) {
-  //     console.log("Erreur like commentaire :", err);
-  //   }
-  // };
+  const handleLikeComment = async (commentId, setLikes, setLiked) => {
+    try {
+      const res = await axios.post(`http://localhost:3001/comment/api/comments/${commentId}/like`, {}, { withCredentials: true });
+      setLikes(res.data.likes);
+      setLiked(res.data.liked);
+    } catch (err) {
+      console.log("Erreur like commentaire :", err);
+    }
+  };
 
 
 //   const toggleResponse = (index) => {
@@ -257,6 +257,7 @@ export default function MyMessages() {
               <div className="mt-4 space-y-4">
                 <AddComment
                   postId={message._id}
+                   translatedTexts={translatedTexts}
                   onCommentAdded={(newComment) => {
                     setCommentsByPost(prev => ({
                       ...prev,
@@ -282,7 +283,7 @@ export default function MyMessages() {
   );
 }
 
-function AddComment({ postId, onCommentAdded }) {
+function AddComment({ postId, translatedTexts,onCommentAdded }) {
   const [content, setContent] = useState("");
 
   const handleSubmit = async () => {
@@ -313,7 +314,7 @@ function AddComment({ postId, onCommentAdded }) {
   );
 }
 
-function CommentThread({ comment, authors, userId, onLike }) {
+function CommentThread({ comment, authors, userId, onLike,translatedTexts  }) {
   const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
   const [replies, setReplies] = useState(comment.replies || []);
@@ -370,7 +371,9 @@ function CommentThread({ comment, authors, userId, onLike }) {
   return (
     <div className="ml-4 border-l-2 border-gray-300 pl-4 mt-4 bg-blue-50 p-2 rounded">
       <div className="flex justify-between text-sm text-gray-600">
-        <span>{translatedTexts[3]} : {authors[comment.author] || comment.author}</span>
+       <span>
+  {(translatedTexts && translatedTexts[3] ? translatedTexts[3] : "Auteur") + " : " + (authors[comment.author] || comment.author)}
+</span>
         <span>{new Date(comment.createdAt).toLocaleString()}</span>
       </div>
 
@@ -395,7 +398,7 @@ function CommentThread({ comment, authors, userId, onLike }) {
         <span onClick={() => onLike(comment._id, setLikes, setLiked)} className={`cursor-pointer ${liked ? 'text-red-500' : ''}`}>
           {liked ? "❤️" : "🤍"} {likes}
         </span>
-        <button onClick={() => setShowReplyBox(prev => !prev)} className="text-blue-600">{translatedTexts[6]}</button>
+        <button onClick={() => setShowReplyBox(prev => !prev)} className="text-blue-600">{translatedTexts?.[6] || "Répondre"}</button>
         {isOwner && (
           <>
             <button onClick={() => setEditing(true)} className="text-blue-600">✏️</button>
@@ -420,7 +423,7 @@ function CommentThread({ comment, authors, userId, onLike }) {
       {replies.length > 0 && (
         <div className="mt-2">
           {replies.map((reply) => (
-            <CommentThread key={reply._id} comment={reply} authors={authors} userId={userId} onLike={onLike} />
+            <CommentThread key={reply._id} comment={reply} authors={authors} userId={userId} onLike={onLike}  translatedTexts={translatedTexts}/>
           ))}
         </div>
       )}

@@ -131,8 +131,8 @@ const uploadAvatar = async (formData) => {
   setFormSubmitted(true);
 
   const file = fileInputRef.current.files[0];
-  const formData = new FormData();
-  formData.append("avatar", file);
+  // const formData = new FormData();
+  // formData.append("avatar", file);
 
 
   const userId = user?._id; // ou currentUser._id selon ta structure
@@ -142,10 +142,19 @@ const uploadAvatar = async (formData) => {
     console.log("Utilisateur non authentifié");
     return;
   }
+if (file) {
+  const formData = new FormData();
+  formData.append("avatar", file);
 
   try {
-    // Upload avatar (si géré ailleurs)
     await uploadAvatar(formData);
+    console.log("Avatar uploaded successfully.");
+  } catch (error) {
+    console.error("Erreur lors de l'upload de l'avatar :", error);
+  }}
+  try {
+    // Upload avatar (si géré ailleurs)
+   // await uploadAvatar(formData);
 
     // Récupération des données du formulaire
     const form = e.target;
@@ -170,7 +179,7 @@ const uploadAvatar = async (formData) => {
     alert("Modifications enregistrées !");
   } catch (error) {
     console.log("Erreur lors de la mise à jour :", error.response?.data || error.message);
-    alert("Erreur lors de la mise à jour du profil");
+    //alert("Erreur lors de la mise à jour du profil");
   }
 };
   return (

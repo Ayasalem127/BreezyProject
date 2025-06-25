@@ -169,7 +169,7 @@ if (file) {
     );
 
     console.log("Profil mis à jour :", res.data);
-    const updatedUser = response.data;
+    const updatedUser = res.data;
 
     // ✅ Met à jour le contexte global avec les nouvelles infos
     setUser((prevUser) => ({

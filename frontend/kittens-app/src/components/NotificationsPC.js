@@ -3,12 +3,15 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useToggleTargetComponent } from "@/context/ToggleTargetComponentContext";
+import { useContext } from "react";
+import { AuthContext } from "@/context/AuthContext";
+
 
 export default function NotificationsPC() {
+  const { user } = useContext(AuthContext);
   const { visible } = useToggleTargetComponent();
   const [notifications, setNotifications] = useState([]);
   const [translatedTexts, setTranslatedTexts] = useState([]);
-
   const textsToTranslate = ["a liké votre post.", "a liké votre commentaire.", "a commenté votre post.", "a répondu à votre commentaire.", "vous a mentioné.", "a commencé à vous suivre.", "vous a notifié.", "Aucune notification."];
 
   const translateMany = async (texts) => {
@@ -26,6 +29,7 @@ export default function NotificationsPC() {
   };
 
   useEffect(() => {
+      if(!user) return;
       translateMany(textsToTranslate);
   }, []);
 

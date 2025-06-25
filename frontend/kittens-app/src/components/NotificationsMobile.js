@@ -2,8 +2,11 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useContext } from "react";
+import { AuthContext } from "@/context/AuthContext";
 
 export default function NotificationsMobile() {
+  const { user } = useContext(AuthContext);
   const [notifications, setNotifications] = useState([]);
   const [translatedTexts, setTranslatedTexts] = useState([]);
 
@@ -33,6 +36,7 @@ export default function NotificationsMobile() {
   };
 
   useEffect(() => {
+    if(!user) return;
     translateMany(textsToTranslate);
   }, []);
 

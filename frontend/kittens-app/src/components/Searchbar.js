@@ -36,7 +36,7 @@ export default function Searchbar({ searchText, setSearchText }) {
           id="searchbar"
           value={searchText}
           onChange={handleChange}
-          className="bg-white mt-1 pl-10 block w-full rounded-xl border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
+          className="bg-white mt-1 !pl-10 block w-full rounded-xl border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
           placeholder={translatedText}
         />
       </div>

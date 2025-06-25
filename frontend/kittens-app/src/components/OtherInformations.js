@@ -2,7 +2,6 @@
 
 import { useContext, useState, useEffect } from "react";
 import axios from "axios";
-import { useEffect } from "react";
 import { AuthContext } from "@/context/AuthContext";
 
 export default function OtherInformations({ userId }) {

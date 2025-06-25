@@ -6,7 +6,6 @@ import UsersSuggestionMobile from "@/components/UsersSuggestionMobile";
 import axios from "axios";
 import { useState, useEffect } from "react";
 
-
 export default function Home() {
   const [translatedTitle, setTranslatedTitle] = useState("Utilisateurs");
   const [searchText, setSearchText] = useState("");

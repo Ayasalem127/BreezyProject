@@ -47,7 +47,7 @@ export default function LanguagesList({ onClose, onSelect }) {
     };
 
     return (
-        <div ref={ref} style={{ backgroundColor: 'var(--input-background)', borderColor: 'var(--input-border)', boxShadow: "0 12px 32px var(--shadow-color)", maxHeight: 'calc(100vh - var(--navbar-height))', overflowY: 'auto' }} className="absolute right-6 top-14 w-50 border rounded z-50">
+        <div ref={ref} style={{ backgroundColor: 'var(--input-background)', borderColor: 'var(--input-border)', boxShadow: "0 12px 32px var(--shadow-color)", maxHeight: 'calc(100vh - var(--navbar-height))', overflowY: 'auto' }} className="absolute right-6 bottom-12 sm:bottom-auto top-auto sm:top-12 w-50 border rounded z-50">
             <ul>
                 {languages.map((language, index) => (
                     <li

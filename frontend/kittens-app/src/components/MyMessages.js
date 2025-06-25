@@ -17,23 +17,17 @@ export default function MyMessages() {
   const { user } = useContext(AuthContext);
   const [translatedTexts, setTranslatedTexts] = useState([]);
 
-    const textsToTranslate = ["Mes posts", "Modifier", "Publier", "Auteur", "Valider", "Annuler", "Répondre"];
+    const textsToTranslate = ["Mes posts", "Modifier", "Publier", "Auteur", "Valider", "Annuler", "Répondre", "Laisse parler ton coeur..."];
 
     const translateMany = async (texts) => {
         try {
-            const results = [];
+          const res = await axios.post(
+            'http://localhost:3001/language/language/translate',
+            { texts },
+            { withCredentials: true }
+          );
 
-            for (const text of texts) {
-                const res = await axios.post(
-                    'http://localhost:3001/language/language/translate',
-                    { text },
-                    { withCredentials: true }
-                );
-
-                results.push(res.data.message);
-            }
-
-            setTranslatedTexts(results);
+          setTranslatedTexts(res.data.messages);
         } catch (error) {
             console.error("Erreur de traduction :", error);
         }
@@ -300,7 +294,7 @@ function AddComment({ postId, translatedTexts,onCommentAdded }) {
     <div className="mb-4">
       <textarea
         className="w-full border p-2 rounded"
-        placeholder="Ajouter un commentaire..."
+        placeholder={translatedTexts[7]}
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={2}
@@ -412,7 +406,7 @@ function CommentThread({ comment, authors, userId, onLike,translatedTexts  }) {
             rows={2}
             value={replyContent}
             onChange={(e) => setReplyContent(e.target.value)}
-            placeholder="Votre réponse..."
+            placeholder={translatedTexts[7]}
           />
           <button onClick={handleReplySubmit}>Valider</button>
         </div>

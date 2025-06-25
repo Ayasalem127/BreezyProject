@@ -19,19 +19,13 @@ export default function Subscriptions({ searchText }) {
 
     const translateMany = async (texts) => {
         try {
-            const results = [];
+            const res = await axios.post(
+                'http://localhost:3001/language/language/translate',
+                { texts },
+                { withCredentials: true }
+            );
 
-            for (const text of texts) {
-                const res = await axios.post(
-                    'http://localhost:3001/language/language/translate',
-                    { text },
-                    { withCredentials: true }
-                );
-
-                results.push(res.data.message);
-            }
-
-            setTranslatedTexts(results);
+            setTranslatedTexts(res.data.messages);
         } catch (error) {
             console.error("Erreur de traduction :", error);
         }
@@ -89,7 +83,7 @@ export default function Subscriptions({ searchText }) {
               <Link href={`/otherProfile?userId=${subscription.userId}`} >
                 <div className="p-2 box-border flex flex-row items-center justify-center rounded-lg gap-4">
                   <img
-                    src={`http://localhost:3001${subscription?.avatarUrl}`|| "/avatarcat.jpg"}
+                    src={user?.avatarUrl? `http://localhost:3001${user.avatarUrl}` : "/avatarcat.jpg"}
                     alt="photo de profil"
                     className="w-10 h-10 object-contain rounded-full"
                   />

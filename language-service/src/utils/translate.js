@@ -6,16 +6,25 @@ const location = "francecentral";
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-const translateText = async (text, to, from = "fr", retry = 5) => {
-
+const translateTexts = async (texts, to, from = "fr", retry = 5) => {
   await sleep(200);
+
+  const isArray = Array.isArray(texts);
+  const inputTexts = isArray ? texts : [texts];
+
+  const validTexts = inputTexts.filter(t => typeof t === 'string' && t.trim() !== '');
+
+  if (validTexts.length === 0) {
+    console.warn("Aucun texte valide à traduire.");
+    return Array.isArray(texts) ? [] : null;
+  }
 
   const url = `${endpoint}/translator/text/v3.0/translate?from=${from}&to=${to}`;
 
   try {
     const res = await axios.post(
       url,
-      [{ Text: text }],
+      validTexts.map((t) => ({ Text: t })),
       {
         headers: {
           "Ocp-Apim-Subscription-Key": subscriptionKey,
@@ -25,16 +34,17 @@ const translateText = async (text, to, from = "fr", retry = 5) => {
       }
     );
 
-    console.log(res.data[0].translations[0].text);
-    return res.data[0].translations[0].text;
+    const translations = res.data.map(item => item.translations[0].text);
+    return Array.isArray(texts) ? translations : translations[0];
 
   } catch (err) {
     if (err.response?.status === 429 && retry > 0) {
-      await sleep(200);
-      return translateText(text, to, from, retry - 1);
+      await sleep(1000);
+      return translateTexts(texts, to, from, retry - 1);
     }
-    console.error("Erreur Azure Translator:", err.response?.data || err.message);
-    return null;
+
+    console.error("Erreur Azure Translator (batch) :", err.response?.data || err.message);
+    return Array.isArray(texts) ? texts.map(() => null) : null;
   }
 };
 
@@ -63,4 +73,4 @@ const getAvailableLanguages = async () => {
 };
 
 
-module.exports = { translateText, getAvailableLanguages };
+module.exports = { translateTexts, getAvailableLanguages };

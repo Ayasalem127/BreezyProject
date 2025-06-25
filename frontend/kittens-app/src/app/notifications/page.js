@@ -7,13 +7,13 @@ import { useState, useEffect } from "react";
 export default function Home() {
   const [translatedTitle, setTranslatedTitle] = useState("Mes notifications");
 
-  const translate = async (text) => {
+  const translate = async (texts) => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 200));
 
-      const res = await axios.post('http://localhost:3001/language/language/translate', {text}, { withCredentials: true });
+      const res = await axios.post('http://localhost:3001/language/language/translate', {texts}, { withCredentials: true });
       console.log(res.data);
-      setTranslatedTitle(res.data.message);
+      setTranslatedTitle(res.data.messages);
 
     } catch (error) {
       console.error("Erreur : ", error);

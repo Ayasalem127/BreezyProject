@@ -11,13 +11,13 @@ export default function ChatSearchbar() {
 
     const [translatedText, setTranslatedText] = useState("Rechercher un utilisateur...");
 
-  const translate = async (text) => {
+  const translate = async (texts) => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 200));
 
-      const res = await axios.post('http://localhost:3001/language/language/translate', {text}, { withCredentials: true });
+      const res = await axios.post('http://localhost:3001/language/language/translate', {texts}, { withCredentials: true });
       console.log(res.data);
-      setTranslatedText(res.data.message);
+      setTranslatedText(res.data.messages);
 
     } catch (error) {
       console.error("Erreur : ", error);

@@ -20,19 +20,13 @@ export default function Messages() {
 
     const translateMany = async (texts) => {
         try {
-            const results = [];
+            const res = await axios.post(
+                'http://localhost:3001/language/language/translate',
+                { texts },
+                { withCredentials: true }
+            );
 
-            for (const text of texts) {
-                const res = await axios.post(
-                    'http://localhost:3001/language/language/translate',
-                    { text },
-                    { withCredentials: true }
-                );
-
-                results.push(res.data.message);
-            }
-
-            setTranslatedTexts(results);
+            setTranslatedTexts(res.data.messages);
         } catch (error) {
             console.error("Erreur de traduction :", error);
         }
@@ -127,7 +121,7 @@ export default function Messages() {
       {posts.map((post, index) => (
         <div key={post._id} className="w-full sm:w-[calc(50%-0.5rem)] p-4 m-4 border border-gray-500 rounded-2xl shadow-2xl">
           <div className="flex items-center justify-between">
-            <span className="font-semibold">Auteur : {authors[post.author] || post.author}</span>
+            <span className="font-semibold">{translatedTexts[1]} : {authors[post.author] || post.author}</span>
             <span className="text-sm text-gray-500">{new Date(post.createdAt).toLocaleString()}</span>
           </div>
 
@@ -135,7 +129,6 @@ export default function Messages() {
             readOnly
             value={post.content}
             rows={3}
-            className="bg-white mt-2 block w-full rounded-md border border-gray-300 p-2"
           />
 
           <div className="flex gap-4 mt-3 text-xl">
@@ -190,13 +183,12 @@ function AddComment({ postId, onCommentAdded }) {
   return (
     <div className="mb-4">
       <textarea
-        className="w-full border p-2 rounded"
         placeholder="Ajouter un commentaire..."
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={2}
       />
-      <button onClick={handleSubmit} className="mt-1 px-3 py-1 bg-green-600 text-white rounded">
+      <button onClick={handleSubmit}>
         {translatedTexts[0]}
       </button>
     </div>

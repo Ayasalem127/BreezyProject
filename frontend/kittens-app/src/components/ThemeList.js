@@ -12,19 +12,13 @@ export default function ThemeList({ onClose, onSelect }) {
 
     const translateMany = async (texts) => {
         try {
-            const results = [];
+            const res = await axios.post(
+                'http://localhost:3001/language/language/translate',
+                { texts },
+                { withCredentials: true }
+            );
 
-            for (const text of texts) {
-                const res = await axios.post(
-                    'http://localhost:3001/language/language/translate',
-                    { text },
-                    { withCredentials: true }
-                );
-
-                results.push(res.data.message);
-            }
-
-            setTranslatedTexts(results);
+            setTranslatedTexts(res.data.messages);
         } catch (error) {
             console.error("Erreur de traduction :", error);
         }

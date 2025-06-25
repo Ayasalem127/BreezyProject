@@ -18,19 +18,13 @@ export default function OtherInformations({ userId }) {
 
     const translateMany = async (texts) => {
         try {
-            const results = [];
+          const res = await axios.post(
+            'http://localhost:3001/language/language/translate',
+            { texts },
+            { withCredentials: true }
+          );
 
-            for (const text of texts) {
-                const res = await axios.post(
-                    'http://localhost:3001/language/language/translate',
-                    { text },
-                    { withCredentials: true }
-                );
-
-                results.push(res.data.message);
-            }
-
-            setTranslatedTexts(results);
+          setTranslatedTexts(res.data.messages);
         } catch (error) {
             console.error("Erreur de traduction :", error);
         }
@@ -105,7 +99,7 @@ console.log("useridddddd",userId);
         <div className="flex items-center justify-center mb-10">
             <div className="w-full sm:w-[calc(50%-0.5rem)] p-2 mt-4 box-border flex flex-col justify-between rounded-lg space-y-2">
 
-                <img src={`http://localhost:3001${profile?.avatarUrl}` || "/avatarcat.jpg"} alt="logo" className="w-50 h-50 object-contain mb-2 rounded-full mx-auto"/>
+                <img src={user?.avatarUrl? `http://localhost:3001${user.avatarUrl}` : "/avatarcat.jpg"} alt="logo" className="w-50 h-50 object-contain mb-2 rounded-full mx-auto"/>
                 <span className="font-semibold">{profile.displayName}</span>
                 <textarea readOnly type="text" id="description" value={profile.bio} className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"/>
 

@@ -18,6 +18,46 @@ export default function UserModerationPanel({ searchText = "" }) {
   const [suspendDuration, setSuspendDuration] = useState("");
   const [suspendUnit, setSuspendUnit] = useState("m");
 
+  const [translatedTexts, setTranslatedTexts] = useState([]);
+
+  const textsToTranslate = [
+  "Modération des utilisateurs",
+  "Chargement...",
+  "Aucun utilisateur trouvé.",
+  "Status",
+  "Suspendre",
+  "Bannir",
+  "Réactiver",
+  "Précédent",
+  "Suivant",
+  "Page",
+  "Durée de la suspension",
+  "Durée",
+  "minutes",
+  "heures",
+  "jours",
+  "Annuler",
+  "Confirmer"
+];
+
+  const translateMany = async (texts) => {
+      try {
+          const res = await axios.post(
+              'http://localhost:3001/language/language/translate',
+              { texts },
+              { withCredentials: true }
+          );
+
+          setTranslatedTexts(res.data.messages);
+      } catch (error) {
+          console.error("Erreur de traduction :", error);
+      }
+  };
+
+  useEffect(() => {
+      translateMany(textsToTranslate);
+  }, []);
+
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -66,16 +106,16 @@ export default function UserModerationPanel({ searchText = "" }) {
 
   return (
     <div className="px-4 py-6">
-      <h2 className="text-2xl font-bold mb-4">Modération des utilisateurs</h2>
+      <h2>{translatedTexts[0]}</h2>
 
       {loading ? (
-        <p>Chargement...</p>
+        <p>{translatedTexts[1]}</p>
       ) : error ? (
         <p className="text-red-500">{error}</p>
       ) : (
         <div className="flex flex-col items-center w-full">
           {filteredUsers.length === 0 ? (
-            <p className="text-gray-500">Aucun utilisateur trouvé.</p>
+            <p className="text-gray-500">{translatedTexts[2]}</p>
           ) : (
             filteredUsers.map((u, index) => (
               <div
@@ -90,7 +130,7 @@ export default function UserModerationPanel({ searchText = "" }) {
                   />
                   <div className="flex-1">
                     <p className="font-semibold">{u.displayName}</p>
-                    <p className="text-sm text-gray-600">Status : {u.status}</p>
+                    <p className="text-sm text-gray-600">{translatedTexts[3]} : {u.status}</p>
                   </div>
                 </div>
 
@@ -102,24 +142,21 @@ export default function UserModerationPanel({ searchText = "" }) {
                           setSelectedUserId(u.userId);
                           setShowSuspendModal(true);
                         }}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
                       >
-                        Suspendre
+                        {translatedTexts[4]}
                       </button>
                       <button
                         onClick={() => updateUserStatus(u.userId, "ban")}
-                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
                       >
-                        Bannir
+                        {translatedTexts[5]}
                       </button>
                     </>
                   )}
                   {(u.status === "suspended" || u.status === "banned") && (
                     <button
                       onClick={() => updateUserStatus(u.userId, "reactivate")}
-                      className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
                     >
-                      Réactiver
+                      {translatedTexts[6]}
                     </button>
                   )}
                 </div>
@@ -134,19 +171,17 @@ export default function UserModerationPanel({ searchText = "" }) {
           <button
             onClick={() => setPage(prev => Math.max(prev - 1, 1))}
             disabled={page === 1}
-            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
           >
-            ← Précédent
+            ← {translatedTexts[7]}
           </button>
           <span className="text-sm font-semibold self-center">
-            Page {page} / {totalPages}
+            {translatedTexts[9]} {page} / {totalPages}
           </span>
           <button
             onClick={() => setPage(prev => Math.min(prev + 1, totalPages))}
             disabled={page === totalPages}
-            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
           >
-            Suivant →
+            {translatedTexts[8]} →
           </button>
         </div>
       )}
@@ -154,14 +189,13 @@ export default function UserModerationPanel({ searchText = "" }) {
       {showSuspendModal && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded shadow-md w-[90%] sm:w-96">
-            <h3 className="text-lg font-bold mb-4">Durée de la suspension</h3>
+            <h3>{translatedTexts[10]}</h3>
             <div className="flex items-center gap-2 mb-4">
               <input
                 type="number"
                 value={suspendDuration}
                 onChange={(e) => setSuspendDuration(e.target.value)}
-                className="border p-2 w-1/2 rounded"
-                placeholder="Durée"
+                placeholder={translatedTexts[11]}
                 min="1"
               />
               <select
@@ -169,9 +203,9 @@ export default function UserModerationPanel({ searchText = "" }) {
                 onChange={(e) => setSuspendUnit(e.target.value)}
                 className="border p-2 rounded"
               >
-                <option value="m">minutes</option>
-                <option value="h">heures</option>
-                <option value="d">jours</option>
+                <option value="m">{translatedTexts[12]}</option>
+                <option value="h">{translatedTexts[13]}</option>
+                <option value="d">{translatedTexts[14]}</option>
               </select>
             </div>
 
@@ -180,7 +214,7 @@ export default function UserModerationPanel({ searchText = "" }) {
                 onClick={() => setShowSuspendModal(false)}
                 className="px-3 py-1 bg-gray-300 rounded"
               >
-                Annuler
+                {translatedTexts[15]}
               </button>
               <button
                 onClick={async () => {
@@ -190,9 +224,8 @@ export default function UserModerationPanel({ searchText = "" }) {
                   setSuspendDuration("");
                   setSuspendUnit("m");
                 }}
-                className="px-3 py-1 bg-yellow-500 text-white rounded"
               >
-                Confirmer
+                {translatedTexts[16]}
               </button>
             </div>
           </div>

@@ -1,18 +1,8 @@
-const { translateText, getAvailableLanguages } = require('../utils/translate');
+const { translateTexts, getAvailableLanguages } = require('../utils/translate');
 const { userExists } = require('../utils/checkUser');
 const { langExists } = require('../utils/checkLang');
 const mongoose = require("mongoose");
 const Language = require("../models/language.model");
-
-/*exports.getWelcomeMessage = async (req, res) => {
-  const { language } = req.body;
-  const msg = "Bienvenue dans notre application !";
-
-  const translated = await translateText(msg, language);
-  if (!translated) return res.status(500).json({ error: "Erreur de traduction" });
-
-  res.status(200).json({ message: translated });
-};*/
 
 exports.createLanguage = async (req, res) => {
     try {
@@ -108,15 +98,16 @@ async function getLanguageByUser (req, res = null) {
 exports.translate = async (req, res) => {
     const to = await getLanguageByUser(req);
     console.log(to);
-    const { text } = req.body;
+    const { texts } = req.body;
 
     try {
-        const translated = await translateText(text, to);
-        if (!translated) {
-            return res.status(500).json({ error: "Erreur de traduction" });
+        const translated = await translateTexts(texts, to);
+
+        if (!translated || translated.includes(null)) {
+            return res.status(500).json({ error: "Une ou plusieurs traductions ont échoué" });
         }
 
-        res.status(200).json({ message: translated });
+        res.status(200).json({ messages: translated });
 
     } catch (error) {
         console.error("Erreur lors de la traduction : ", error);

@@ -10,12 +10,8 @@ export default function UsersSuggestionMobile() {
 
     const [translatedText, setTranslatedText] = useState("Suggestions de suivi");
 
-
-    
-    
-     const { user,setUser } = useContext(AuthContext);
-     const [users, setUsers] = useState([]);
-   
+    const { user,setUser } = useContext(AuthContext);
+    const [users, setUsers] = useState([]);
     
     useEffect(() => {
         axios.get(`http://localhost:3001/user/api/users/suggestions`, { withCredentials: true })
@@ -26,20 +22,13 @@ export default function UsersSuggestionMobile() {
             .catch(err => console.error(err));
     }, [user]);
 
-
-
-
-
-
-
-
-    const translate = async (text) => {
+    const translate = async (texts) => {
         try {
         await new Promise((resolve) => setTimeout(resolve, 200));
         
-        const res = await axios.post('http://localhost:3001/language/language/translate', {text}, { withCredentials: true });
+        const res = await axios.post('http://localhost:3001/language/language/translate', {texts}, { withCredentials: true });
         console.log(res.data);
-        setTranslatedText(res.data.message);
+        setTranslatedText(res.data.messages);
         
         } catch (error) {
         console.error("Erreur : ", error);
@@ -59,8 +48,8 @@ export default function UsersSuggestionMobile() {
                         <Link href={"/otherProfile"}>
                             <div className="p-2 box-border flex flex-row items-center justify-center rounded-lg gap-4">
                                 <img src={user?.avatarUrl
-  ? `http://localhost:3001${user.avatarUrl}`
-  : "/avatarcat.jpg"} alt="photo de profil" className="w-10 h-10 object-contain rounded-full"/>
+                                    ? `http://localhost:3001${user.avatarUrl}`
+                                    : "/avatarcat.jpg"} alt="photo de profil" className="w-10 h-10 object-contain rounded-full"/>
                                 <span className="font-semibold">{user.displayName}</span>
                             </div>
                         </Link>

@@ -7,7 +7,7 @@ import { AuthContext } from "@/context/AuthContext";
 
 export default function Publish() {
     const [content, setContent] = useState("");
-    const photo = "/logo.webp";
+    const photo = "/";
     const { user } = useContext(AuthContext);
 
     const [translatedTexts, setTranslatedTexts] = useState([]);
@@ -56,7 +56,7 @@ export default function Publish() {
     // Calcul de l'avatar
     const avatarUrl = user?.avatarUrl
         ? `http://localhost:3001${user.avatarUrl}`
-        : "/logo.webp";
+        : "/avatarcat.jpg";
 
     return (
         <div className="flex items-center justify-center">

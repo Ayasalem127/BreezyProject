@@ -1,7 +1,8 @@
 'use client';
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "@/context/AuthContext";
 import axios from "axios";
 
 export default function UsersSuggestionMobile() {

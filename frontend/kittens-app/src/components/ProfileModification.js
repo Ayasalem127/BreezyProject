@@ -7,7 +7,7 @@ import { AuthContext } from "@/context/AuthContext";
 
 export default function ProfilModification() {
     // Récupère userId depuis AuthContext
-  const infos = ["username", "/logo.webp", "Description"];
+  const infos = ["username", "/avatarcat.jpg", "Description"];
  const { user,setUser } = useContext(AuthContext);
    useEffect(() => {
    setImage(`http://localhost:3001${user?.avatarUrl}` || infos[1])

@@ -35,7 +35,7 @@ export default function Chat({userId}) {
             {chats.messages.map((chat, index) => {
                 const isMe = chat.authorId === chats.meId;
                 const displayName = isMe ? chats.meDisplayName : chats.otherDisplayName;
-                const avatarUrl = isMe ? chats.meAvatarUrl || "/logo.webp" : chats.otherAvatarUrl || "/logo.webp";
+                const avatarUrl = isMe ? chats.meAvatarUrl || "/avatarcat.jpg" : chats.otherAvatarUrl || "/avatarcat.jpg";
 
                 return (
                     <div key={index} className={`w-full sm:w-[calc(50%-0.5rem)] m-2 flex ${isMe ? "justify-end" : "justify-start"}`}>

@@ -58,9 +58,7 @@ export default function UsersSuggestionPC() {
                           query: { userId: user.userId }
                          }}>
                             <div className="box-border flex flex-row items-center justify-center rounded-lg gap-4">
-                                <img src={user?.avatarUrl
-  ? `http://localhost:3001${user.avatarUrl}`
-  : "/avatarcat.jpg"} alt="photo de profil" className="w-10 h-10 object-contain rounded-full"/>
+                                <img src={user?.avatarUrl? `http://localhost:3001${user.avatarUrl}` : "/avatarcat.jpg"} alt="photo de profil" className="w-10 h-10 object-contain rounded-full"/>
                                 <span className="font-semibold">{user.displayName}</span>
                             </div>
                         </Link>

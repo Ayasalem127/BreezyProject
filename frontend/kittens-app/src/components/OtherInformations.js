@@ -6,7 +6,7 @@ import { AuthContext } from "@/context/AuthContext";
 
 export default function OtherInformations({ userId }) {
     const { user,setUser } = useContext(AuthContext);
-    const infos = ["username", "/logo.webp", "Description"];
+    const infos = ["username", "/avatarcat.jpg", "Description"];
     const [subscribe, setSubscribe] = useState(user?.following?.includes(userId) );
 
     const [profile, setProfile] = useState(null);
@@ -105,7 +105,7 @@ console.log("useridddddd",userId);
         <div className="flex items-center justify-center mb-10">
             <div className="w-full sm:w-[calc(50%-0.5rem)] p-2 mt-4 box-border flex flex-col justify-between rounded-lg space-y-2">
 
-                <img src={`http://localhost:3001${profile?.avatarUrl}`} alt="logo" className="w-50 h-50 object-contain mb-2 rounded-full mx-auto"/>
+                <img src={`http://localhost:3001${profile?.avatarUrl}` || "/avatarcat.jpg"} alt="logo" className="w-50 h-50 object-contain mb-2 rounded-full mx-auto"/>
                 <span className="font-semibold">{profile.displayName}</span>
                 <textarea readOnly type="text" id="description" value={profile.bio} className="bg-white mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"/>
 

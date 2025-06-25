@@ -125,7 +125,7 @@ export default function ConnectionForm() {
           )}
         </div>
 
-        <button type="submit" className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition">
+        <button type="submit">
           Se connecter
         </button>
       </form>

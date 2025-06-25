@@ -195,7 +195,7 @@ export default function MyMessages() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-800 p-5">{translatedTexts[0]}</h2>
+      <h2>{translatedTexts[0]}</h2>
 
       {notification && (
         <p className="text-center text-sm text-green-600 font-semibold">{notification}</p>
@@ -205,7 +205,7 @@ export default function MyMessages() {
         {posts.map((message, index) => (
           <div key={index} className="w-full sm:w-[calc(50%-0.5rem)] p-4 m-4 box-border flex flex-col justify-between border border-gray-500 rounded-2xl shadow-2xl">
             <div className="flex items-center gap-3 w-full">
-              <img src={message.avatarUrl} alt="avatar" className="w-10 h-10 object-contain mb-2 rounded-full" />
+              <img src={message.avatarUrl || "/avatarcat.jpg"} alt="avatar" className="w-10 h-10 object-contain mb-2 rounded-full" />
               <span className="font-semibold">{authors[message.author] || message.author}</span>
               <span className="flex ml-auto text-sm text-gray-500">
                 {new Date(message.createdAt).toLocaleDateString()}
@@ -246,9 +246,7 @@ export default function MyMessages() {
 
             <div className="flex justify-end">
               <button
-                onClick={(e) => handleModification(e, index)}
-                className="px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
+                onClick={(e) => handleModification(e, index)}>
                 {translatedTexts[1]}
               </button>
             </div>
@@ -307,7 +305,7 @@ function AddComment({ postId, translatedTexts,onCommentAdded }) {
         onChange={(e) => setContent(e.target.value)}
         rows={2}
       />
-      <button onClick={handleSubmit} className="mt-1 px-3 py-1 bg-green-600 text-white rounded">
+      <button onClick={handleSubmit}>
         {translatedTexts[2]}
       </button>
     </div>
@@ -388,8 +386,8 @@ function CommentThread({ comment, authors, userId, onLike,translatedTexts  }) {
             onChange={(e) => setEditContent(e.target.value)}
           />
           <div className="mt-1 flex gap-2">
-            <button onClick={handleUpdate} className="px-3 py-1 bg-yellow-600 text-white rounded">{translatedTexts[4]}</button>
-            <button onClick={() => setEditing(false)} className="px-3 py-1 bg-gray-500 text-white rounded">{translatedTexts[5]}</button>
+            <button onClick={handleUpdate}>{translatedTexts[4]}</button>
+            <button onClick={() => setEditing(false)}>{translatedTexts[5]}</button>
           </div>
         </div>
       )}
@@ -416,7 +414,7 @@ function CommentThread({ comment, authors, userId, onLike,translatedTexts  }) {
             onChange={(e) => setReplyContent(e.target.value)}
             placeholder="Votre réponse..."
           />
-          <button className="mt-1 px-3 py-1 bg-blue-600 text-white rounded" onClick={handleReplySubmit}>Valider</button>
+          <button onClick={handleReplySubmit}>Valider</button>
         </div>
       )}
 

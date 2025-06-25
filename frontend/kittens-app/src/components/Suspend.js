@@ -84,7 +84,7 @@ export default function UserModerationPanel({ searchText = "" }) {
               >
                 <div className="flex items-center gap-4">
                   <img
-                    src={`http://localhost:3001${u.avatarUrl || "/default-avatar.png"}`}
+                    src={`http://localhost:3001${u.avatarUrl || "/avatarcat.jpg"}`}
                     alt="avatar"
                     className="w-10 h-10 rounded-full object-cover"
                   />

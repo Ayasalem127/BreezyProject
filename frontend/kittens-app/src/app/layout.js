@@ -38,10 +38,10 @@ export default function RootLayout({ children }) {
 
             {/* ✅ Le reste de l'app */}
               <RedirectIfAuthenticated>
-  <ProtectedRoute>
-    {children}
-  </ProtectedRoute>
-</RedirectIfAuthenticated>
+                <ProtectedRoute>
+                  {children}
+                </ProtectedRoute>
+              </RedirectIfAuthenticated>
 
           </AuthProvider>
         </ToggleProvider>

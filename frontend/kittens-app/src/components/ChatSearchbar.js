@@ -9,6 +9,25 @@ export default function ChatSearchbar() {
     const [users, setUsers] = useState([]);
     const [showResults, setShowResults] = useState(false);
 
+    const [translatedText, setTranslatedText] = useState("Rechercher un utilisateur...");
+
+  const translate = async (text) => {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      const res = await axios.post('http://localhost:3001/language/language/translate', {text}, { withCredentials: true });
+      console.log(res.data);
+      setTranslatedText(res.data.message);
+
+    } catch (error) {
+      console.error("Erreur : ", error);
+    }
+  }
+
+  useEffect(() => {
+    translate("Rechercher un utilisateur...");
+  }, []);
+
     function handleChange(e) {
         const text = e.target.value;
         setSearchText(text);
@@ -53,7 +72,7 @@ export default function ChatSearchbar() {
                 value={searchText}
                 onChange={handleChange}
                 className="bg-white mt-1 !pl-10 block w-full rounded-xl border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
-                placeholder="Rechercher un utilisateur"
+                placeholder={translatedText}
                 />
 
                 {showResults && users.length > 0 && (

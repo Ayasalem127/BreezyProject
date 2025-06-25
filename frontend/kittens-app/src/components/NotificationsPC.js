@@ -7,6 +7,33 @@ import { useToggleTargetComponent } from "@/context/ToggleTargetComponentContext
 export default function NotificationsPC() {
   const { visible } = useToggleTargetComponent();
   const [notifications, setNotifications] = useState([]);
+  const [translatedTexts, setTranslatedTexts] = useState([]);
+
+  const textsToTranslate = ["a liké votre post.", "a liké votre commentaire.", "a commenté votre post.", "a répondu à votre commentaire.", "vous a mentioné.", "a commencé à vous suivre.", "vous a notifié.", "Aucune notification."];
+
+  const translateMany = async (texts) => {
+      try {
+          const results = [];
+
+          for (const text of texts) {
+              const res = await axios.post(
+                  'http://localhost:3001/language/language/translate',
+                  { text },
+                  { withCredentials: true }
+              );
+
+              results.push(res.data.message);
+          }
+
+          setTranslatedTexts(results);
+      } catch (error) {
+          console.error("Erreur de traduction :", error);
+      }
+  };
+
+  useEffect(() => {
+      translateMany(textsToTranslate);
+  }, []);
 
   useEffect(() => {
     if (!visible) return;
@@ -52,19 +79,19 @@ export default function NotificationsPC() {
   const formatNotificationMessage = (notif) => {
     switch (notif.type) {
       case "like_post":
-        return "a liké votre post";
+        return translatedTexts[0];
       case "like_comment":
-        return "a liké votre commentaire";
+        return translatedTexts[1];
       case "comment_post":
-        return "a commenté votre post";
+        return translatedTexts[2];
       case "comment_reply":
-        return "a répondu à votre commentaire";
+        return translatedTexts[3];
       case "mention":
-        return "vous a mentionné";
+        return translatedTexts[4];
       case "follow":
-        return "a commencé à vous suivre";
+        return translatedTexts[5];
       default:
-        return notif.message || "vous a notifié";
+        return notif.message || translatedTexts[6];
     }
   };
 
@@ -91,7 +118,7 @@ export default function NotificationsPC() {
   return (
     <div className="fixed top-12 right-4 w-80 bg-white shadow-lg p-4 rounded-xl z-50 max-h-[60vh] overflow-y-auto">
       {notifications.length === 0 ? (
-        <p className="text-gray-500 text-sm">Aucune notification</p>
+        <p className="text-gray-500 text-sm">{translatedTexts[7]}</p>
       ) : (
         notifications.map((notif) => (
           <div key={notif._id} className="border p-2 rounded mb-2">

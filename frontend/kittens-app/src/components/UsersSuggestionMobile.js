@@ -5,9 +5,32 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 export default function UsersSuggestionMobile() {
-    const users = [["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"]];
+    //const users = [["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"], ["username", "/logo.webp"]];
 
     const [translatedText, setTranslatedText] = useState("Suggestions de suivi");
+
+
+    
+    
+     const { user,setUser } = useContext(AuthContext);
+     const [users, setUsers] = useState([]);
+   
+    
+    useEffect(() => {
+        axios.get(`http://localhost:3001/user/api/users/suggestions`, { withCredentials: true })
+            .then(res => {
+                setUsers(res.data);
+               
+            })
+            .catch(err => console.error(err));
+    }, [user]);
+
+
+
+
+
+
+
 
     const translate = async (text) => {
         try {

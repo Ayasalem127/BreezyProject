@@ -4,7 +4,7 @@ import ThemeList from "./ThemeList";
 import LanguagesList from "./LanguagesList";
 import { useToggleTargetComponent } from "@/context/ToggleTargetComponentContext";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AuthContext } from "@/context/AuthContext";
 import { useContext } from "react";
@@ -19,6 +19,11 @@ export default function Navbar() {
 
   const photo = "/avatarcat.jpg";
   const { user,setUser } = useContext(AuthContext); 
+    useEffect(() => {
+    axios.get('http://localhost:3001/user/api/users/me', { withCredentials: true })
+      .then(res => setUser(res.data))
+      .catch(() => setUser(null));
+  }, []);
     const handleLogout = async () => {
     try {
       await axios.post("http://localhost:3001/auth/auth/logout", {}, { withCredentials: true });

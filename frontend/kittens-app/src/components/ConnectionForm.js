@@ -10,7 +10,7 @@ import PopupWrongCredentials from "./PopupWrongCredentials";
 
 export default function ConnectionForm() {
   const router = useRouter();
-  const { setUser } = useContext(AuthContext);
+  const { user,setUser } = useContext(AuthContext);
 
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState(true);
@@ -41,7 +41,6 @@ export default function ConnectionForm() {
       setShowPopupEmpty(true);
       return;
     }
-
     try {
       const res = await axios.post(
         'http://localhost:3001/auth/auth/login',
@@ -53,6 +52,11 @@ export default function ConnectionForm() {
       if (!user) {
         throw new Error("Utilisateur manquant dans la réponse");
       }
+      console.log("uuuuuuuuuuuuu",user);
+    setUser(user);
+setTimeout(() => {
+  router.push('/home');
+}, 100);
 
       // 🚫 Bloquer l’accès si suspendu ou banni
       if (user.status === "suspended" || user.status === "banned") {
@@ -61,9 +65,10 @@ export default function ConnectionForm() {
         await axios.post("http://localhost:3001/auth/auth/logout", {}, { withCredentials: true });
         return;
       }
-
-      setUser(user);
-      router.push("/home");
+setUser(user);
+setTimeout(() => {
+  router.push('/home');
+}, 100);
 
     } catch (error) {
       console.error("Erreur : ", error);

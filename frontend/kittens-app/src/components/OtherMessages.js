@@ -224,6 +224,7 @@ export default function OtherMessages({ userId }) {
               <div className="mt-4 space-y-4">
                 <AddComment
                   postId={post._id}
+                  translatedTexts={translatedTexts}
                   onCommentAdded={(newComment) => {
                     setCommentsByPost(prev => ({
                       ...prev,
@@ -232,7 +233,7 @@ export default function OtherMessages({ userId }) {
                   }}
                 />
                 {commentsByPost[post._id]?.map(comment => (
-                  <CommentThread key={comment._id} comment={comment} authors={authors} viewerId={viewerId} />
+                  <CommentThread key={comment._id} comment={comment} authors={authors} viewerId={viewerId} translatedTexts={translatedTexts} />
                 ))}
               </div>
             )}
@@ -243,7 +244,7 @@ export default function OtherMessages({ userId }) {
   );
 }
 
-function AddComment({ postId, onCommentAdded }) {
+function AddComment({ postId, translatedTexts, onCommentAdded }) {
   const [content, setContent] = useState("");
 
   const handleSubmit = async () => {
@@ -274,7 +275,7 @@ function AddComment({ postId, onCommentAdded }) {
   );
 }
 
-function CommentThread({ comment, authors, viewerId }) {
+function CommentThread({ comment, authors, viewerId, translatedTexts }) {
   const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
   const [replies, setReplies] = useState(comment.replies || []);
@@ -353,7 +354,7 @@ function CommentThread({ comment, authors, viewerId }) {
       {replies.length > 0 && (
         <div className="mt-3 space-y-2">
           {replies.map(reply => (
-            <CommentThread key={reply._id} comment={reply} authors={authors} viewerId={viewerId} />
+            <CommentThread key={reply._id} comment={reply} authors={authors} viewerId={viewerId} translatedTexts={translatedTexts} />
           ))}
         </div>
       )}

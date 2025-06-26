@@ -324,7 +324,7 @@ function CommentThread({ comment, authors, translatedTexts }) {
       {replies?.length > 0 && (
         <div className="mt-2">
           {replies.map((reply) => (
-            <CommentThread key={reply._id} comment={reply} authors={authors} />
+            <CommentThread key={reply._id} comment={reply} authors={authors} translatedTexts={translatedTexts} />
           ))}
 
         </div>

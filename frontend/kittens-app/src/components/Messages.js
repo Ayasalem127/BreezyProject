@@ -146,6 +146,7 @@ export default function Messages() {
             <div className="mt-4 space-y-4">
               <AddComment
                 postId={post._id}
+                translatedTexts={translatedTexts}
                 onCommentAdded={(newComment) => {
                   setCommentsByPost(prev => ({
                     ...prev,
@@ -154,7 +155,7 @@ export default function Messages() {
                 }}
               />
               {commentsByPost[post._id]?.map(comment => (
-                <CommentThread key={comment._id} comment={comment} authors={authors} />
+                <CommentThread key={comment._id} comment={comment} authors={authors} translatedTexts={translatedTexts} />
               ))}
             </div>
           )}
@@ -164,7 +165,7 @@ export default function Messages() {
   );
 }
 
-function AddComment({ postId, onCommentAdded }) {
+function AddComment({ postId, onCommentAdded, translatedTexts }) {
   const [content, setContent] = useState("");
 
   const handleSubmit = async () => {
@@ -195,7 +196,7 @@ function AddComment({ postId, onCommentAdded }) {
   );
 }
 
-function CommentThread({ comment, authors }) {
+function CommentThread({ comment, authors, translatedTexts }) {
   const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
   const [showReplyBox, setShowReplyBox] = useState(false);

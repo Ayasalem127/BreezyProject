@@ -16,7 +16,7 @@ export default function Messages() {
 
     const [translatedTexts, setTranslatedTexts] = useState([]);
 
-    const textsToTranslate = ["Publier", "Auteur", "Valider", "Annuler", "Répondre"];
+    const textsToTranslate = ["Publier", "Auteur", "Valider", "Annuler", "Répondre", "Ajouter un commentaire..."];
 
     const translateMany = async (texts) => {
         try {
@@ -183,7 +183,7 @@ function AddComment({ postId, onCommentAdded }) {
   return (
     <div className="mb-4">
       <textarea
-        placeholder="Ajouter un commentaire..."
+        placeholder={translatedTexts[5]}
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={2}

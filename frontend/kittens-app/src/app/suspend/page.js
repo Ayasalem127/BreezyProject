@@ -5,7 +5,8 @@ import Suspend from "@/components/Suspend";
 import UsersSuggestionMobile from "@/components/UsersSuggestionMobile";
 
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 
 export default function Home() {

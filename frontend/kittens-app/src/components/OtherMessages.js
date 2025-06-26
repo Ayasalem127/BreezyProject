@@ -91,7 +91,7 @@ export default function OtherMessages({ userId }) {
   
   const [translatedTexts, setTranslatedTexts] = useState([]);
 
-    const textsToTranslate = ["Message de ", "Aucun message trouvé.", "Auteur", "Publier", "Répondre", "Valider"];
+    const textsToTranslate = ["Message de ", "Aucun message trouvé.", "Auteur", "Publier", "Répondre", "Valider", "Laisse parler ton coeur..."];
 
     const translateMany = async (texts) => {
         try {
@@ -262,13 +262,13 @@ function AddComment({ postId, onCommentAdded }) {
     <div className="mb-4">
       <textarea
         className="w-full border p-2 rounded"
-        placeholder="Ajouter un commentaire..."
+        placeholder={translatedTexts[6] || "Laisse parler ton coeur..."}
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={2}
       />
       <button onClick={handleSubmit} className="mt-1 px-3 py-1 bg-green-600 text-white rounded">
-        {translatedTexts[3]}
+        {translatedTexts[3] || "Publier"}
       </button>
     </div>
   );

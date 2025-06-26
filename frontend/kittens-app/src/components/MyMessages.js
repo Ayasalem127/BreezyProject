@@ -275,7 +275,7 @@ export default function MyMessages() {
   );
 }
 
-function AddComment({ postId, translatedTexts,onCommentAdded }) {
+function AddComment({ postId, translatedTexts, onCommentAdded }) {
   const [content, setContent] = useState("");
 
   const handleSubmit = async () => {
@@ -294,7 +294,7 @@ function AddComment({ postId, translatedTexts,onCommentAdded }) {
     <div className="mb-4">
       <textarea
         className="w-full border p-2 rounded"
-        placeholder={translatedTexts[7]}
+        placeholder={translatedTexts[7] || "Laisse parler ton coeur..."}
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={2}
@@ -406,7 +406,7 @@ function CommentThread({ comment, authors, userId, onLike,translatedTexts  }) {
             rows={2}
             value={replyContent}
             onChange={(e) => setReplyContent(e.target.value)}
-            placeholder={translatedTexts[7]}
+            placeholder={translatedTexts[7] || "Laisse parler ton coeur..."}
           />
           <button onClick={handleReplySubmit}>Valider</button>
         </div>

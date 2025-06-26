@@ -29,6 +29,7 @@ export default function MyInformations() {
     }
 
     useEffect(() => {
+        
         translate("Modifier mon profil");
     }, []);
 
@@ -44,7 +45,7 @@ export default function MyInformations() {
         <div className="flex items-center justify-center">
             <div className="w-full sm:w-[calc(50%-0.5rem)] p-2 mt-4 box-border flex flex-col justify-between rounded-lg space-y-2">
                 <img src={infos[1]} alt="logo" className="w-50 h-50 object-contain mb-2 rounded-full mx-auto"/>
-                <span className="font-semibold">{infos[0]}</span>
+                <span className="font-semibold">{user?.displayName}</span>
                 <textarea readOnly type="text" id="description" value={infos[2]} className="focus:border-blue-500 focus:outline-none"/>
                 <button onClick={handleModification}>{translatedText}</button>
             </div>
